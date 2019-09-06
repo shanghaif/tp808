@@ -33,9 +33,9 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
          * @param authCode  成功之后返回鉴权码，失败返回 对应原因
          * */
         void registerResp(int result, String authCode) ;       //  注册应答，返回鉴权码
-        void authResp(String authCode) ;           //  鉴权
-        void heartResp() ;          //  心跳
-        void gpsResp() ;            //  GPS 数据
+        void authResp(int result, String reason) ;           //  鉴权
+        void heartResp(int result, String reason) ;          //  心跳
+        void gpsResp(int result, String reason) ;            //  GPS 数据
         void defaultResp(PacketData packetData, String errorMsg, int replyCode) ;       //  未加应答码
         void onConnect(int i) ;          //  是否连接
         void onDisConnect() ;
@@ -212,7 +212,11 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
     }
 
     public void close(){
-        udpClient.close();
+        if (isOpenUdp){
+            udpClient.close();
+        }else
+            tcpClient.close();
+
     }
 
     public boolean isConnected(){
@@ -462,7 +466,7 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
 //            }
 
             SocketClientSender.sendHB(false, false);
-            listener.heartResp();
+//            listener.heartResp();
 
         }
 
@@ -544,7 +548,16 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
                         if (isUpd){
                             setUdpLastHbDt();
                         }else setTcpLastHbDt();
-                        listener.commomResp(generalResult, ResponseReason.getInstance().GENERALRESULT[generalResult], packetData);
+
+                        if (Constants.TERMINAL_LOCATION_UPLOAD == ((ServerGeneralMsg) packetData).getAnswerId()){
+                            listener.gpsResp(generalResult, ResponseReason.getInstance().GENERALRESULT[generalResult]);
+                        }else if (Constants.TERMINAL_HEART_BEAT == ((ServerGeneralMsg) packetData).getAnswerId()){
+                            listener.heartResp(generalResult, ResponseReason.getInstance().GENERALRESULT[generalResult]);
+                        }else if (Constants.TERMINAL_AUTHEN == ((ServerGeneralMsg) packetData).getAnswerId()){
+                            listener.authResp(generalResult, ResponseReason.getInstance().GENERALRESULT[generalResult]);
+                        }else {
+                            listener.commomResp(generalResult, ResponseReason.getInstance().GENERALRESULT[generalResult], packetData);
+                        }
                         Log.d("cjh", "----------------------平台通用应答-------- OnDispathCmd " +
                                 "--------------46------------\n packetData -"+packetData+
                                 "\n 应答流水号((ServerGeneralMsg) packetData).getSerialNumber():"+((ServerGeneralMsg) packetData).getSerialNumber()+

@@ -116,12 +116,12 @@ public class Constants {
     public static final int UDPRECONNECT_TIMEOUT = 5 ;       //  重连超时次数
 
     public static final int TCPTHREAD_TIMEOUT = 30 * MILLISECONDSTOSECONDS ;     //  sec
-    public static final int TCPTHREAD_SO_TIMEOUT = 120 * MILLISECONDSTOSECONDS ;     //  sec
+    public static final int TCPTHREAD_SO_TIMEOUT = 2 * 61 * MILLISECONDSTOSECONDS ;     //  2 min 3 sec
     public static final int TCPTHREAD_SLEEPIME = 1 * MILLISECONDSTOSECONDS ;     //  sec
     public static final int TCPRECONNECT_TIMEOUT = 5 ;       //  重连超时次数
 
     public static final int HBOPENTHREAD_SLEEPIME = 1 * MILLISECONDSTOSECONDS ;     //  sec
-    public static final int HBTHREAD_SLEEPIME = 3 * 60 * MILLISECONDSTOSECONDS ;     //  3分钟
+    public static final int HBTHREAD_SLEEPIME = 3 * 60 * MILLISECONDSTOSECONDS ;     //  3 分钟
 
     public static final int HBTHREAD_TOMEOUT = 10 * MILLISECONDSTOSECONDS;           //  心跳间隔多少秒为超时
 

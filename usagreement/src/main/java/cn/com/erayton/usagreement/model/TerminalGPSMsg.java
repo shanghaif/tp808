@@ -48,39 +48,18 @@ public class TerminalGPSMsg extends PacketData {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
             //32 位二进制 从高到低位
-            Decoder4LoggingOnly decoder4LoggingOnly = new Decoder4LoggingOnly() ;
-            byte[] warningMark =bitOperator.integerTo4Bytes(Integer.parseInt(String.valueOf(terminalGPSInfo.getWarningMark()), 2)) ;
-//            decoder4LoggingOnly.decodeHex(warningMark);
-            baos.write(warningMark);
-            byte[] state = bitOperator.integerTo4Bytes(Integer.parseInt(String.valueOf(terminalGPSInfo.getState()), 2));
-//            decoder4LoggingOnly.decodeHex(state);
-            baos.write(state);
-//            byte[] latitue = bitOperator.longToDword(terminalGPSInfo.getLatitude());
-            byte[] latitue = bitOperator.longToBytes(terminalGPSInfo.getLatitude(), 4);
-//            baos.write(bitOperator.integerTo4Bytes(Integer.parseInt(String.valueOf(terminalGPSInfo.getWarningMark()), 2)));
-//            baos.write(bitOperator.integerTo4Bytes(Integer.parseInt(String.valueOf(terminalGPSInfo.getState()), 2)));
-            Log.d(TAG, "terminalGPSInfo.getLatitude()"+terminalGPSInfo.getLatitude()) ;
-            decoder4LoggingOnly.decodeHex(latitue);
-            baos.write(latitue);
-//            byte[] longitude = bitOperator.longToDword(terminalGPSInfo.getLongitude());
-            byte[] longitude = bitOperator.longToBytes(terminalGPSInfo.getLongitude(), 4);
-            Log.d(TAG, "terminalGPSInfo.getLongitude()"+terminalGPSInfo.getLongitude()) ;
-             decoder4LoggingOnly.decodeHex(longitude);
-            baos.write(longitude);
-            byte[] altitude = bitOperator.integerTo2Bytes(terminalGPSInfo.getAltitude());
-//             decoder4LoggingOnly.decodeHex(altitude);
-            baos.write(altitude);
-//            byte[] speed =  bitOperator.byte2Float(terminalGPSInfo.getSpeed());
-            byte[] speed =  bitOperator.integerTo2Bytes(terminalGPSInfo.getSpeed());
-            // decoder4LoggingOnly.decodeHex(speed);
-            baos.write(speed);
-            byte[] girection =  bitOperator.integerTo2Bytes(terminalGPSInfo.getDirection());
-            // decoder4LoggingOnly.decodeHex(girection);
-            baos.write(girection);
-            byte[] bcdtime =  BCD8421Operator.getInstance().getBCDTime();
-            // decoder4LoggingOnly.decodeHex(bcdtime);
-            baos.write(bcdtime);
-
+            baos.write(bitOperator.integerTo4Bytes(Integer.parseInt(String.valueOf(terminalGPSInfo.getWarningMark()), 2)));
+            baos.write(bitOperator.integerTo4Bytes(Integer.parseInt(String.valueOf(terminalGPSInfo.getState()), 2)));
+            baos.write(bitOperator.longToBytes(terminalGPSInfo.getLatitude(), 4));
+            baos.write(bitOperator.longToBytes(terminalGPSInfo.getLongitude(), 4));
+            baos.write(bitOperator.integerTo2Bytes(terminalGPSInfo.getAltitude()));
+            baos.write(bitOperator.integerTo2Bytes(terminalGPSInfo.getSpeed()));
+            baos.write(bitOperator.integerTo2Bytes(terminalGPSInfo.getDirection()));
+            baos.write(BCD8421Operator.getInstance().getBCDTime());
+            baos.write(bitOperator.integerTo1Bytes(terminalGPSInfo.getAdditionalInformationId()));
+            baos.write(bitOperator.integerTo1Bytes(terminalGPSInfo.getAdditionalInformationLength()));
+            baos.write(bitOperator.integerTo4Bytes(terminalGPSInfo.getMileage()));
+            //  位置信息附加项
 
 //            long lat = 22581626 ;
 //            long lng = 113918790 ;
@@ -138,8 +117,12 @@ public class TerminalGPSMsg extends PacketData {
         private byte[] BCDTime ;
 //        位置附加信息
 //        附加信息 ID
+        private int additionalInformationId ;
 //        private byte[] fid= new byte[6] ;
 //        附加信息长度
+        private int additionalInformationLength ;
+        // 里程
+        private int mileage ;
 
 
         public int getWarningMark() {
@@ -206,17 +189,44 @@ public class TerminalGPSMsg extends PacketData {
             this.BCDTime = BCDTime;
         }
 
+        public int getAdditionalInformationId() {
+            return additionalInformationId;
+        }
+
+        public void setAdditionalInformationId(int additionalInformationId) {
+            this.additionalInformationId = additionalInformationId;
+        }
+
+        public int getAdditionalInformationLength() {
+            return additionalInformationLength;
+        }
+
+        public void setAdditionalInformationLength(int additionalInformationLength) {
+            this.additionalInformationLength = additionalInformationLength;
+        }
+
+        public int getMileage() {
+            return mileage;
+        }
+
+        public void setMileage(int mileage) {
+            this.mileage = mileage;
+        }
+
         @Override
         public String toString() {
             return "TerminalGPSInfo{" +
-                    "warningMark='" + warningMark + '\'' +
-                    ", state='" + state + '\'' +
+                    "warningMark=" + warningMark +
+                    ", state=" + state +
                     ", latitude=" + latitude +
                     ", longitude=" + longitude +
                     ", altitude=" + altitude +
-                    ", speed='" + speed + '\'' +
+                    ", speed=" + speed +
                     ", direction=" + direction +
                     ", BCDTime=" + Arrays.toString(BCDTime) +
+                    ", additionalInformationId=" + additionalInformationId +
+                    ", additionalInformationLength=" + additionalInformationLength +
+                    ", mileage=" + mileage +
                     '}';
         }
     }

@@ -214,7 +214,7 @@ public class TCPClient implements Runnable {
             }
             catch (SocketTimeoutException e) {
                 e.printStackTrace();
-                continue;
+//                continue;     //  跳过此异常
             }
             catch (SocketException e) {
                 e.printStackTrace();

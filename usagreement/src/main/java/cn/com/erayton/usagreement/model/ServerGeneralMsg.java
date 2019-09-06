@@ -3,6 +3,7 @@ package cn.com.erayton.usagreement.model;
 import android.util.Log;
 
 import cn.com.erayton.usagreement.utils.BitOperator;
+import cn.com.erayton.usagreement.utils.Decoder4LoggingOnly;
 
 public class ServerGeneralMsg extends PacketData{
     private static final String TAG = "ServerGeneralMsg";
@@ -43,6 +44,7 @@ public class ServerGeneralMsg extends PacketData{
 
     @Override
     public void inflatePackageBody(byte[] data) {
+        Decoder4LoggingOnly decoder4LoggingOnly = new Decoder4LoggingOnly() ;
 
         int msgBodyLength = getMsgHeader().getMsgBodyLength();
         Log.e(TAG, "inflatePackageBody_msgBodyLength: " + msgBodyLength);
@@ -58,7 +60,21 @@ public class ServerGeneralMsg extends PacketData{
         setAnswerFlowId(bitOperator.parseIntFromBytes(tmp, 0, 2));
 //        Log.d(TAG, "应答流水 --bitOperator.parseIntFromBytes(tmp, 2, 2)"+bitOperator.parseIntFromBytes(tmp, 0, 2)) ;
         setSerialNumber(bitOperator.parseIntFromBytes(tmp, 0, 2));
+//        Log.d(TAG, "应答ID --bitOperator.parseIntFromBytes(tmp, 0, 1)"+bitOperator.parseIntFromBytes(tmp, 0, 1)) ;
+//        Log.d(TAG, "应答ID --bitOperator.parseIntFromBytes(tmp, 0, 2)"+bitOperator.parseIntFromBytes(tmp, 0, 2)) ;
+//        Log.d(TAG, "应答ID --bitOperator.parseIntFromBytes(tmp, 0, 3)"+bitOperator.parseIntFromBytes(tmp, 0, 3)) ;
+//        Log.d(TAG, "应答ID --bitOperator.parseIntFromBytes(tmp, 0, 4)"+bitOperator.parseIntFromBytes(tmp, 0, 4)) ;
+//        Log.d(TAG, "应答ID --bitOperator.parseIntFromBytes(tmp, 0, 5)"+bitOperator.parseIntFromBytes(tmp, 0, 5)) ;
+//        Log.d(TAG, "应答ID --bitOperator.parseIntFromBytes(tmp, 1, 1)"+bitOperator.parseIntFromBytes(tmp, 1, 1)) ;
+//        Log.d(TAG, "应答ID --bitOperator.parseIntFromBytes(tmp, 1, 2)"+bitOperator.parseIntFromBytes(tmp, 1, 2)) ;
+//        Log.d(TAG, "应答ID --bitOperator.parseIntFromBytes(tmp, 1, 3)"+bitOperator.parseIntFromBytes(tmp, 1, 3)) ;
+//        Log.d(TAG, "应答ID --bitOperator.parseIntFromBytes(tmp, 1, 4)"+bitOperator.parseIntFromBytes(tmp, 1, 4)) ;
+//        Log.d(TAG, "应答ID --bitOperator.parseIntFromBytes(tmp, 2, 1)"+bitOperator.parseIntFromBytes(tmp, 2, 1)) ;
 //        Log.d(TAG, "应答ID --bitOperator.parseIntFromBytes(tmp, 2, 2)"+bitOperator.parseIntFromBytes(tmp, 2, 2)) ;
+//        Log.d(TAG, "应答ID --bitOperator.parseIntFromBytes(tmp, 2, 3)"+bitOperator.parseIntFromBytes(tmp, 2, 3)) ;
+//        Log.d(TAG, "应答ID --bitOperator.parseIntFromBytes(tmp, 3, 1)"+bitOperator.parseIntFromBytes(tmp, 3, 1)) ;
+//        Log.d(TAG, "应答ID --bitOperator.parseIntFromBytes(tmp, 3, 2)"+bitOperator.parseIntFromBytes(tmp, 3, 2)) ;
+//        Log.d(TAG, "应答ID --bitOperator.parseIntFromBytes(tmp, 4, 1)"+bitOperator.parseIntFromBytes(tmp, 4, 1)) ;
         setAnswerId(bitOperator.parseIntFromBytes(tmp, 2, 2));
         setResult(bitOperator.parseIntFromBytes(tmp, 4, 1));
 //        setAuthentication(new String(tmp, 3, tmp.length - 3));
