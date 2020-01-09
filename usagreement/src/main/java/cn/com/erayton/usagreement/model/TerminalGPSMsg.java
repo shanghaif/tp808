@@ -49,7 +49,10 @@ public class TerminalGPSMsg extends PacketData {
         try {
             //32 位二进制 从高到低位
             baos.write(bitOperator.integerTo4Bytes(Integer.parseInt(String.valueOf(terminalGPSInfo.getWarningMark()), 2)));
-            baos.write(bitOperator.integerTo4Bytes(Integer.parseInt(String.valueOf(terminalGPSInfo.getState()), 2)));
+//            String radix2State = "00000000000000000000000000000010";
+            baos.write(bitOperator.integerTo4Bytes(Integer.parseInt(terminalGPSInfo.getState(), 2)));
+//            baos.write(bitOperator.integerTo4Bytes(Integer.parseInt(String.valueOf(terminalGPSInfo.getState()), 2)));
+//            baos.write(bitOperator.integerTo4Bytes(Integer.parseInt(radix2State, 2)));
             baos.write(bitOperator.longToBytes(terminalGPSInfo.getLatitude(), 4));
             baos.write(bitOperator.longToBytes(terminalGPSInfo.getLongitude(), 4));
             baos.write(bitOperator.integerTo2Bytes(terminalGPSInfo.getAltitude()));
@@ -102,7 +105,8 @@ public class TerminalGPSMsg extends PacketData {
 //        报警标志[4]   报警标志位定义         DWORD
         private int warningMark;
 //        状态[4]     状态位定义               DWORD
-        private int state;
+        private String state;
+//        private int state;
 //        纬度[4]     以度为单位的纬度值乘以 10 的 6 次方，精确到百万分之一度     DWORD
         private long latitude;
 //        经度[4]     以度为单位的经度值乘以 10 的 6 次方，精确到百万分之一度     DWORD
@@ -133,13 +137,21 @@ public class TerminalGPSMsg extends PacketData {
             this.warningMark = warningMark;
         }
 
-        public int getState() {
+        public String getState() {
             return state;
         }
 
-        public void setState(int state) {
+        public void setState(String state) {
             this.state = state;
         }
+
+//        public int getState() {
+//            return state;
+//        }
+//
+//        public void setState(int state) {
+//            this.state = state;
+//        }
 
         public long getLatitude() {
             return latitude;
@@ -170,7 +182,7 @@ public class TerminalGPSMsg extends PacketData {
         }
 
         public void setSpeed(int speed) {
-            this.speed = speed;
+            this.speed = speed*10;
         }
 
         public int getDirection() {

@@ -4,6 +4,9 @@ package cn.com.erayton.usagreement.model;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+/**
+ * 鉴权
+ * */
 public class TerminalAuthMsg extends PacketData {
 
     private TerminalAuthInfo terminalAuthInfo ;

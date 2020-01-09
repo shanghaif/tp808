@@ -1,6 +1,7 @@
 package cn.com.erayton.usagreement.model;
 
 import android.util.Log;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
@@ -10,10 +11,11 @@ import cn.com.erayton.usagreement.utils.BitOperator;
 
 /**
  * 终端注册消息
+ * 服务器注册消息返回类, 返回鉴权码
  *
- * @author hylexus
+ * @author android
  */
-public class TerminalRegisterMsg extends PacketData {
+public class RegisterMsg extends PacketData {
     private static final String TAG = "TerminalRegisterMsg";
 
     private int registerResult;
@@ -22,7 +24,7 @@ public class TerminalRegisterMsg extends PacketData {
     private TerminalRegInfo terminalRegInfo;
 
 
-    public TerminalRegisterMsg() {
+    public RegisterMsg() {
 
     }
 
@@ -73,10 +75,12 @@ public class TerminalRegisterMsg extends PacketData {
     @Override
     public int getBodyLength() {
         byte[] bytes = packageDataBody2Byte();
-        Log.e(TAG, "getBodyLength: " + bytes.length);
         return bytes.length;
     }
 
+    /**
+     * Terminal
+     * */
     @Override
     public void inflatePackageBody(byte[] data) {
         int msgBodyLength = getMsgHeader().getMsgBodyLength();
@@ -96,8 +100,10 @@ public class TerminalRegisterMsg extends PacketData {
     }
 
 
+    /**
+     * Server
+     * */
     public byte[] packageDataBody2Byte() {
-
         BitOperator bitOperator = BitOperator.getInstance();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {

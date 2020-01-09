@@ -1,23 +1,27 @@
 package cn.com.erayton.usagreement.socket.client;
 
-import android.util.Log;
-
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-
 import cn.com.erayton.usagreement.data.Constants;
 import cn.com.erayton.usagreement.data.ResponseReason;
 import cn.com.erayton.usagreement.model.PacketData;
+import cn.com.erayton.usagreement.model.ServerAVTranslateMsg;
 import cn.com.erayton.usagreement.model.ServerGeneralMsg;
+import cn.com.erayton.usagreement.model.ServerParametersMsg;
 import cn.com.erayton.usagreement.model.ServerRegisterMsg;
 import cn.com.erayton.usagreement.socket.core.TCPClient;
 import cn.com.erayton.usagreement.socket.core.UDPClient;
 import cn.com.erayton.usagreement.utils.BitOperator;
 import cn.com.erayton.usagreement.utils.Decoder4LoggingOnly;
+import cn.com.erayton.usagreement.utils.HexStringUtils;
+import cn.com.erayton.usagreement.utils.LogUtils;
 import cn.com.erayton.usagreement.utils.MsgTransformer;
 import cn.com.erayton.usagreement.utils.Utils;
 
+/**
+ * TCP 连接
+ * */
 public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPClientListener, Runnable {
     public interface SocketClientListener{
 //        0：成功/确认；1：失败；2：消息有误；3：不支持；4：报警处理确认；
@@ -40,7 +44,10 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
         void onConnect(int i) ;          //  是否连接
         void onDisConnect() ;
         void onSend(byte[] data, boolean result) ;
-
+        //        设置终端参数
+        void onTernimalParameterSetting(ServerParametersMsg packetData) ;
+        void queryTernimalParameterSetting(int serNum) ;
+        void onTernimalAVTranslate(ServerAVTranslateMsg packetData) ;
     }
 
 
@@ -48,7 +55,6 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
     private Thread hBThread = new Thread(this) ;                    //  心跳发送线程，登陆成功之后发送
     private boolean isHBThread = false ;                                   //   心跳线程是否已启用
 
-    private static final String TAG = SocketClient.class.getSimpleName();
     private BitOperator bitOperator;
     private UDPClient udpClient = new UDPClient() ;
     private TCPClient tcpClient = new TCPClient() ;
@@ -78,7 +84,7 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
     public long getTcpLastHbDt() {synchronized (tcpLastHbDtLock){
         return tcpLastHbDt;
     }}
-    public void setTcpLastHbDt() {synchronized (tcpLastHbDtLock){
+    public void updateTcpLastHbDt() {synchronized (tcpLastHbDtLock){
         tcpLastHbDt = System.currentTimeMillis();
     }}
 
@@ -137,6 +143,7 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
         udpTimeOutCount ++;
     }}
 
+
     private boolean isOpenHB = false ;            //  是否开启心跳
     private Object isOpenHBLock = new Object() ;
     public boolean getIsOpenHB() {synchronized (isOpenHBLock){
@@ -146,7 +153,7 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
         this.isOpenHB = isOpenHB;
     }}
 
-    private long hBInterval = 30 ;            //  心跳时间间隔
+    private long hBInterval = 90 ;            //  心跳时间间隔    3 分钟
     private Object hBIntervalLock = new Object() ;
     public long getHBInterval() {synchronized (hBIntervalLock){
         return hBInterval;
@@ -172,6 +179,14 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
     public void setIsNeedReconnect(boolean needReconnect) {synchronized (isNeedReconnectLock){
         isNeedReconnect = needReconnect;
     }}
+
+
+//    private boolean mIsOpenHbDetectionThread = false;
+//    private Object mIsOpenHbDetectionThreadLock = new Object();
+//    private boolean getIsOpenHbDetectionThread() { synchronized (mIsOpenHbDetectionThreadLock) { return mIsOpenHbDetectionThread; } }
+//    private void setIsOpenHbDetectionThread(boolean isOpenHbDetectionThread) { synchronized (mIsOpenHbDetectionThreadLock) { mIsOpenHbDetectionThread = isOpenHbDetectionThread; } }
+
+
 
     private boolean isLogin = false ;
     private Object isLoginLock = new Object() ;
@@ -216,7 +231,7 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
             udpClient.close();
         }else
             tcpClient.close();
-
+        setIsOpenHB(false);
     }
 
     public boolean isConnected(){
@@ -233,16 +248,16 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
         }
         if (!isAsyn){
             if (!tcpClient.sendAsyn(msgTransformer.packageDataToByte(packetData))) {
-                Log.d(TAG, "Send " + msgTransformer.packageDataToByte(packetData)  + " to fail. [Asyn][TCP] error:" + msgTransformer.packageDataToByte(packetData) );
+                LogUtils.d( "Send " + msgTransformer.packageDataToByte(packetData)  + " to fail. [Asyn][TCP] error:" + msgTransformer.packageDataToByte(packetData) );
                 return false;
             }
         }else {
-//            Log.d("cjh", "------------------------------ isAsyn ----------------------------") ;
+//            LogUtils.d( "------------------------------ isAsyn ----------------------------") ;
             if (!tcpClient.send(msgTransformer.packageDataToByte(packetData))) {
-                Log.d(TAG, "Send " + msgTransformer.packageDataToByte(packetData) + " to fail. [Sync][TCP] error:" + msgTransformer.packageDataToByte(packetData));
+                LogUtils.d( "Send " + msgTransformer.packageDataToByte(packetData) + " to fail. [Sync][TCP] error:" + msgTransformer.packageDataToByte(packetData));
                 return false;
             } else {
-                Log.d(TAG, "Send " + msgTransformer.packageDataToByte(packetData) + " success.[TCP][Sync]");
+                LogUtils.d( "Send " + msgTransformer.packageDataToByte(packetData) + " success.[TCP][Sync]");
             }
         }
 
@@ -251,20 +266,20 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
 
     public boolean sendTcpMsg(byte[] data, boolean isAsyn){
         if (!isAsyn) {
-//            Log.d("cjh", "------------------------------ !isAsyn ----------------------------") ;
+//            LogUtils.d( "------------------------------ !isAsyn ----------------------------") ;
 //            tcpClient.sendAsyn(data) ;
             if (!tcpClient.sendAsyn(data)) {
-                Log.d(TAG, "Send " + data + " to fail. [Asyn][TCP] error:" + data);
+                LogUtils.d( "Send " + data + " to fail. [Asyn][TCP] error:" + data);
                 return false;
             }
         }else {
-//            Log.d("cjh", "------------------------------ isAsyn ----------------------------") ;
+//            LogUtils.d( "------------------------------ isAsyn ----------------------------") ;
             if (!tcpClient.send(data)) {
-					Log.d(TAG, "Send " + data + " to fail. [Sync][TCP] error:" + data);
-					return false;
-				} else {
-					Log.d(TAG, "Send " + data + " success.[TCP][Sync]");
-				}
+                LogUtils.d( "Send " + data + " to fail. [Sync][TCP] error:" + data);
+                return false;
+            } else {
+                LogUtils.d( "Send " + data + " success.[TCP][Sync]:"+data.length);
+            }
         }
         return true ;
     }
@@ -276,16 +291,16 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
         if (!isAsyn) {
             udpClient.sendAsyn(data) ;
             if (!udpClient.sendAsyn(data)) {
-                Log.d(TAG, "Send " + data + " to fail. [Asyn][UDP] error:" + data);
+                LogUtils.d( "Send " + data + " to fail. [Asyn][UDP] error:" + data);
                 return false;
             }
         }else {
             if (!udpClient.send(data)) {
-					Log.d(TAG, "Send " + data + " to fail. [Sync][UDP] error:" + data);
-					return false;
-				} else {
-					Log.d(TAG, "Send " + data + " success.[UDP][Sync]");
-				}
+                LogUtils.d( "Send " + data + " to fail. [Sync][UDP] error:" + data);
+                return false;
+            } else {
+                LogUtils.d( "Send " + data + " success.[UDP][Sync]");
+            }
         }
         return true ;
     }
@@ -297,24 +312,29 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
             new ThreadPoolExecutor.DiscardPolicy()
     );
 
+    /**
+     * 鉴权成功才允许发送心跳
+     * */
     @Override
     public void onTcpConnect(int result) {
+        LogUtils.d( "OnConnect:" + result);
         if (result == 0){
+
             setIsNeedReconnect(false) ;
             //  连接成功
         }else if(result == -1){
             //  无法连接服务器, 与服务器断开
 //            if (tcpClient != null){
 //                tcpClient.close();
-//                Log.d(TAG, "-------------------- restart") ;
+//                LogUtils.d( "-------------------- restart") ;
 //                tcpClient.start();
 //            }
+            setIsNeedReconnect(true) ;
         }else {
-            Log.d(TAG, "OnConnect else -- " + result);
+            LogUtils.d( "OnConnect else -- " + result);
         }
 
         listener.onConnect(result);
-        Log.d(TAG, "OnConnect " + result);
     }
 
     @Override
@@ -322,6 +342,7 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
         if (listener != null){
             listener.onDisConnect();
         }
+        LogUtils.d( "onDisConnect -- ");
         setIsNeedReconnect(true);
     }
 
@@ -330,7 +351,8 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
 //      something here
 
         if (listener != null) {
-//            Log.d("cjh", "------------------------------ onTcpSend ----------------------------") ;
+            LogUtils.d( "------------------------------ onTcpSend ---------------------------- \n"
+                    +HexStringUtils.toHexString(data)) ;
             listener.onSend(data, result) ;
         }
     }
@@ -356,117 +378,70 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
 
     @Override
     public void run() {
+        LogUtils.d( "heart run -------------------------------------------") ;
         //  心跳规则
         while (true){
-            //  心跳发送
-            isHBThread = true ;
-            Log.d(TAG, "Send HB --1---- run ----------") ;
-//            SocketClientSender.sendHB(false, false);
+
+            //  等待开启心跳
             if (!getIsOpenHB()){
                 try {
-                    Thread.sleep(Constants.HBOPENTHREAD_SLEEPIME);
+                    LogUtils.d( "wait for heartbert -------------------------------------------") ;
+                    Thread.sleep(Constants.HBTHREAD_TOMEOUT);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
                 continue;
             }
-            Log.d(TAG, "Send HB ---2--- run ----------") ;
+
+            final long tcpLastHbDt = getTcpLastHbDt() ;
+            final long curDt = System.currentTimeMillis();
+
+//            if (!isConnected() || (tcpLastHbDt + (getHBInterval() + 30) * 1000) > curDt) {
+            //  两次心跳未收到回复即进行重连
+            if (!isConnected() || (tcpLastHbDt + (getHBInterval() * 3 + 30) * 1000) < curDt) {
+                LogUtils.d( "Hb is timeout, will be reconnect.");
+                LogUtils.d( "isConnected:"+isConnected()+
+                        "\n tcpLastHbDt:"+tcpLastHbDt+
+                        "\ngetHbInterval:"+getHBInterval()+
+                        "\ncurDt:"+curDt) ;
+                setIsNeedReconnect(true);
+            }
+
+            if (getIsNeedReconnect()){
+                LogUtils.d( "reconnecting") ;
+                tcpClient.close();
+                if (tcpClient.connect(getTcpIp(), getTcpPort()) == 0) {
+                    LogUtils.d( "reconnect success.");
+                    //Reset QoS
+                    //QoS.ReSet();
+                    updateTcpLastHbDt() ;
+                    setIsNeedReconnect(false);
+                } else {
+                    LogUtils.d( "reconnect to fail.");
+                }
+
+                try {
+                    Thread.sleep(Constants.RECONNECT_INTERVAL);
+                }
+                catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            } else{
+                LogUtils.d( "2 -------------------------------------------") ;
+                if ((tcpLastHbDt + getHBInterval() * 1000) <= curDt) {
+                    //  有信息发送的情况下不再发送心跳
+                    LogUtils.d( "3 -------------------------------------------") ;
+                    SocketClientSender.sendHB(false, false);
+                }
+                LogUtils.d( "4 -------------------------------------------") ;
+            }
 
             try {
                 Thread.sleep(Constants.HBTHREAD_SLEEPIME);
-            } catch (InterruptedException e) {
+            }
+            catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
-
-            //region UDP 心跳
-            //            //  UDP  当最后一次时间超过 5 秒时， 超时
-//            long udpLastHbDt = getUdpLastHbDt() ;
-//            long currentDt = System.currentTimeMillis() ;
-//            Log.d(TAG, "udpLastHbDt:"+((udpLastHbDt + Constants.HBTHREAD_TOMEOUT )<currentDt)+"\n"+(udpLastHbDt + Constants.HBTHREAD_TOMEOUT) +"\n"+currentDt);
-//            if ((udpLastHbDt+Constants.HBTHREAD_TOMEOUT) < currentDt){
-//                Log.d(TAG, "udp timeout ");
-//
-//                addUdpTimeOutCount() ;
-//
-//                if (getUdpTimeOutCount() == Constants.UDPRECONNECT_TIMEOUT){
-//                    isConnect = false ;
-//                    udpClient.close();
-//                    udpClient.start() ;
-//                    if (listener != null){
-//                        listener.onConnect(1);
-//                    }
-//                }
-//                SocketClientSender.sendHB(false, true) ;
-//            }else {
-//                Log.d(TAG, "udp no time out delay sometime to sendHb");
-//                if (!isConnect){
-//                    if (listener != null) {
-//                        listener.onConnect(0);
-//                    }
-//                    isConnect=true;
-//                }
-//                udpTimeOutCount=0;
-//                try {
-//
-//                    if (getUdpHBInterval()>4){
-//                        Thread.sleep((getUdpHBInterval()-4)*1000);
-//                    }
-//                }
-//                catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//                //  心跳发送
-//                SocketClientSender.sendHB(false, true);
-//            }
-            //endregion
-
-//            //  当最后一次时间超过 5 秒时， 超时
-//            long tcpLast = getTcpLastHbDt() ;
-//            long currentDt = System.currentTimeMillis() ;
-//            Log.d(TAG, "tcpLast:"+((tcpLast + Constants.HBTHREAD_TOMEOUT )<currentDt)+"\n"+(tcpLast + Constants.HBTHREAD_TOMEOUT) +"\n"+currentDt);
-//            if ((tcpLast+Constants.HBTHREAD_TOMEOUT) < currentDt){
-//                Log.d(TAG, "tcp timeout ");
-//
-//                addTcpTimeOutCount();
-//
-//                if (getTcpTimeOutCount() == Constants.UDPRECONNECT_TIMEOUT){
-//                    isConnect = false ;
-//                    tcpClient.close();
-//                    tcpClient.start();
-//                    if (listener != null){
-//                        listener.onConnect(1);
-//                    }
-//                }
-//                SocketClientSender.sendHB(false, false) ;
-//            }else {
-//                Log.d(TAG, "udp no time out delay sometime to sendHb");
-//                if (!isConnect){
-//                    if (listener != null) {
-//                        listener.onConnect(0);
-//                    }
-//                    isConnect=true;
-//                }
-//                tcpTimeOutCount =0;
-//                try {
-//
-//                    if (getTcpHBInterval()>4){
-//                        Thread.sleep((getTcpHBInterval()-4)*1000);
-//                    }
-//                }
-//                catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//                //  心跳发送
-//                SocketClientSender.sendHB(false, false);
-//            }
-//            if (getIsNeedReconnect()){
-//                    tcpClient.close();
-//                    tcpClient.start();
-//            }
-
-            SocketClientSender.sendHB(false, false);
-//            listener.heartResp();
 
         }
 
@@ -475,13 +450,10 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
 
     //  解析指令
     private void OnDispathCmd(final byte[] page, final boolean isUpd){
-//        final Decoder4LoggingOnly decoder4LoggingOnly = new Decoder4LoggingOnly() ;
-//        try {
-//            decoder4LoggingOnly.decodeHex(page);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        Log.d("cjh", "------------------------------ OnDispathCmd ----------------------------") ;
+
+        LogUtils.d( "------------------------------ OnDispathCmd ---------------------------- \n"
+        + HexStringUtils.toHexString(page)
+        ) ;
         poolExecutor.execute(new Runnable() {
             @Override
             public void run() {
@@ -489,13 +461,16 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
                 byte[] data = new byte[page.length-2] ;
                 System.arraycopy(page, 1, data, 0, page.length-2);
                 try {
-//                    Log.d("cjh", "1-------------------------data.length--"+data.length+"--- OnDispathCmd ----------------------------") ;
+                    LogUtils.d( "1-------------------------data.length--"+data.length+"--- OnDispathCmd ----------------------------") ;
                     data = Utils.doEscape4Receive(data, 0, data.length - 1);
 //                    decoder4LoggingOnly.decodeHex(data);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
 
+                if (isUpd){
+                    setUdpLastHbDt();
+                }else updateTcpLastHbDt();
 
                 PacketData packetData = null;
 //                PacketData packetData = new ServerRegisterMsg();
@@ -509,12 +484,12 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
                 msgHeader.setReservedBit(((msgBodyProps & 0xC000) >> 14));
                 msgHeader.setTerminalPhone(bitOperator.parseBcdStringFromBytes(data, 4, 6));
                 msgHeader.setFlowId(bitOperator.parseIntFromBytes(data, 10, 2));
-//                Log.d("cjh", "-----------------------------29- OnDispathCmd ---------------------------msgHeader\n-"+msgHeader+"\nmsgBodyProps"+msgBodyProps) ;
-                if (msgHeader.isHasSubPackage()) {
+                LogUtils.d( "-----------------------------29- OnDispathCmd ---------------------------msgHeader\n-"+msgHeader+"\nmsgBodyProps"+msgBodyProps) ;
+                if (msgHeader.isHasSubPackage()) {      //  有分包
                     msgHeader.setPackageInfoField(bitOperator.parseIntFromBytes(data, 12, 4));
                     msgHeader.setTotalSubPackage(bitOperator.parseIntFromBytes(data, 12, 2));
                     msgHeader.setSubPackageSeq(bitOperator.parseIntFromBytes(data, 12, 2));
-//                    Log.d("cjh", "------------------------------ OnDispathCmd -------40--------------------msgHeader \n-"+msgHeader) ;
+                    LogUtils.d( "------------------------------ OnDispathCmd -------40--------------------msgHeader \n-"+msgHeader) ;
                 }
                 switch (msgHeader.getMsgId()){
                     case Constants.SERVER_COMMOM_RSP:           //  平台通用应答
@@ -523,42 +498,21 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
                         packetData.inflatePackageBody(data);
                         //        0：成功/确认；1：失败；2：消息有误；3：不支持；4：报警处理确认；
                         int generalResult = ((ServerGeneralMsg) packetData).getResult() ;
-//                        setHBInterval();    // 设置心跳时间
-//                        String generalReason = null ;
-//                        switch (generalResult){
-//                            case 0:
-//                                generalReason = "成功";
-//                                break;
-//                            case 1:
-//                                generalReason = "失败" ;
-//                                break;
-//                            case 2:
-//                                generalReason = "消息有误" ;
-//                                break;
-//                            case 3:
-//                                generalReason = "不支持" ;
-//                                break;
-//                            case 4:
-//                                generalReason = "报警处理确认" ;
-//                                break;
-//                            default:
-//                                generalReason = "请检查错误码" ;
-//                                break;
-//                        }
-                        if (isUpd){
-                            setUdpLastHbDt();
-                        }else setTcpLastHbDt();
+//                        if (isUpd){
+//                            setUdpLastHbDt();
+//                        }else updateTcpLastHbDt();
 
                         if (Constants.TERMINAL_LOCATION_UPLOAD == ((ServerGeneralMsg) packetData).getAnswerId()){
                             listener.gpsResp(generalResult, ResponseReason.getInstance().GENERALRESULT[generalResult]);
                         }else if (Constants.TERMINAL_HEART_BEAT == ((ServerGeneralMsg) packetData).getAnswerId()){
                             listener.heartResp(generalResult, ResponseReason.getInstance().GENERALRESULT[generalResult]);
                         }else if (Constants.TERMINAL_AUTHEN == ((ServerGeneralMsg) packetData).getAnswerId()){
+                            if (generalResult == 0)  setIsOpenHB(true);
                             listener.authResp(generalResult, ResponseReason.getInstance().GENERALRESULT[generalResult]);
                         }else {
                             listener.commomResp(generalResult, ResponseReason.getInstance().GENERALRESULT[generalResult], packetData);
                         }
-                        Log.d("cjh", "----------------------平台通用应答-------- OnDispathCmd " +
+                        LogUtils.d( "----------------------平台通用应答-------- OnDispathCmd " +
                                 "--------------46------------\n packetData -"+packetData+
                                 "\n 应答流水号((ServerGeneralMsg) packetData).getSerialNumber():"+((ServerGeneralMsg) packetData).getSerialNumber()+
                                 "\n 应答 ID((ServerGeneralMsg) packetData).getAnswerId():"+((ServerGeneralMsg) packetData).getAnswerId()) ;
@@ -568,50 +522,227 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
                         packetData.setMsgHeader(msgHeader);
                         packetData.inflatePackageBody(data);
                         int registerResult = ((ServerRegisterMsg) packetData).getRegisterResult() ;
-//                        switch (registerResult){
-//                            case 0:
-//                                reason = ((ServerRegisterMsg) packetData).getAuthentication() ;
-//                                break;
-//                            case 1:
-//                                reason = "车辆已被注册" ;
-//                                break;
-//                            case 2:
-//                                reason = "数据库中无该车辆" ;
-//                                break;
-//                            case 3:
-//                                reason = "终端已被注册" ;
-//                                break;
-//                            case 4:
-//                                reason = "数据库中无该终端" ;
-//                                break;
-//                                default:
-//                                    reason = "请检查错误码" ;
-//                                    break;
-//                        }
+                        LogUtils.d( "----------------------注册应答-------- OnDispathCmd --------------45------------\n registerResult  -"+registerResult) ;
+
                         if (registerResult == 0 ){      //  注册成功
                             listener.registerResp(registerResult, ((ServerRegisterMsg) packetData).getAuthentication());
-                            Log.d("cjh", "----------------------心跳-------- OnDispathCmd --------------45------------\n isHBThread  -"+isHBThread) ;
                             setIsOpenHB(true);                                  // 开启心跳
-                            if (isHBThread){return;}                           //  心跳线程启动之后不再次启动
-                            hBThread.setName("Hb detection thread");
-                            Log.d("cjh", "----------------------心跳-------- OnDispathCmd --------------45------------ start -") ;
-                            hBThread.start();                                   // 心跳线程启动
+                            if (!isHBThread){
+                                hBThread.setName("Hb detection thread");
+                                hBThread.start();                                   // 心跳线程启动
+                            }                           //  心跳线程启动之后不再次启动
+
+                            isHBThread =true ;
                         }else {
                             listener.registerResp(registerResult, ResponseReason.getInstance().REGISTERRESULT[registerResult]);
                         }
-                        Log.d("cjh", "-------------------"+((ServerRegisterMsg) packetData).getAuthentication()+
+                        LogUtils.d( "-------------------"+((ServerRegisterMsg) packetData).getAuthentication()+
                                 "---- 注册应答 ------- OnDispathCmd -------------------46--------\n packetData -"+packetData) ;
                         break;
+
+                    case Constants.TERMINAL_PARAMETERS_SETTING:
+                        LogUtils.d( "----------------------- 设置终端参数 ---------------------------\n packetData -"+packetData) ;
+                        packetData = new ServerParametersMsg() ;
+                        packetData.setMsgHeader(msgHeader);
+                        packetData.inflatePackageBody(page);
+                        LogUtils.d( "--------------------------------------------------\n getSerialNumber -"+((ServerParametersMsg) packetData).getSerialNumber()+"\n ((ServerParametersMsg) packetData)"+((ServerParametersMsg) packetData)) ;
+                        listener.onTernimalParameterSetting((ServerParametersMsg) packetData);
+                        break;
+                    case Constants.TERMINAL_PARAMETERS_SPECIFY_QUERY:
+                        LogUtils.d( "----------------------- 查询指定终端参数 ---------------------------\n packetData -"+packetData) ;
+//                        packetData = new ServerParametersMsg() ;
+//                        packetData.setMsgHeader(msgHeader);
+//                        packetData.inflatePackageBody(page);
+//                        LogUtils.d( "--------------------------------------------------\n getSerialNumber -"+((ServerParametersMsg) packetData).getSerialNumber()+"\n ((ServerParametersMsg) packetData)"+((ServerParametersMsg) packetData)) ;
+//                        listener.onTernimalParameterSetting((ServerParametersMsg) packetData);
+                        listener.queryTernimalParameterSetting(msgHeader.getFlowId());
+                        break;
+                    case Constants.SERVER_AVTRANSMISSION_REQUEST:
+                        LogUtils.d( "----------------------- 实时音视频传输请求 ---------------------------\n packetData -"+packetData) ;
+//                        packetData = new ServerParametersMsg() ;
+//                        packetData.setMsgHeader(msgHeader);
+//                        packetData.inflatePackageBody(page);
+//                        LogUtils.d( "--------------------------------------------------\n getSerialNumber -"+((ServerParametersMsg) packetData).getSerialNumber()+"\n ((ServerParametersMsg) packetData)"+((ServerParametersMsg) packetData)) ;
+//                        listener.onTernimalParameterSetting((ServerParametersMsg) packetData);
+                        packetData = new ServerAVTranslateMsg() ;
+                        packetData.setMsgHeader(msgHeader);
+                        packetData.inflatePackageBody(page);
+//                        TerminalGeneralMsg.TerminalGeneralInfo info = new TerminalGeneralMsg.TerminalGeneralInfo() ;
+//                        info.setResult(0);
+//                        info.setRespId(msgHeader.getMsgId());
+//                        info.setSeNum(msgHeader.getFlowId());
+//
+//                        SocketClientSender.sendGeneralReponse(info, true, false) ;
+                        listener.onTernimalAVTranslate((ServerAVTranslateMsg) packetData);
+                        break;
+                    case Constants.SERVER_AVTRANSMISSION_CONTROL:
+                        LogUtils.d( "----------------------- 音视频实时传输控制 ---------------------------\n packetData -"+packetData) ;
+                        break;
+
+
                     default:
                         packetData = new ServerRegisterMsg();
                         packetData.setMsgHeader(msgHeader);
 //                        packetData.inflatePackageBody(data);                    //  有可能为空
                         listener.defaultResp(packetData, Constants.NO_REPLY_CODE, msgHeader.getMsgId());
-                        Log.d("cjh", "----------------------- 其它应答 ------- OnDispathCmd -------------------46--------\n packetData -"+packetData) ;
+
+                        LogUtils.d( "----------------------- 其它应答 ------- OnDispathCmd ---------------------------\n packetData -"+packetData+"\n hex:"+HexStringUtils.toHexString(page)) ;
                         break;
                 }
 
             }
         });
+    }
+
+
+    private String getDebugString(int msgId) {
+        switch(msgId) {
+
+            //  平台通用应答
+            case Constants.SERVER_COMMOM_RSP:
+                return "平台通用应答" ;
+            //  补传分包请求
+            case Constants.SERVER_SUBCONTRACT_REQ:
+                return "补传分包请求" ;
+            //  终端注册应答
+            case Constants.SERVER_REGISTER_RSP:
+                return "终端注册应答" ;
+            //  位置信息查询
+//            case Constants.SERVER_LOCATION_REQ:
+//                return "" ;
+
+            //  设置终端参数
+            case Constants.TERMINAL_PARAMETERS_SETTING:
+                return "设置终端参数" ;
+            //  终端参数子参数
+            //  DWORD 位置汇报策略，0：定时汇报；1：定距汇报；2：定时和定距汇报
+            case Constants.TERMINAL_PARAMETERS_SETTING_0X0020:
+                return "位置汇报策略" ;
+            case Constants.TERMINAL_PARAMETERS_SETTING_0X0021:
+                return "" ;
+            case Constants.TERMINAL_PARAMETERS_SETTING_0X0022:
+                return "" ;
+
+            case Constants.TERMINAL_PARAMETERS_SETTING_0X0027:
+                return "" ;
+            case Constants.TERMINAL_PARAMETERS_SETTING_0X0028:
+                return "" ;
+            //  DWORD 缺省时间汇报间隔，单位为秒（s），>0
+            case Constants.TERMINAL_PARAMETERS_SETTING_0X0029:
+                return "缺省时间汇报间隔" ;
+            case Constants.TERMINAL_PARAMETERS_SETTING_0X0030:
+                return "" ;
+            case Constants.TERMINAL_PARAMETERS_SETTING_0X0031:
+                return "" ;
+
+            //  查询终端参数
+            case Constants.TERMINAL_PARAMETERS_QUERY:
+                return "查询终端参数" ;
+            //  终端控制
+            case Constants.TERMINAL_CONTROL:
+                return "终端控制" ;
+            //  查询指定终端参数
+            case Constants.TERMINAL_PARAMETERS_SPECIFY_QUERY:
+                return "查询指定终端参数" ;
+            //  查询终端属性
+            case Constants.TERMINAL_PROPERTIES_QUERY:
+                return "查询终端属性" ;
+            //  下发终端升级包
+            case Constants.TERMINAL_ISSUE_UPGRADE_PACKAGE:
+                return "下发终端升级包" ;
+            //  位置信息查询
+            case Constants.TERMINAL_LOCATION_INFORMATION_QUERY:
+                return "位置信息查询" ;
+            //  临时位置跟踪控制
+            case Constants.SERVER_LOCATION_TMP_REQ:
+                return "临时位置跟踪控制" ;
+            //  人工确认报警消息
+            case Constants.TERMINAL_CONFIRM_ALARM:
+                return "人工确认报警消息" ;
+            //  文本信息下发
+            case Constants.SERVER_DISTRIBUTION_MSG:
+                return "文本信息下发" ;
+            //  事件设置
+            case Constants.SERVER_EVENT_SET:
+                return "事件设置" ;
+            //  提问下发
+            case Constants.SERVER_QUESTIONS_ISSUED:
+                return "提问下发" ;
+            //  信息点播菜单设置
+            case Constants.SERVER_INFORMATION_DEMAND:
+                return "信息点播菜单设置" ;
+            //  信息服务
+            case Constants.SERVER_INFORMATION_SERVICE:
+                return "信息服务" ;
+            //  电话回拨
+            case Constants.SERVER_TEL_RESPONSE:
+                return "电话回拨" ;
+            //  设置电话本
+            case Constants.SERVER_PHONE_BOOK:
+                return "设置电话本" ;
+            //  车辆控制
+            case Constants.SERVER_VEHICLE_CONTROL:
+                return "车辆控制" ;
+
+//    p32
+
+            //  实时音视频传输请求
+            case Constants.SERVER_AVTRANSMISSION_REQUEST:
+                return "实时音视频传输请求" ;
+            //  音视频实时传输控制
+            case Constants.SERVER_AVTRANSMISSION_CONTROL:
+                return "音视频实时传输控制" ;
+
+
+
+            //  终端通用应答
+            case Constants.TERMINAL_CONMOM_RSP:
+                return "终端通用应答" ;
+            //  终端心跳
+            case Constants.TERMINAL_HEART_BEAT:
+                return "终端心跳" ;
+            //  终端注销
+            case Constants.TERMINAL_UNREGISTER:
+                return "终端注销" ;
+            //  终端注册
+            case Constants.TERMINAL_REGISTER:
+                return "终端注册" ;
+            //  终端鉴权
+            case Constants.TERMINAL_AUTHEN:
+                return "终端鉴权" ;
+            //  查询终端参数应答
+            case Constants.SERVER_PARAMETERS_QUERY_RSP:
+                return "查询终端参数应答" ;
+            //  查询终端属性应答
+            case Constants.SERVER_PROPERTIES_REQ:
+                return "查询终端属性应答" ;
+//              终端升级结果通知
+//            case Constants.TERMINAL_UPGRADE_RESULTS:
+//                return "" ;
+            //  位置信息汇报
+            case Constants.TERMINAL_LOCATION_UPLOAD:
+                return "位置信息汇报" ;
+            //  位置信息查询应答
+            case Constants.TERMINAL_LOCATION_RSP:
+                return "位置信息查询应答" ;
+            //  事件报告
+            case Constants.TERMINAL_INCIDENT_REPORT:
+                return "事件报告" ;
+            //  提问应答
+            case Constants.TERMINAL_QUESTIONS_ANSWER:
+                return "提问应答" ;
+            //  信息点播/取消
+            case Constants.TERMINAL_INFORMATION_OPERATION:
+                return "信息点播/取消" ;
+            //  车辆控制应答
+            case Constants.TERMINAL_VEHICLE_CONTROL_RESPONSE:
+                return "车辆控制应答" ;
+            //  定位数据批量上传
+            case Constants.TERMINAL_LOCATION_BATCH_UPLOAD:
+                return "定位数据批量上传" ;
+
+            default:
+                return "其它应答";
+        }
     }
 }

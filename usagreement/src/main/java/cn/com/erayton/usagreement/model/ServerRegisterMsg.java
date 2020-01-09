@@ -6,20 +6,19 @@ import cn.com.erayton.usagreement.utils.BitOperator;
 
 
 /**
- * Created by Kent_Lee on 2017/4/1.
+ * Created by android on 2017/4/1.
  */
 
 public class ServerRegisterMsg extends PacketData {
     private static final String TAG = "ServerRegisterMsg";
+    private int registerResult;
+    private String authentication;
+
 
     @Override
     public byte[] packageDataBody2Byte() {
         return new byte[0];
     }
-
-    private int registerResult;
-
-    private String authentication;
 
     public int getRegisterResult() {
         return registerResult;

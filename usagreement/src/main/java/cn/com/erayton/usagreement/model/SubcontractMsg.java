@@ -1,6 +1,7 @@
 package cn.com.erayton.usagreement.model;
 
 import android.util.Log;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
@@ -9,11 +10,11 @@ import cn.com.erayton.usagreement.utils.BitOperator;
 
 
 /**
- * 终端注册消息
+ * 补传分包请求
  *
- * @author hylexus
+ * @author android
  */
-public class TerminalRegisterMsg extends PacketData {
+public class SubcontractMsg extends PacketData {
     private static final String TAG = "TerminalRegisterMsg";
 
     private int registerResult;
@@ -22,7 +23,7 @@ public class TerminalRegisterMsg extends PacketData {
     private TerminalRegInfo terminalRegInfo;
 
 
-    public TerminalRegisterMsg() {
+    public SubcontractMsg() {
 
     }
 

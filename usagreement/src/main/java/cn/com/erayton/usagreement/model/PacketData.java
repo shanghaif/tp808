@@ -20,6 +20,16 @@ public abstract class PacketData {
      */
     protected int checkSum;
 
+//    /**
+//     * 流水号
+//     * */
+//    protected int serNum ;
+
+    /**
+     * 应答 ID
+     * */
+    protected int answerFlowId;
+
 //    @JSONField(serialize = false)
 //    protected Channel channel;
 
@@ -47,16 +57,6 @@ public abstract class PacketData {
         this.checkSum = checkSum;
     }
 
-//    public Channel getChannel() {
-//        return channel;
-//    }
-//
-//    public void setChannel(Channel channel) {
-//        this.channel = channel;
-//    }
-
-    protected int answerFlowId;
-
     public int getAnswerFlowId() {
         return answerFlowId;
     }
@@ -75,8 +75,10 @@ public abstract class PacketData {
         return packageDataBody2Byte().length;
     }
 
+    //  解密
     public abstract void inflatePackageBody(byte[] data);
 
+    //  加密
     public abstract byte[] packageDataBody2Byte();
 
     public static class MsgHeader {

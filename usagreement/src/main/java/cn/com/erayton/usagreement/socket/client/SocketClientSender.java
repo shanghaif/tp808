@@ -7,8 +7,11 @@ import cn.com.erayton.usagreement.model.EmptyPacketData;
 import cn.com.erayton.usagreement.model.PacketData;
 import cn.com.erayton.usagreement.model.TerminalAuthMsg;
 import cn.com.erayton.usagreement.model.TerminalGPSMsg;
+import cn.com.erayton.usagreement.model.TerminalGeneralMsg;
+import cn.com.erayton.usagreement.model.TerminalParametersMsg;
 import cn.com.erayton.usagreement.model.TerminalRegisterMsg;
 import cn.com.erayton.usagreement.utils.BCD8421Operator;
+import cn.com.erayton.usagreement.utils.LogUtils;
 
 public class SocketClientSender {
     private static final String TAG = "SocketClientSender" ;
@@ -45,10 +48,24 @@ public class SocketClientSender {
         header.setReservedBit(0);
         //设置终端号
         if (phone == null) {
-            Log.i(TAG, "phone is null.") ;
+            LogUtils.e("phone is null.") ;
         }
         header.setTerminalPhone("0"+phone);
+//        header.setTerminalPhone(String.format("%012s", phone));
         return header ;
+    }
+
+
+    //  通用回复
+    public static boolean sendGeneralReponse(TerminalGeneralMsg.TerminalGeneralInfo terminalGeneralInfo, boolean isAsyn, boolean isUdp){
+        TerminalGeneralMsg msg = new TerminalGeneralMsg() ;
+        msg.setTerminalGeneralInfo(terminalGeneralInfo);
+        //header
+        PacketData.MsgHeader header = getHeader();
+        header.setMsgId(Constants.TERMINAL_CONMOM_RSP);
+        header.setMsgBodyLength(msg.getBodyLength());
+        msg.setMsgHeader(header);
+        return send(msg, isAsyn, isUdp) ;
     }
 
 
@@ -85,14 +102,13 @@ public class SocketClientSender {
         header.setMsgId(Constants.TERMINAL_HEART_BEAT);
         header.setMsgBodyLength(msg.getBodyLength());
         msg.setMsgHeader(header);
-        Log.d(TAG, "header:"+header) ;
+        LogUtils.d("header:"+header);
         return send(msg, isAsyn, isUdp) ;
     }
 
     public static boolean sendAuth(TerminalAuthMsg.TerminalAuthInfo terminalAuthInfo, boolean isAsyn, boolean isUdp){
         if (socketClient == null)   return false ;
         //  鉴权
-
         TerminalAuthMsg msg = new TerminalAuthMsg();
         //body
 //        TerminalRegisterMsg.TerminalRegInfo terminalRegInfo = new TerminalRegisterMsg.TerminalRegInfo();
@@ -123,10 +139,25 @@ public class SocketClientSender {
         header.setMsgId(Constants.TERMINAL_LOCATION_UPLOAD);
         header.setMsgBodyLength(msg.getBodyLength());
         msg.setMsgHeader(header);
+
         return send(msg, isAsyn, isUdp) ;
     }
 
-    private static boolean send(byte[] msg, boolean isAsyn, boolean isUdp){
+    public static boolean sendParamenter(TerminalParametersMsg.TerminalParametersInfo parametersInfo, boolean isAsyn, boolean isUdp){
+        if (socketClient == null)   return false ;
+
+        TerminalParametersMsg msg = new TerminalParametersMsg();
+        msg.setTerminalParametersInfo(parametersInfo);
+        //header
+        PacketData.MsgHeader header = getHeader();
+        header.setMsgId(Constants.SERVER_PARAMETERS_QUERY_RSP);
+        header.setMsgBodyLength(msg.getBodyLength());
+        msg.setMsgHeader(header);
+
+        return send(msg, isAsyn, isUdp) ;
+    }
+
+    public static boolean send(byte[] msg, boolean isAsyn, boolean isUdp){
         if (!isUdp){
             Log.d("cjh", "------------------------------ send byte[] ----------------------------") ;
             return socketClient.sendTcpMsg(msg, isAsyn) ;
@@ -134,7 +165,7 @@ public class SocketClientSender {
     }
 
     private static boolean send(PacketData msg, boolean isAsyn, boolean isUdp){
-
+        Log.d(TAG, "send PacketData -----------------------------"+msg) ;
         if (!isUdp){
             Log.d("cjh", "------------------------------ send PacketData ----------------------------") ;
             return socketClient.sendTcpMsg(msg, isAsyn) ;
@@ -142,4 +173,5 @@ public class SocketClientSender {
 //            return socketClient.sendTcpMsg(msg, isAsyn) ;
 //        }else return socketClient.sendUdpMsg(msg, isAsyn) ;
     }
+
 }

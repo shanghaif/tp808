@@ -187,4 +187,6 @@ public class BCD8421Operator {
         Log.i(TAG,"getBCDTime- "+f.format(date)) ;
         return string2Bcd(f.format(date));
     }
+
+
 }

@@ -2,6 +2,7 @@ package cn.com.erayton.usagreement.test;
 
 import java.util.List;
 
+import cn.com.erayton.usagreement.utils.BitOperator;
 import cn.com.erayton.usagreement.utils.USGate;
 import cn.com.erayton.usagreement.utils.Utils;
 
@@ -9,7 +10,17 @@ public class APITest {
     static String msid= "23803641400" ;
     static USGate mUSGate;
     public static void main(String[] args){
-        new USThread().start();
+//        BitOperator bitOperator = BitOperator.getInstance();
+//        int gpsS = 0x01 ;
+//        int gpsString = Integer.parseInt(String.valueOf(gpsS), 2) ;
+//        byte[] gpsState = bitOperator.integerTo4Bytes(gpsString);
+//        System.out.println("gpsS:"+gpsS+
+//                "\nString.valueOf(gpsS):"+String.valueOf(gpsS)+
+//                "\n gpsString:"+gpsString+
+//                "\n gpsState:"+gpsState);
+
+
+//        new USThread().start();
 //        mUSGate = new USGate();
 //        mUSGate.setCommand(msid);
 //        mUSGate.setIPCallback(new USGate.IPCallback() {

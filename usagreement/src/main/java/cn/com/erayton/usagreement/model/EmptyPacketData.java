@@ -1,7 +1,7 @@
 package cn.com.erayton.usagreement.model;
 
 /**
- * Created by Kent_Lee on 2017/4/1.
+ * Created by android on 2017/4/1.
  */
 
 public class EmptyPacketData extends PacketData {
