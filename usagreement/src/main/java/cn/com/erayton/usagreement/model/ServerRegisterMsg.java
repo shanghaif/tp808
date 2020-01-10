@@ -2,15 +2,14 @@ package cn.com.erayton.usagreement.model;
 
 import android.util.Log;
 
+import cn.com.erayton.usagreement.data.Constants;
 import cn.com.erayton.usagreement.utils.BitOperator;
+import cn.com.erayton.usagreement.utils.HexStringUtils;
+import cn.com.erayton.usagreement.utils.LogUtils;
 
 
-/**
- * Created by android on 2017/4/1.
- */
 
 public class ServerRegisterMsg extends PacketData {
-    private static final String TAG = "ServerRegisterMsg";
     private int registerResult;
     private String authentication;
 
@@ -38,18 +37,18 @@ public class ServerRegisterMsg extends PacketData {
 
     public void inflatePackageBody(byte[] data) {
         int msgBodyLength = getMsgHeader().getMsgBodyLength();
-        Log.e(TAG, "inflatePackageBody_msgBodyLength: " + msgBodyLength);
-        int msgBodyByteStartIndex = 12;
+        LogUtils.e("inflatePackageBody_msgBodyLength: " + msgBodyLength);
+        byte[] tmp = new byte[msgHeader.getMsgBodyLength()];
         // 2. 消息体
         // 有子包信息,消息体起始字节后移四个字节:消息包总数(word(16))+包序号(word(16))
         if (msgHeader.isHasSubPackage()) {
-            msgBodyByteStartIndex = 16;
+            System.arraycopy(data, Constants.MSGBODY_SUBPACKAGE_DEFAULT_START_INDEX, tmp, 0, tmp.length);
+        }else {
+            System.arraycopy(data, Constants.MSGBODY_DEFAULT_START_INDEX, tmp, 0, tmp.length);
         }
-        byte[] tmp = new byte[msgHeader.getMsgBodyLength()];
-        System.arraycopy(data, msgBodyByteStartIndex, tmp, 0, tmp.length);
-        BitOperator bitOperator = BitOperator.getInstance();
-        setAnswerFlowId(bitOperator.parseIntFromBytes(tmp, 0, 2));
-        setRegisterResult(bitOperator.parseIntFromBytes(tmp, 2, 1));
+        LogUtils.e(HexStringUtils.toHexString(tmp));
+        setAnswerFlowId(BitOperator.getInstance().parseIntFromBytes(tmp, 0, 2));
+        setRegisterResult(BitOperator.getInstance().parseIntFromBytes(tmp, 2, 1));
         setAuthentication(new String(tmp, 3, tmp.length - 3));
     }
 

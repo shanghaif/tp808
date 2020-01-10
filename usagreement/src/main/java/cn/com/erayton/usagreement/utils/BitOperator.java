@@ -638,7 +638,7 @@ public class BitOperator {
 
 
 
-    private static final long[] fflong = {0xFF,0xFF00,0xFF0000,0xFF000000,0xFF000000};
+    private final long[] fflong = {0xFF,0xFF00,0xFF0000,0xFF000000,0xFF000000};
 
 //    //将小端byte[]转成数字　例子: ([1,0],0,2)=1
 //    public static long toXDint(byte[] byteData,int startPos,int length){
@@ -654,7 +654,7 @@ public class BitOperator {
 //    }
 
     //将数字转成指定长度的字符串   例子: (3,2)=03
-    public static String numToStr(Object value, int length){
+    public String numToStr(Object value, int length){
         try {
             String v = String.valueOf(Long.parseLong(value.toString()));
             while (v.length() < length) {
@@ -670,7 +670,7 @@ public class BitOperator {
 
     //将bytes数组复制，从startPos位置开始，长度为length
     //例子: ([0,1,2,3],1,3)=[1,2,3]
-    public static byte[] subByte(byte[] bytes,int startPos,int length){
+    public byte[] subByte(byte[] bytes,int startPos,int length){
         byte[] bs = new byte[length];
         System.arraycopy(bytes, startPos, bs, 0, length);
         return bs;
@@ -678,13 +678,13 @@ public class BitOperator {
 
     //将bytes数组复制，从startPos位置开始直到结尾
     //例子: ([0,1,2,3],2)=[2,3]
-    public static byte[] subByte(byte[] bytes,int startPos){
+    public byte[] subByte(byte[] bytes,int startPos){
         int length = bytes.length - startPos;
         return subByte(bytes, startPos, length);
     }
 
     //将多个字节数组合并  例子: (1,[2,3],[4,5])=[1,2,3,4,5]
-    public static byte[] concast(Object... bs) {
+    public byte[] concast(Object... bs) {
         int length = 0;
         for (Object b : bs) {
             if (b instanceof byte[]) {
@@ -708,7 +708,7 @@ public class BitOperator {
     }
 
     //将多个字节数组合并  例子: ([2,3],[4,5])=[2,3,4,5]
-    public static byte[] concast(byte[]...bs) {
+    public byte[] concast(byte[]...bs) {
         int len = 0, index = 0;
         for(byte[] b : bs) {
             len += b.length;
@@ -722,12 +722,12 @@ public class BitOperator {
     }
 
     //将小数组复制到大数据里  例子: ([1,2,0,0,0],2,[3,4,5])  [1,2,0,0,0]->[1,2,3,4,5]
-    public static void arraycopy(byte[] bigs, int startPos, byte[] smalls) {
+    public void arraycopy(byte[] bigs, int startPos, byte[] smalls) {
         System.arraycopy(smalls, 0, bigs, startPos, smalls.length);
     }
 
     //反转数组  例子: ([1,2,3]) = [3,2,1]
-    private static byte[] reverse(byte[] data) {
+    private byte[] reverse(byte[] data) {
 //		ArrayUtils.reverse(data);
         data=invertArray(data);
         return data;
@@ -735,7 +735,7 @@ public class BitOperator {
     /**
      * 反转数组
      */
-    public static <T> T invertArray(T array) {
+    public <T> T invertArray(T array) {
         int len = Array.getLength(array);
         Class<?> classz = array.getClass().getComponentType();
         Object dest = Array.newInstance(classz, len);
@@ -752,7 +752,7 @@ public class BitOperator {
     }
 
 
-    public static int indexOf(byte[] bigs, byte[] smalls) {
+    public int indexOf(byte[] bigs, byte[] smalls) {
         int smallLength = smalls.length, length = bigs.length - smallLength;
         for (int i = 0; i <= length; i++) {
             boolean flag = true;
@@ -769,7 +769,7 @@ public class BitOperator {
         return -1;
     }
 
-    public static int indexOf(byte[] bigs, byte value) {
+    public int indexOf(byte[] bigs, byte value) {
         int length = bigs.length;
         for (int i = 0; i <= length; i++) {
             if (bigs[i] == value) {
@@ -779,7 +779,7 @@ public class BitOperator {
         return -1;
     }
 
-    public static int lastIndexOf(byte[] bigs, byte[] smalls) {
+    public int lastIndexOf(byte[] bigs, byte[] smalls) {
         int smallLength = smalls.length, length = bigs.length - smallLength;
         for (int i = length; i >= 0; i--) {
             boolean flag = true;
@@ -799,7 +799,7 @@ public class BitOperator {
     //字符串相关===============================================================================================
 
     //字符串转成指定长度的字节数组
-    public static byte[] strToBytes(String str, int length) {
+    public byte[] strToBytes(String str, int length) {
         try {
             byte[] bytes = str.getBytes(), b = new byte[length];
             System.arraycopy(bytes, 0, b, length-bytes.length, bytes.length);
@@ -810,7 +810,7 @@ public class BitOperator {
     }
 
     //字符串转成指定长度的字节数组
-    public static byte[] strToBytes(String str) {
+    public byte[] strToBytes(String str) {
         try {
             return str.getBytes();
         } catch (Exception e) {
@@ -828,7 +828,7 @@ public class BitOperator {
     }
 
     //字符串转成指定长度的字节数组
-    public static byte[] strToBytes_UTF8(String str, int length) {
+    public byte[] strToBytes_UTF8(String str, int length) {
         try {
             byte[] bytes = str.getBytes("UTF-8"), b = new byte[length];
             System.arraycopy(bytes, 0, b, length-bytes.length, bytes.length);
@@ -839,7 +839,7 @@ public class BitOperator {
     }
 
     //字符串转成指定长度的字节数组
-    public static byte[] strToBytes_UTF8(String str) {
+    public byte[] strToBytes_UTF8(String str) {
         try {
             return str.getBytes("UTF-8");
         } catch (Exception e) {
@@ -857,7 +857,7 @@ public class BitOperator {
     }
 
     //字节数组转成字符串
-    public static String bytesToStr_UTF8(byte[] bytes) {
+    public String bytesToStr_UTF8(byte[] bytes) {
         try {
             return new String(bytes,"UTF-8").trim();
         } catch (Exception e) {
@@ -906,7 +906,7 @@ public class BitOperator {
 //    }
 
     // 字符串前补0
-    public static String addZero(String str, int len) {
+    public String addZero(String str, int len) {
         if (str.length() < len) {
             int l = str.length();
             for (int i = 0; i < len - l; i++) {
@@ -939,12 +939,12 @@ public class BitOperator {
 //        return data;
 //    }
 
-    public static String getHexStr(byte temp){
+    public String getHexStr(byte temp){
         return Integer.toHexString((temp & 0xFF)+0x100).substring(1).toUpperCase();
     }
 
 
-    public static String getHexStr(byte[] temp){
+    public String getHexStr(byte[] temp){
         StringBuilder sb = new StringBuilder();
         for (int index = 0; index < temp.length; index++) {
             sb.append(getHexStr(temp[index]));
@@ -961,7 +961,7 @@ public long toDDint(byte[] byteData,int startPos,int length){
 
 
     //转数字转小端byte[]　例子: (1,2)=[1,0]
-    public static byte[] toXDbyte(long value, int length) {
+    public byte[] toXDbyte(long value, int length) {
         byte[] result = new byte[length];
         for (int i = 0; i < length; i++) {
             result[i] = (byte) ((value >> i * 8) & 0xFF);
@@ -970,7 +970,7 @@ public long toDDint(byte[] byteData,int startPos,int length){
     }
 
     //转数字转小端byte[]　例子: (1,2)=[1,0]
-    public static byte[] toXDbyte(String value, int length) {
+    public byte[] toXDbyte(String value, int length) {
         try {
             return toXDbyte(Long.valueOf(value), length);
         } catch (Exception e) {
@@ -979,7 +979,7 @@ public long toDDint(byte[] byteData,int startPos,int length){
     }
 
     //将小端byte[]转成数字　例子: ([1,0],0,2)=1
-    public static long toXDint(byte[] byteData,int startPos,int length){
+    public long toXDint(byte[] byteData,int startPos,int length){
         if(byteData == null){
             return 0;
         }

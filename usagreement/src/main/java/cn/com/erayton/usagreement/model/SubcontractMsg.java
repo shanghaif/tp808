@@ -6,6 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
+import cn.com.erayton.usagreement.data.Constants;
 import cn.com.erayton.usagreement.utils.BitOperator;
 
 
@@ -82,18 +83,18 @@ public class SubcontractMsg extends PacketData {
     public void inflatePackageBody(byte[] data) {
         int msgBodyLength = getMsgHeader().getMsgBodyLength();
         Log.e(TAG, "inflatePackageBody_msgBodyLength: " + msgBodyLength);
-        int msgBodyByteStartIndex = 12;
+        byte[] tmp = new byte[msgHeader.getMsgBodyLength()];
         // 2. 消息体
         // 有子包信息,消息体起始字节后移四个字节:消息包总数(word(16))+包序号(word(16))
         if (msgHeader.isHasSubPackage()) {
-            msgBodyByteStartIndex = 16;
+            System.arraycopy(data, Constants.MSGBODY_SUBPACKAGE_START_INDEX, tmp, 0, tmp.length);
+        }else {
+            System.arraycopy(data, Constants.MSGBODY_START_INDEX, tmp, 0, tmp.length);
         }
-        byte[] tmp = new byte[msgHeader.getMsgBodyLength()];
-        System.arraycopy(data, msgBodyByteStartIndex, tmp, 0, tmp.length);
         BitOperator bitOperator = BitOperator.getInstance();
-        setAnswerFlowId(bitOperator.parseIntFromBytes(tmp, 0, 2));
-        setRegisterResult(bitOperator.parseIntFromBytes(tmp, 2, 1));
-        setAuthentication(new String(tmp, 3, tmp.length - 3));
+        setAnswerFlowId(bitOperator.parseIntFromBytes(tmp, 0, 4));
+        setRegisterResult(bitOperator.parseIntFromBytes(tmp, 4, 1));
+        setAuthentication(new String(tmp, 5, tmp.length - 4));
     }
 
 

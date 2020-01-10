@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 import cn.com.erayton.usagreement.data.Constants;
 import cn.com.erayton.usagreement.data.ResponseReason;
 import cn.com.erayton.usagreement.model.PacketData;
+import cn.com.erayton.usagreement.model.ServerAVTranslateControlMsg;
 import cn.com.erayton.usagreement.model.ServerAVTranslateMsg;
 import cn.com.erayton.usagreement.model.ServerGeneralMsg;
 import cn.com.erayton.usagreement.model.ServerParametersMsg;
@@ -13,7 +14,6 @@ import cn.com.erayton.usagreement.model.ServerRegisterMsg;
 import cn.com.erayton.usagreement.socket.core.TCPClient;
 import cn.com.erayton.usagreement.socket.core.UDPClient;
 import cn.com.erayton.usagreement.utils.BitOperator;
-import cn.com.erayton.usagreement.utils.Decoder4LoggingOnly;
 import cn.com.erayton.usagreement.utils.HexStringUtils;
 import cn.com.erayton.usagreement.utils.LogUtils;
 import cn.com.erayton.usagreement.utils.MsgTransformer;
@@ -240,9 +240,7 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
 
     public boolean sendTcpMsg(PacketData packetData, boolean isAsyn){
         MsgTransformer msgTransformer = new MsgTransformer() ;
-        Decoder4LoggingOnly decoder4LoggingOnly = new Decoder4LoggingOnly() ;
         try {
-            decoder4LoggingOnly.decodeHex(msgTransformer.packageDataToByte(packetData));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -576,6 +574,9 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
                         listener.onTernimalAVTranslate((ServerAVTranslateMsg) packetData);
                         break;
                     case Constants.SERVER_AVTRANSMISSION_CONTROL:
+                        packetData = new ServerAVTranslateControlMsg() ;
+                        packetData.setMsgHeader(msgHeader);
+                        packetData.inflatePackageBody(page);
                         LogUtils.d( "----------------------- 音视频实时传输控制 ---------------------------\n packetData -"+packetData) ;
                         break;
 

@@ -1,12 +1,12 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 25
+    compileSdkVersion 28
 
 
     defaultConfig {
-        minSdkVersion 14
-        targetSdkVersion 22
+        minSdkVersion 21
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
 
@@ -19,6 +19,12 @@ android {
             minifyEnabled true
 //            shrinkResources true  //  去除无效资源，依赖 minifyEnabled
             zipAlignEnabled true    //  zip优化
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            minifyEnabled false
+//            shrinkResources false  //  去除无效资源，依赖 minifyEnabled
+            zipAlignEnabled false    //  zip优化
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -42,6 +48,13 @@ android {
     }
 
     makeJar.dependsOn(build)
+
+//    sourceSets {
+//        main {
+//            jniLibs.srcDirs 'libs'
+////            jniLibs.srcDirs = ['libs']
+//        }
+//    }
 
 }
 configurations.all{

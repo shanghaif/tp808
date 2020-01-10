@@ -1,12 +1,12 @@
 package cn.com.erayton.usagreement.model;
 
-import android.util.Log;
 
+import cn.com.erayton.usagreement.data.Constants;
 import cn.com.erayton.usagreement.utils.BitOperator;
+import cn.com.erayton.usagreement.utils.LogUtils;
 
 /**
  * 平台下发的设置参数
- * 比协议文档位数多 1 位的原因是流水号在这里解析
  * */
 public class ServerAVTranslateMsg extends PacketData {
     String TAG = ServerAVTranslateMsg.class.getName() ;
@@ -89,23 +89,23 @@ public class ServerAVTranslateMsg extends PacketData {
     @Override
     public void inflatePackageBody(byte[] data) {
         int msgBodyLength = getMsgHeader().getMsgBodyLength();
-        Log.e(TAG, "inflatePackageBody_msgBodyLength: " + msgBodyLength);
-        int msgBodyByteStartIndex = 12;
+        LogUtils.d("inflatePackageBody_msgBodyLength: " + msgBodyLength);
+        byte[] tmp = new byte[msgHeader.getMsgBodyLength()];
         // 2. 消息体
         // 有子包信息,消息体起始字节后移四个字节:消息包总数(word(16))+包序号(word(16))
         if (msgHeader.isHasSubPackage()) {
-            msgBodyByteStartIndex = 16;
+            System.arraycopy(data, Constants.MSGBODY_SUBPACKAGE_START_INDEX, tmp, 0, tmp.length);
+        }else {
+            System.arraycopy(data, Constants.MSGBODY_START_INDEX, tmp, 0, tmp.length);
         }
-        byte[] tmp = new byte[msgHeader.getMsgBodyLength()];
-        System.arraycopy(data, msgBodyByteStartIndex, tmp, 0, tmp.length);
         BitOperator bitOperator = BitOperator.getInstance();
-        setIpLength(bitOperator.parseIntFromBytes(tmp, 1, 1));
-        setHost(bitOperator.bytesToStr(tmp,2, getIpLength()));
-        setTcpPort((int) bitOperator.toDDint(tmp, getIpLength()+2, 2));
-        setUdpPort((int) bitOperator.toDDint(tmp, getIpLength()+4, 2));
-        setChannelNum(bitOperator.parseIntFromBytes(tmp, getIpLength()+6, 1));
-        setDataType(bitOperator.parseIntFromBytes(tmp, getIpLength()+7, 1));
-//        setSteamType(bitOperator.parseIntFromBytes(tmp, getIpLength()+8, 1));     //  少了个码流类型
+        setIpLength(bitOperator.parseIntFromBytes(tmp, 0, 1));
+        setHost(bitOperator.bytesToStr(tmp,1, getIpLength()));
+        setTcpPort((int) bitOperator.toDDint(tmp, getIpLength()+1, 2));
+        setUdpPort((int) bitOperator.toDDint(tmp, getIpLength()+3, 2));
+        setChannelNum(bitOperator.parseIntFromBytes(tmp, getIpLength()+5, 1));
+        setDataType(bitOperator.parseIntFromBytes(tmp, getIpLength()+6, 1));
+        setSteamType(bitOperator.parseIntFromBytes(tmp, getIpLength()+7, 1));
 
     }
 

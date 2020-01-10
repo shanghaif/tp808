@@ -7,9 +7,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
-import cn.com.erayton.usagreement.utils.BCD8421Operator;
 import cn.com.erayton.usagreement.utils.BitOperator;
-import cn.com.erayton.usagreement.utils.Decoder4LoggingOnly;
 import cn.com.erayton.usagreement.utils.Utils;
 
 /**
@@ -44,24 +42,24 @@ public class TerminalGPSMsg extends PacketData {
 
     @Override
     public byte[] packageDataBody2Byte() {
-        BitOperator bitOperator = BitOperator.getInstance();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
             //32 位二进制 从高到低位
-            baos.write(bitOperator.integerTo4Bytes(Integer.parseInt(String.valueOf(terminalGPSInfo.getWarningMark()), 2)));
+            baos.write(BitOperator.getInstance().integerTo4Bytes(Integer.parseInt(String.valueOf(terminalGPSInfo.getWarningMark()), 2)));
 //            String radix2State = "00000000000000000000000000000010";
-            baos.write(bitOperator.integerTo4Bytes(Integer.parseInt(terminalGPSInfo.getState(), 2)));
-//            baos.write(bitOperator.integerTo4Bytes(Integer.parseInt(String.valueOf(terminalGPSInfo.getState()), 2)));
-//            baos.write(bitOperator.integerTo4Bytes(Integer.parseInt(radix2State, 2)));
-            baos.write(bitOperator.longToBytes(terminalGPSInfo.getLatitude(), 4));
-            baos.write(bitOperator.longToBytes(terminalGPSInfo.getLongitude(), 4));
-            baos.write(bitOperator.integerTo2Bytes(terminalGPSInfo.getAltitude()));
-            baos.write(bitOperator.integerTo2Bytes(terminalGPSInfo.getSpeed()));
-            baos.write(bitOperator.integerTo2Bytes(terminalGPSInfo.getDirection()));
-            baos.write(BCD8421Operator.getInstance().getBCDTime());
-            baos.write(bitOperator.integerTo1Bytes(terminalGPSInfo.getAdditionalInformationId()));
-            baos.write(bitOperator.integerTo1Bytes(terminalGPSInfo.getAdditionalInformationLength()));
-            baos.write(bitOperator.integerTo4Bytes(terminalGPSInfo.getMileage()));
+            baos.write(BitOperator.getInstance().integerTo4Bytes(Integer.parseInt(terminalGPSInfo.getState(), 2)));
+//            baos.write(BitOperator.getInstance().integerTo4Bytes(Integer.parseInt(String.valueOf(terminalGPSInfo.getState()), 2)));
+//            baos.write(BitOperator.getInstance().integerTo4Bytes(Integer.parseInt(radix2State, 2)));
+            baos.write(BitOperator.getInstance().longToBytes(terminalGPSInfo.getLatitude(), 4));
+            baos.write(BitOperator.getInstance().longToBytes(terminalGPSInfo.getLongitude(), 4));
+            baos.write(BitOperator.getInstance().integerTo2Bytes(terminalGPSInfo.getAltitude()));
+            baos.write(BitOperator.getInstance().integerTo2Bytes(terminalGPSInfo.getSpeed()));
+            baos.write(BitOperator.getInstance().integerTo2Bytes(terminalGPSInfo.getDirection()));
+//            baos.write(BCD8421Operator.getInstance().getBCDTime());
+            baos.write(BitOperator.getInstance().getBCDTime());
+            baos.write(BitOperator.getInstance().integerTo1Bytes(terminalGPSInfo.getAdditionalInformationId()));
+            baos.write(BitOperator.getInstance().integerTo1Bytes(terminalGPSInfo.getAdditionalInformationLength()));
+            baos.write(BitOperator.getInstance().integerTo4Bytes(terminalGPSInfo.getMileage()));
             //  位置信息附加项
 
 //            long lat = 22581626 ;

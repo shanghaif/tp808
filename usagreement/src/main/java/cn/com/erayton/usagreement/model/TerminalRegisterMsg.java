@@ -5,7 +5,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
+import cn.com.erayton.usagreement.data.Constants;
 import cn.com.erayton.usagreement.utils.BitOperator;
+import cn.com.erayton.usagreement.utils.HexStringUtils;
+import cn.com.erayton.usagreement.utils.LogUtils;
 
 
 /**
@@ -80,32 +83,31 @@ public class TerminalRegisterMsg extends PacketData {
     @Override
     public void inflatePackageBody(byte[] data) {
         int msgBodyLength = getMsgHeader().getMsgBodyLength();
-        Log.e(TAG, "inflatePackageBody_msgBodyLength: " + msgBodyLength);
-        int msgBodyByteStartIndex = 12;
+        LogUtils.e("inflatePackageBody_msgBodyLength: " + msgBodyLength);
+        byte[] tmp = new byte[msgHeader.getMsgBodyLength()];
         // 2. 消息体
         // 有子包信息,消息体起始字节后移四个字节:消息包总数(word(16))+包序号(word(16))
         if (msgHeader.isHasSubPackage()) {
-            msgBodyByteStartIndex = 16;
+            System.arraycopy(data, Constants.MSGBODY_SUBPACKAGE_START_INDEX, tmp, 0, tmp.length);
+        }else {
+            System.arraycopy(data, Constants.MSGBODY_START_INDEX, tmp, 0, tmp.length);
         }
-        byte[] tmp = new byte[msgHeader.getMsgBodyLength()];
-        System.arraycopy(data, msgBodyByteStartIndex, tmp, 0, tmp.length);
-        BitOperator bitOperator = BitOperator.getInstance();
-        setAnswerFlowId(bitOperator.parseIntFromBytes(tmp, 0, 2));
-        setRegisterResult(bitOperator.parseIntFromBytes(tmp, 2, 1));
+        LogUtils.e(HexStringUtils.toHexString(tmp));
+        setAnswerFlowId(BitOperator.getInstance().parseIntFromBytes(tmp, 0, 2));
+        setRegisterResult(BitOperator.getInstance().parseIntFromBytes(tmp, 2, 1));
         setAuthentication(new String(tmp, 3, tmp.length - 3));
     }
 
 
     public byte[] packageDataBody2Byte() {
 
-        BitOperator bitOperator = BitOperator.getInstance();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
             //拼接消息体
             // 1. 省域ID word(16)
-            baos.write(bitOperator.integerTo2Bytes(terminalRegInfo.getProvinceId()));
+            baos.write(BitOperator.getInstance().integerTo2Bytes(terminalRegInfo.getProvinceId()));
             //市县域 ID
-            baos.write(bitOperator.integerTo2Bytes(terminalRegInfo.getCityId()));
+            baos.write(BitOperator.getInstance().integerTo2Bytes(terminalRegInfo.getCityId()));
             //制造商 ID
             baos.write(terminalRegInfo.getManufacturerId().getBytes());
             //终端型号
@@ -113,7 +115,7 @@ public class TerminalRegisterMsg extends PacketData {
             //终端 ID
             baos.write(terminalRegInfo.getTerminalId().getBytes());
             //车牌颜色
-            baos.write(bitOperator.integerTo1Byte(terminalRegInfo.getLicensePlateColor()));
+            baos.write(BitOperator.getInstance().integerTo1Byte(terminalRegInfo.getLicensePlateColor()));
             //车牌标识
             baos.write(terminalRegInfo.getLicensePlate().getBytes());
         } catch (IOException e) {

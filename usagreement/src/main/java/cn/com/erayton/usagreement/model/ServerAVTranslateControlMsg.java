@@ -2,12 +2,14 @@ package cn.com.erayton.usagreement.model;
 
 import android.util.Log;
 
+import cn.com.erayton.usagreement.data.Constants;
 import cn.com.erayton.usagreement.utils.BitOperator;
+import cn.com.erayton.usagreement.utils.HexStringUtils;
 import cn.com.erayton.usagreement.utils.LogUtils;
 
 /**
  * 音视频实时传输控制
- * 0x92
+ * 0x9102
  * */
 public class ServerAVTranslateControlMsg extends PacketData {
     String TAG = ServerAVTranslateControlMsg.class.getName() ;
@@ -21,26 +23,24 @@ public class ServerAVTranslateControlMsg extends PacketData {
     public void inflatePackageBody(byte[] data) {
         int msgBodyLength = getMsgHeader().getMsgBodyLength();
         LogUtils.d("inflatePackageBody_msgBodyLength: " + msgBodyLength);
-        int msgBodyByteStartIndex = 12;
+        byte[] tmp = new byte[msgHeader.getMsgBodyLength()];
         // 2. 消息体
         // 有子包信息,消息体起始字节后移四个字节:消息包总数(word(16))+包序号(word(16))
         if (msgHeader.isHasSubPackage()) {
-            msgBodyByteStartIndex = 16;
-        }
-        byte[] tmp = new byte[msgHeader.getMsgBodyLength()];
-        System.arraycopy(data, msgBodyByteStartIndex, tmp, 0, tmp.length);
-        BitOperator bitOperator = BitOperator.getInstance();
-        LogUtils.d("pass:"+bitOperator.parseIntFromBytes(tmp, 1, 1));
-        LogUtils.d("control:"+bitOperator.parseIntFromBytes(tmp, 2, 1));
-        LogUtils.d("close:"+bitOperator.parseIntFromBytes(tmp, 3, 1));
-        LogUtils.d("steam type:"+bitOperator.parseIntFromBytes(tmp, 4, 1));
-//        setIpLength(bitOperator.parseIntFromBytes(tmp, 1, 1));
-//        setHost(bitOperator.bytesToStr(tmp,2, getIpLength()));
-//        setTcpPort((int) bitOperator.toDDint(tmp, getIpLength()+2, 2));
-//        setUdpPort((int) bitOperator.toDDint(tmp, getIpLength()+4, 2));
-//        setChannelNum(bitOperator.parseIntFromBytes(tmp, getIpLength()+6, 1));
-//        setDataType(bitOperator.parseIntFromBytes(tmp, getIpLength()+7, 1));
-//        setSteamType(bitOperator.parseIntFromBytes(tmp, getIpLength()+8, 1));     //  少了个码流类型
+            System.arraycopy(data, Constants.MSGBODY_SUBPACKAGE_START_INDEX, tmp, 0, tmp.length);
+        }else
+        System.arraycopy(data, Constants.MSGBODY_START_INDEX, tmp, 0, tmp.length);
+
+        LogUtils.d("length:"+tmp.length+"\n "+ HexStringUtils.toHexString(tmp));
+//        逻辑通道号
+        LogUtils.d("pass:"+BitOperator.getInstance().parseIntFromBytes(tmp, 0, 1));
+//        控制指令
+        LogUtils.d("control:"+BitOperator.getInstance().parseIntFromBytes(tmp, 1, 1));
+//        关闭音频类型
+        LogUtils.d("close:"+BitOperator.getInstance().parseIntFromBytes(tmp, 2, 1));
+//        切换码流类型
+        LogUtils.d("steam type:"+BitOperator.getInstance().parseIntFromBytes(tmp, 3, 1));
+
 
     }
 

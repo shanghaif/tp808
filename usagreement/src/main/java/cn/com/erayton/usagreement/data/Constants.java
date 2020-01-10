@@ -39,6 +39,16 @@ public class Constants {
         public static final int TERMINAL_PARAMETERS_SETTING_0X0028 = 0x0028 ;
         //  DWORD 缺省时间汇报间隔，单位为秒（s），>0
         public static final int TERMINAL_PARAMETERS_SETTING_0X0029 = 0x0029 ;
+        //  缺省距离汇报间隔
+        public static final int TERMINAL_PARAMETERS_SETTING_0X002C = 0x002C ;
+        //  驾驶员未登录汇报距离间隔
+        public static final int TERMINAL_PARAMETERS_SETTING_0X002D = 0x002D ;
+        //  休眠时汇报距离间隔
+        public static final int TERMINAL_PARAMETERS_SETTING_0X002E = 0x002E ;
+        //  紧急报警时汇报距离间隔
+        public static final int TERMINAL_PARAMETERS_SETTING_0X002F = 0x002F ;
+
+
         public static final int TERMINAL_PARAMETERS_SETTING_0X0030 = 0x0030 ;
         public static final int TERMINAL_PARAMETERS_SETTING_0X0031 = 0x0031 ;
 
@@ -177,6 +187,7 @@ public class Constants {
 
 
 //    ============================================================================================
+
     //    0：成功；1：车辆已被注册；2：数据库中无该车辆；3：终端已被注册；4：数据库中无该终端
     public static final int CODE_ZERO = 0 ;
     public static final int CODE_ONE = 1 ;
@@ -190,5 +201,21 @@ public class Constants {
 
 //    private static final int THREADTIME =  1000;     // 进制
 //    public static final int UDPTHREADSEC = UDPThreadTime * THREADTIME;     //  realTime
+
+
+//    ============================================================================================
+    //  808 协议消息体解析起始位
+    /**
+     * 无分包消息体解析起始位
+     * */
+    public static final int MSGBODY_START_INDEX = 13 ;
+    public static final int MSGBODY_DEFAULT_START_INDEX = 12 ;
+    /**
+     * 有分包消息体解析起始位
+     * */
+    public static final int MSGBODY_SUBPACKAGE_START_INDEX = 17 ;
+    public static final int MSGBODY_SUBPACKAGE_DEFAULT_START_INDEX = 16 ;
+
+
 
 }
