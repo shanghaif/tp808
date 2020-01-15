@@ -46,7 +46,7 @@ public class SocketClientSender {
         header.setEncryptionType(0);
         header.setHasSubPackage(false);
         header.setReservedBit(0);
-        //设置终端号
+        //  设置终端号
         if (phone == null) {
             LogUtils.e("phone is null.") ;
         }
@@ -60,7 +60,7 @@ public class SocketClientSender {
     public static boolean sendGeneralReponse(TerminalGeneralMsg.TerminalGeneralInfo terminalGeneralInfo, boolean isAsyn, boolean isUdp){
         TerminalGeneralMsg msg = new TerminalGeneralMsg() ;
         msg.setTerminalGeneralInfo(terminalGeneralInfo);
-        //header
+        //  header
         PacketData.MsgHeader header = getHeader();
         header.setMsgId(Constants.TERMINAL_CONMOM_RSP);
         header.setMsgBodyLength(msg.getBodyLength());
@@ -73,7 +73,7 @@ public class SocketClientSender {
         if (socketClient == null)   return false ;
         // 注册
         TerminalRegisterMsg msg = new TerminalRegisterMsg();
-        //body
+        //  body
 //        TerminalRegisterMsg.TerminalRegInfo terminalRegInfo = new TerminalRegisterMsg.TerminalRegInfo();
 //        terminalRegInfo.setProvinceId(0x00);
 //        terminalRegInfo.setCityId(0x00);
@@ -110,7 +110,7 @@ public class SocketClientSender {
         if (socketClient == null)   return false ;
         //  鉴权
         TerminalAuthMsg msg = new TerminalAuthMsg();
-        //body
+        //  body
 //        TerminalRegisterMsg.TerminalRegInfo terminalRegInfo = new TerminalRegisterMsg.TerminalRegInfo();
 //        terminalRegInfo.setProvinceId(0x00);
 //        terminalRegInfo.setCityId(0x00);
@@ -134,7 +134,7 @@ public class SocketClientSender {
         TerminalGPSMsg msg = new TerminalGPSMsg();
         terminalAuthInfo.setBCDTime(BCD8421Operator.getInstance().getBCDTime());
         msg.setTerminalGPSInfo(terminalAuthInfo);
-        //header
+        //  header
         PacketData.MsgHeader header = getHeader();
         header.setMsgId(Constants.TERMINAL_LOCATION_UPLOAD);
         header.setMsgBodyLength(msg.getBodyLength());
@@ -148,7 +148,7 @@ public class SocketClientSender {
 
         TerminalParametersMsg msg = new TerminalParametersMsg();
         msg.setTerminalParametersInfo(parametersInfo);
-        //header
+        //  header
         PacketData.MsgHeader header = getHeader();
         header.setMsgId(Constants.SERVER_PARAMETERS_QUERY_RSP);
         header.setMsgBodyLength(msg.getBodyLength());
@@ -159,19 +159,14 @@ public class SocketClientSender {
 
     public static boolean send(byte[] msg, boolean isAsyn, boolean isUdp){
         if (!isUdp){
-            Log.d("cjh", "------------------------------ send byte[] ----------------------------") ;
             return socketClient.sendTcpMsg(msg, isAsyn) ;
         }else return socketClient.sendUdpMsg(msg, isAsyn) ;
     }
 
     private static boolean send(PacketData msg, boolean isAsyn, boolean isUdp){
-        Log.d(TAG, "send PacketData -----------------------------"+msg) ;
         if (!isUdp){
-            Log.d("cjh", "------------------------------ send PacketData ----------------------------") ;
             return socketClient.sendTcpMsg(msg, isAsyn) ;
         }else return socketClient.sendUdpMsg(msg, isAsyn) ;
-//            return socketClient.sendTcpMsg(msg, isAsyn) ;
-//        }else return socketClient.sendUdpMsg(msg, isAsyn) ;
     }
 
 }

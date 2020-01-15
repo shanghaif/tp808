@@ -37,10 +37,12 @@ dependencies {
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
+    implementation 'org.greenrobot:eventbus:3.1.1'
     implementation "androidx.core:core-ktx:+"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation(name: 'usagreement-debug', ext: 'aar')
+//    implementation(name: 'usagreement-debug', ext: 'aar')
 //    implementation (name: 'usagreement-debug1', ext: 'aar')
+    implementation (name: 'usagreement-debug3', ext: 'aar')
 
 }
 repositories {

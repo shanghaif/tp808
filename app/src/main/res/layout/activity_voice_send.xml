@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".video.voice.Voice">
+
+    <Button
+        android:id="@+id/startVoice"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="开始对讲" />
+    <Button
+        android:id="@+id/reciveVoice"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="开始接收" />
+
+</LinearLayout>

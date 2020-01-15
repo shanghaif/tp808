@@ -1,5 +1,7 @@
 package cn.com.erayton.usagreement.data;
 
+import com.library.live.vd.VDEncoder;
+
 import java.nio.charset.Charset;
 
 /**
@@ -32,10 +34,13 @@ public class Constants {
     //  终端参数子参数
         //  DWORD 位置汇报策略，0：定时汇报；1：定距汇报；2：定时和定距汇报
         public static final int TERMINAL_PARAMETERS_SETTING_0X0020 = 0x0020 ;
+        //  位置汇报方案
         public static final int TERMINAL_PARAMETERS_SETTING_0X0021 = 0x0021 ;
+        //  驾驶员未登录汇报时间间隔
         public static final int TERMINAL_PARAMETERS_SETTING_0X0022 = 0x0022 ;
-
+        //  休眠时汇报时间间隔
         public static final int TERMINAL_PARAMETERS_SETTING_0X0027 = 0x0027 ;
+        //  紧急报警时汇报时间间隔
         public static final int TERMINAL_PARAMETERS_SETTING_0X0028 = 0x0028 ;
         //  DWORD 缺省时间汇报间隔，单位为秒（s），>0
         public static final int TERMINAL_PARAMETERS_SETTING_0X0029 = 0x0029 ;
@@ -47,9 +52,9 @@ public class Constants {
         public static final int TERMINAL_PARAMETERS_SETTING_0X002E = 0x002E ;
         //  紧急报警时汇报距离间隔
         public static final int TERMINAL_PARAMETERS_SETTING_0X002F = 0x002F ;
-
-
+        //  拐点补传角度
         public static final int TERMINAL_PARAMETERS_SETTING_0X0030 = 0x0030 ;
+        //  电子围栏半径（非法位移阈值）
         public static final int TERMINAL_PARAMETERS_SETTING_0X0031 = 0x0031 ;
 
     //  查询终端参数
@@ -166,7 +171,7 @@ public class Constants {
 
 //    =============================== socketclient ===============================
     /**
-     * 心跳间隔 2 分钟
+     * 心跳间隔 3 分钟
      * */
     public static final int HBTHREAD_SLEEPIME = 3 * 60 * MILLISECONDSTOSECONDS ;     //  3 分钟
 
@@ -217,5 +222,28 @@ public class Constants {
     public static final int MSGBODY_SUBPACKAGE_DEFAULT_START_INDEX = 16 ;
 
 
+//    ============================================================================================
+    //  帧率
+    public static int FRAME_RATE = 15 ;
+    //  推流分辨率
+    public static int PUSHER_RESOLUTION_W = 352 ;
+    public static int PUSHER_RESOLUTION_H = 288 ;
 
+    //  视频推流码率
+    public static int VIDEO_PUSH_RATE = 100 * SCALE ;
+    //  视频采集码率
+    public static int VIDEO_SAMPLING_RATE = 300 * SCALE ;
+
+    //  编码方式
+    public static String VIDEO_ENCODING = VDEncoder.H264 ;
+    //  预览
+    public static boolean PREVIEW = false ;
+    //  摄像头 true 前置， false 后置
+    public static boolean camera = false ;
+    //  音频推流码率
+    public static int VOICE_PUSH_RATE = 8 * SCALE ;
+    //  音频采集码率
+    public static int VOICE_SAMPLING_RATE = 8 * SCALE ;
+
+    private static final int SCALE = 1024 ;
 }

@@ -1,9 +1,5 @@
 package cn.com.erayton.usagreement.model;
 
-import android.util.Log;
-
-import java.util.Arrays;
-
 import cn.com.erayton.usagreement.data.Constants;
 import cn.com.erayton.usagreement.utils.BitOperator;
 import cn.com.erayton.usagreement.utils.HexStringUtils;

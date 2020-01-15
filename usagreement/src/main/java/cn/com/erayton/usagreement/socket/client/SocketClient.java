@@ -48,6 +48,8 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
         void onTernimalParameterSetting(ServerParametersMsg packetData) ;
         void queryTernimalParameterSetting(int serNum) ;
         void onTernimalAVTranslate(ServerAVTranslateMsg packetData) ;
+        //  音视频传输控制
+        void onAVControl() ;
     }
 
 
@@ -398,10 +400,6 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
             //  两次心跳未收到回复即进行重连
             if (!isConnected() || (tcpLastHbDt + (getHBInterval() * 3 + 30) * 1000) < curDt) {
                 LogUtils.d( "Hb is timeout, will be reconnect.");
-                LogUtils.d( "isConnected:"+isConnected()+
-                        "\n tcpLastHbDt:"+tcpLastHbDt+
-                        "\ngetHbInterval:"+getHBInterval()+
-                        "\ncurDt:"+curDt) ;
                 setIsNeedReconnect(true);
             }
 
@@ -425,13 +423,10 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
                     e.printStackTrace();
                 }
             } else{
-                LogUtils.d( "2 -------------------------------------------") ;
                 if ((tcpLastHbDt + getHBInterval() * 1000) <= curDt) {
                     //  有信息发送的情况下不再发送心跳
-                    LogUtils.d( "3 -------------------------------------------") ;
                     SocketClientSender.sendHB(false, false);
                 }
-                LogUtils.d( "4 -------------------------------------------") ;
             }
 
             try {
@@ -496,10 +491,6 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
                         packetData.inflatePackageBody(data);
                         //        0：成功/确认；1：失败；2：消息有误；3：不支持；4：报警处理确认；
                         int generalResult = ((ServerGeneralMsg) packetData).getResult() ;
-//                        if (isUpd){
-//                            setUdpLastHbDt();
-//                        }else updateTcpLastHbDt();
-
                         if (Constants.TERMINAL_LOCATION_UPLOAD == ((ServerGeneralMsg) packetData).getAnswerId()){
                             listener.gpsResp(generalResult, ResponseReason.getInstance().GENERALRESULT[generalResult]);
                         }else if (Constants.TERMINAL_HEART_BEAT == ((ServerGeneralMsg) packetData).getAnswerId()){
@@ -548,35 +539,20 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
                         break;
                     case Constants.TERMINAL_PARAMETERS_SPECIFY_QUERY:
                         LogUtils.d( "----------------------- 查询指定终端参数 ---------------------------\n packetData -"+packetData) ;
-//                        packetData = new ServerParametersMsg() ;
-//                        packetData.setMsgHeader(msgHeader);
-//                        packetData.inflatePackageBody(page);
-//                        LogUtils.d( "--------------------------------------------------\n getSerialNumber -"+((ServerParametersMsg) packetData).getSerialNumber()+"\n ((ServerParametersMsg) packetData)"+((ServerParametersMsg) packetData)) ;
-//                        listener.onTernimalParameterSetting((ServerParametersMsg) packetData);
                         listener.queryTernimalParameterSetting(msgHeader.getFlowId());
                         break;
                     case Constants.SERVER_AVTRANSMISSION_REQUEST:
                         LogUtils.d( "----------------------- 实时音视频传输请求 ---------------------------\n packetData -"+packetData) ;
-//                        packetData = new ServerParametersMsg() ;
-//                        packetData.setMsgHeader(msgHeader);
-//                        packetData.inflatePackageBody(page);
-//                        LogUtils.d( "--------------------------------------------------\n getSerialNumber -"+((ServerParametersMsg) packetData).getSerialNumber()+"\n ((ServerParametersMsg) packetData)"+((ServerParametersMsg) packetData)) ;
-//                        listener.onTernimalParameterSetting((ServerParametersMsg) packetData);
                         packetData = new ServerAVTranslateMsg() ;
                         packetData.setMsgHeader(msgHeader);
                         packetData.inflatePackageBody(page);
-//                        TerminalGeneralMsg.TerminalGeneralInfo info = new TerminalGeneralMsg.TerminalGeneralInfo() ;
-//                        info.setResult(0);
-//                        info.setRespId(msgHeader.getMsgId());
-//                        info.setSeNum(msgHeader.getFlowId());
-//
-//                        SocketClientSender.sendGeneralReponse(info, true, false) ;
                         listener.onTernimalAVTranslate((ServerAVTranslateMsg) packetData);
                         break;
                     case Constants.SERVER_AVTRANSMISSION_CONTROL:
                         packetData = new ServerAVTranslateControlMsg() ;
                         packetData.setMsgHeader(msgHeader);
                         packetData.inflatePackageBody(page);
+                        listener.onAVControl();
                         LogUtils.d( "----------------------- 音视频实时传输控制 ---------------------------\n packetData -"+packetData) ;
                         break;
 

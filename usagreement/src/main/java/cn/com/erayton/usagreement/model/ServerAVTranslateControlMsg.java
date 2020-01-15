@@ -14,6 +14,47 @@ import cn.com.erayton.usagreement.utils.LogUtils;
 public class ServerAVTranslateControlMsg extends PacketData {
     String TAG = ServerAVTranslateControlMsg.class.getName() ;
 
+    private int channelNum ;
+
+    private int controlCode ;
+
+    private int closeType ;
+
+    private int steamType ;
+
+
+    public int getChannelNum() {
+        return channelNum;
+    }
+
+    private void setChannelNum(int channelNum) {
+        this.channelNum = channelNum;
+    }
+
+    public int getControlCode() {
+        return controlCode;
+    }
+
+    private void setControlCode(int controlCode) {
+        this.controlCode = controlCode;
+    }
+
+    public int getCloseType() {
+        return closeType;
+    }
+
+    private void setCloseType(int closeType) {
+        this.closeType = closeType;
+    }
+
+    public int getSteamType() {
+        return steamType;
+    }
+
+    private void setSteamType(int steamType) {
+        this.steamType = steamType;
+    }
+
     @Override
     public byte[] packageDataBody2Byte() {
         return new byte[0];
@@ -33,14 +74,17 @@ public class ServerAVTranslateControlMsg extends PacketData {
 
         LogUtils.d("length:"+tmp.length+"\n "+ HexStringUtils.toHexString(tmp));
 //        逻辑通道号
-        LogUtils.d("pass:"+BitOperator.getInstance().parseIntFromBytes(tmp, 0, 1));
+        setChannelNum(BitOperator.getInstance().parseIntFromBytes(tmp, 0, 1));
+        LogUtils.d("pass:"+getChannelNum());
 //        控制指令
-        LogUtils.d("control:"+BitOperator.getInstance().parseIntFromBytes(tmp, 1, 1));
+        setControlCode(BitOperator.getInstance().parseIntFromBytes(tmp, 1, 1));
+        LogUtils.d("control:"+getControlCode());
 //        关闭音频类型
-        LogUtils.d("close:"+BitOperator.getInstance().parseIntFromBytes(tmp, 2, 1));
+        setCloseType(BitOperator.getInstance().parseIntFromBytes(tmp, 2, 1));
+        LogUtils.d("close:"+getCloseType());
 //        切换码流类型
-        LogUtils.d("steam type:"+BitOperator.getInstance().parseIntFromBytes(tmp, 3, 1));
-
+        setSteamType(BitOperator.getInstance().parseIntFromBytes(tmp, 3, 1));
+        LogUtils.d("steam type:"+getSteamType());
 
     }
 

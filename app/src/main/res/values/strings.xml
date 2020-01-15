@@ -1,3 +1,20 @@
 <resources>
     <string name="app_name">JT-T808</string>
+
+    <string name="default_ip">106.14.186.44</string>
+    <string name="default_port">9982</string>
+
+    <string name="frame_rate_video">24</string>
+    <string name="frame_rate_voice_push">8</string>
+    <string name="frame_rate_voice_collect">8</string>
+    <string name="push_width">352</string>
+    <string name="push_height">288</string>
+    <string name="collect_width">400</string>
+    <string name="collect_height">380</string>
+    <!--<string name="push_width">288</string>-->
+    <!--<string name="push_height">352</string>-->
+
+    <string name="push_bitrage">300</string>
+    <string name="collect_bitrage">600</string>
+
 </resources>

@@ -94,5 +94,10 @@ public class ClientManager {
         public void onTernimalAVTranslate(ServerAVTranslateMsg serverAVTranslateMsg) {
             LogUtils.d(serverAVTranslateMsg.toString());
         }
+
+        @Override
+        public void onAVControl() {
+
+        }
     } ;
 }

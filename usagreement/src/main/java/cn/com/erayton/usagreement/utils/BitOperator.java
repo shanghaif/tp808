@@ -13,10 +13,10 @@ public class BitOperator {
     private static final String TAG = "BitOperator";
 
     private BitOperator() {
-        //no instance
+        //  no instance
     }
 
-    public static final class HOLDER {
+    private static final class HOLDER {
         private static final BitOperator INSTANCE = new BitOperator();
     }
 
@@ -619,14 +619,14 @@ public class BitOperator {
     //  ===================================================================
 
 
-    //数字相关===============================================================================================
+    //  数字相关===============================================================================================
 
-    //将数字转大端字节数组　例子: (1,2)=[0,1]
+    //  将数字转大端字节数组　例子: (1,2)=[0,1]
     public byte[] toDDbyte(long value, int length) {
         return reverse(toXDbyte(value, length));
     }
 
-    //将数字转大端字节数组　例子: (1,2)=[0,1]
+    //  将数字转大端字节数组　例子: (1,2)=[0,1]
     public byte[] toDDbyte(String value, int length) {
         try {
             return toDDbyte(Long.valueOf(value), length);
@@ -653,7 +653,7 @@ public class BitOperator {
 //        return value;
 //    }
 
-    //将数字转成指定长度的字符串   例子: (3,2)=03
+    //  将数字转成指定长度的字符串   例子: (3,2)=03
     public String numToStr(Object value, int length){
         try {
             String v = String.valueOf(Long.parseLong(value.toString()));
@@ -666,24 +666,24 @@ public class BitOperator {
         }
     }
 
-    //数组相关===============================================================================================
+    //  数组相关===============================================================================================
 
-    //将bytes数组复制，从startPos位置开始，长度为length
-    //例子: ([0,1,2,3],1,3)=[1,2,3]
+    //  将bytes数组复制，从startPos位置开始，长度为length
+    //  例子: ([0,1,2,3],1,3)=[1,2,3]
     public byte[] subByte(byte[] bytes,int startPos,int length){
         byte[] bs = new byte[length];
         System.arraycopy(bytes, startPos, bs, 0, length);
         return bs;
     }
 
-    //将bytes数组复制，从startPos位置开始直到结尾
-    //例子: ([0,1,2,3],2)=[2,3]
+    //  将bytes数组复制，从startPos位置开始直到结尾
+    //  例子: ([0,1,2,3],2)=[2,3]
     public byte[] subByte(byte[] bytes,int startPos){
         int length = bytes.length - startPos;
         return subByte(bytes, startPos, length);
     }
 
-    //将多个字节数组合并  例子: (1,[2,3],[4,5])=[1,2,3,4,5]
+    //  将多个字节数组合并  例子: (1,[2,3],[4,5])=[1,2,3,4,5]
     public byte[] concast(Object... bs) {
         int length = 0;
         for (Object b : bs) {
@@ -707,7 +707,7 @@ public class BitOperator {
         return bytes;
     }
 
-    //将多个字节数组合并  例子: ([2,3],[4,5])=[2,3,4,5]
+    //  将多个字节数组合并  例子: ([2,3],[4,5])=[2,3,4,5]
     public byte[] concast(byte[]...bs) {
         int len = 0, index = 0;
         for(byte[] b : bs) {
@@ -721,12 +721,12 @@ public class BitOperator {
         return bytes;
     }
 
-    //将小数组复制到大数据里  例子: ([1,2,0,0,0],2,[3,4,5])  [1,2,0,0,0]->[1,2,3,4,5]
+    //  将小数组复制到大数据里  例子: ([1,2,0,0,0],2,[3,4,5])  [1,2,0,0,0]->[1,2,3,4,5]
     public void arraycopy(byte[] bigs, int startPos, byte[] smalls) {
         System.arraycopy(smalls, 0, bigs, startPos, smalls.length);
     }
 
-    //反转数组  例子: ([1,2,3]) = [3,2,1]
+    //  反转数组  例子: ([1,2,3]) = [3,2,1]
     private byte[] reverse(byte[] data) {
 //		ArrayUtils.reverse(data);
         data=invertArray(data);
@@ -796,9 +796,9 @@ public class BitOperator {
         return -1;
     }
 
-    //字符串相关===============================================================================================
+    //  字符串相关===============================================================================================
 
-    //字符串转成指定长度的字节数组
+    //  字符串转成指定长度的字节数组
     public byte[] strToBytes(String str, int length) {
         try {
             byte[] bytes = str.getBytes(), b = new byte[length];
@@ -809,7 +809,7 @@ public class BitOperator {
         }
     }
 
-    //字符串转成指定长度的字节数组
+    //  字符串转成指定长度的字节数组
     public byte[] strToBytes(String str) {
         try {
             return str.getBytes();
@@ -818,7 +818,7 @@ public class BitOperator {
         }
     }
 
-    //字节数组转成字符串
+    //  字节数组转成字符串
     public String bytesToStr(byte[] bytes, int startPos, int length) {
         try {
             return new String(subByte(bytes,startPos,length)).trim();
@@ -827,7 +827,7 @@ public class BitOperator {
         }
     }
 
-    //字符串转成指定长度的字节数组
+    //  字符串转成指定长度的字节数组
     public byte[] strToBytes_UTF8(String str, int length) {
         try {
             byte[] bytes = str.getBytes("UTF-8"), b = new byte[length];
@@ -838,7 +838,7 @@ public class BitOperator {
         }
     }
 
-    //字符串转成指定长度的字节数组
+    //  字符串转成指定长度的字节数组
     public byte[] strToBytes_UTF8(String str) {
         try {
             return str.getBytes("UTF-8");
@@ -847,7 +847,7 @@ public class BitOperator {
         }
     }
 
-    //字节数组转成字符串
+    //  字节数组转成字符串
     public String bytesToStr_UTF8(byte[] bytes, int startPos, int length) {
         try {
             return new String(subByte(bytes,startPos,length),"UTF-8").trim();
@@ -856,7 +856,7 @@ public class BitOperator {
         }
     }
 
-    //字节数组转成字符串
+    //  字节数组转成字符串
     public String bytesToStr_UTF8(byte[] bytes) {
         try {
             return new String(bytes,"UTF-8").trim();
@@ -867,45 +867,8 @@ public class BitOperator {
 
 
     //************************************************
-//    /**
-//     * 把一个整形改为2位的byte数组
-//     *
-//     * @param value
-//     * @return
-//     * @throws Exception
-//     */
-//    public static byte[] integerTo2Bytes(int value) {
-//        byte[] result = new byte[2];
-//        result[0] = (byte) ((value >>> 8) & 0xFF);
-//        result[1] = (byte) (value & 0xFF);
-//        return result;
-//    }
 
-//    /**
-//     * 字符串==>BCD字节数组
-//     *
-//     * @param str
-//     * @return BCD字节数组
-//     */
-//    public byte[] string2Bcd(String str) {
-//        // 奇数,前补零
-//        if ((str.length() & 0x1) == 1) {
-//            str = "0" + str;
-//        }
-//
-//        byte ret[] = new byte[str.length() / 2];
-//        byte bs[] = str.getBytes();
-//        for (int i = 0; i < ret.length; i++) {
-//
-//            byte high = ascII2Bcd(bs[2 * i]);
-//            byte low = ascII2Bcd(bs[2 * i + 1]);
-//
-//            ret[i] = (byte) ((high << 4) | low);
-//        }
-//        return ret;
-//    }
-
-    // 字符串前补0
+    //  字符串前补0
     public String addZero(String str, int len) {
         if (str.length() < len) {
             int l = str.length();
@@ -952,15 +915,15 @@ public class BitOperator {
         return sb.toString();
     }
 
-//  大小端
-//将大端byte[]转成数字　例子: ([0,1],0,2)=1
-public long toDDint(byte[] byteData,int startPos,int length){
-    byteData = reverse(subByte(byteData, startPos, length));
-    return toXDint(byteData,0,length);
-}
+    //  大小端
+    //  将大端byte[]转成数字　例子: ([0,1],0,2)=1
+    public long toDDint(byte[] byteData,int startPos,int length){
+        byteData = reverse(subByte(byteData, startPos, length));
+        return toXDint(byteData,0,length);
+    }
 
 
-    //转数字转小端byte[]　例子: (1,2)=[1,0]
+    //  转数字转小端byte[]　例子: (1,2)=[1,0]
     public byte[] toXDbyte(long value, int length) {
         byte[] result = new byte[length];
         for (int i = 0; i < length; i++) {
@@ -969,7 +932,7 @@ public long toDDint(byte[] byteData,int startPos,int length){
         return result;
     }
 
-    //转数字转小端byte[]　例子: (1,2)=[1,0]
+    //  转数字转小端byte[]　例子: (1,2)=[1,0]
     public byte[] toXDbyte(String value, int length) {
         try {
             return toXDbyte(Long.valueOf(value), length);
@@ -978,7 +941,7 @@ public long toDDint(byte[] byteData,int startPos,int length){
         }
     }
 
-    //将小端byte[]转成数字　例子: ([1,0],0,2)=1
+    //  将小端byte[]转成数字　例子: ([1,0],0,2)=1
     public long toXDint(byte[] byteData,int startPos,int length){
         if(byteData == null){
             return 0;

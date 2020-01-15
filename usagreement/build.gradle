@@ -14,6 +14,13 @@ android {
 //        multiDexEnabled true
     }
 
+    repositories {
+        flatDir {
+            dirs 'libs'
+//            dirs 'libs','../library/libs'
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled true
@@ -49,12 +56,12 @@ android {
 
     makeJar.dependsOn(build)
 
-//    sourceSets {
-//        main {
-//            jniLibs.srcDirs 'libs'
-////            jniLibs.srcDirs = ['libs']
-//        }
-//    }
+    sourceSets {
+        main {
+            jniLibs.srcDirs 'libs'
+//            jniLibs.srcDirs = ['libs']
+        }
+    }
 
 }
 configurations.all{
@@ -64,6 +71,8 @@ configurations.all{
 
 dependencies {
 //    implementation fileTree(include: ['*.jar'], dir: 'libs')
+
+    compileOnly 'com.android.support:appcompat-v7:28.1.0'
 //    implementation 'com.android.support:appcompat-v7:25.2.0'
 //    testImplementation 'junit:junit:4.12'
 //    androidTestImplementation 'com.android.support.test:runner:1.0.2'
