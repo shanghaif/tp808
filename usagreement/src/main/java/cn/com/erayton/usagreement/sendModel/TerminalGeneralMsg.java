@@ -1,9 +1,10 @@
-package cn.com.erayton.usagreement.model;
+package cn.com.erayton.usagreement.sendModel;
 
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import cn.com.erayton.usagreement.model.PacketData;
 import cn.com.erayton.usagreement.utils.BitOperator;
 
 

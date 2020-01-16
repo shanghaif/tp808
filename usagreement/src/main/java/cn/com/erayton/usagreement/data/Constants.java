@@ -223,11 +223,20 @@ public class Constants {
 
 
 //    ============================================================================================
+    //  视频初始化时长 sec
+    public static int VIDEO_INIT_TIME = 3 ;
+
+    //  kpbs 进制 ？
+    private static int SCALE = 1024 ;
+
     //  帧率
     public static int FRAME_RATE = 15 ;
     //  推流分辨率
     public static int PUSHER_RESOLUTION_W = 352 ;
     public static int PUSHER_RESOLUTION_H = 288 ;
+    //  预览分辨率
+    public static int PREVIEW_RESOLUTION_W = 352 ;
+    public static int PREVIEW_RESOLUTION_H = 288 ;
 
     //  视频推流码率
     public static int VIDEO_PUSH_RATE = 100 * SCALE ;
@@ -239,11 +248,10 @@ public class Constants {
     //  预览
     public static boolean PREVIEW = false ;
     //  摄像头 true 前置， false 后置
-    public static boolean camera = false ;
+    public static boolean CAMERA = false ;
     //  音频推流码率
     public static int VOICE_PUSH_RATE = 8 * SCALE ;
     //  音频采集码率
     public static int VOICE_SAMPLING_RATE = 8 * SCALE ;
 
-    private static final int SCALE = 1024 ;
 }

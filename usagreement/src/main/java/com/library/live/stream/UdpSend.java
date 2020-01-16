@@ -15,10 +15,7 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import cn.com.erayton.usagreement.model.TerminalAVDataMsg;
-import cn.com.erayton.usagreement.utils.BCD8421Operator;
-import cn.com.erayton.usagreement.utils.BitOperator;
-import cn.com.erayton.usagreement.utils.HexStringUtils;
+import cn.com.erayton.usagreement.sendModel.TerminalAVDataMsg;
 import cn.com.erayton.usagreement.utils.LogUtils;
 
 /**
@@ -33,13 +30,18 @@ public class UdpSend {
     private UdpControlInterface udpControl = null;
 
     private TCPManager tcpManager = new TCPManager() ;
+    private String phone ;
+    private String ip ;
+    private int port ;
+    //  逻辑通道号
+    private int channelNum = 1 ;
 
     private DatagramSocket socket = null;
     private DatagramPacket packetsendPush = null;
     private int voiceNum = 0;
     private int videoNum = 0;
 //    private final int sendUdplength = 480;//视频包长度固定480
-    private final int sendUdplength = 950;//视频包长度固定950 + 30
+    private final int sendUdplength = 950;//    视频包长度固定950 + 30
 //    private ByteBuffer buffvideo = ByteBuffer.allocate(548);
     private ByteBuffer buffvideo = ByteBuffer.allocate(980);
     private ByteBuffer buffvoice = ByteBuffer.allocate(1024);
@@ -52,6 +54,17 @@ public class UdpSend {
     private ArrayBlockingQueue<byte[]> sendQueue = new ArrayBlockingQueue<>(OtherUtil.QueueNum);
 
     public UdpSend(String ip, int port) {
+        initSocket(ip, port);
+    }
+    public UdpSend(String phone, String ip, int port, int channelNum) {
+        this.phone = phone ;
+        this.channelNum = channelNum ;
+        this.ip = ip ;
+        this.port = port ;
+        initSocket(ip, port);
+    }
+
+    private void initSocket(String ip, int port){
         try {
             socket = new DatagramSocket(port+1);
             socket.setSendBufferSize(1024 * 1024);
@@ -72,7 +85,6 @@ public class UdpSend {
 
     private void init(String ip, int port) {
         try {
-//            packetsendPush = new DatagramPacket(new byte[10], 10, InetAddress.getByName(ip), port);
             packetsendPush = new DatagramPacket(new byte[10], 10, InetAddress.getByName("192.168.1.106"), 8765+1);
         } catch (UnknownHostException e) {
             e.printStackTrace();
@@ -82,6 +94,9 @@ public class UdpSend {
 
     public void startsend() {
         if (packetsendPush != null) {
+            if (!tcpManager.isConnect()) {
+                tcpManager.connectSocket(ip, port);
+            }
             buffvoice.clear();
             voiceSendNum = 0;
             PUBLISH_STATUS = PUBLISH_STATUS_START;
@@ -105,16 +120,14 @@ public class UdpSend {
         }
     }
 
-    public void addVideo(byte[] video, String isIFrame) {
-        if (PUBLISH_STATUS == PUBLISH_STATUS_START) {
-//            writeVideo(video);
-            writeVideo(video, isIFrame);
+    public void closeTCPSocket(){
+        if (tcpManager!= null){
+            tcpManager.closeSocket();
         }
     }
+
     public void addVideo(byte[] video, int isIFrame) {
-        LogUtils.e("-------------------------------------------------------"+isIFrame);
         if (PUBLISH_STATUS == PUBLISH_STATUS_START) {
-//            writeVideo(video);
             writeVideo(video, isIFrame);
         }
     }
@@ -136,31 +149,18 @@ public class UdpSend {
     public int getPublishStatus() {
         return PUBLISH_STATUS;
     }
-    private long lastIFrameTime = 0 ;
-    private long betIFrameTime = 0 ;
-    private long lastFrameTime = 0 ;
-
-    private static final byte[] FRAMETIMES = {0, 0, 0, 0};//帧时间
-    private static final byte V_P_X_CC = (byte) Integer.parseInt("10000001",2);
-    private static final byte M_PT_VIDEO = Byte.parseByte("01100010",2);    //  视频
-    private static final byte M_PT_AUDIO = Byte.parseByte("00001000",2);    //  音频
-    private static final byte[] LOGO = {0x30, 0x31, 0x63, 0x64};
 
     /**
      * 发送视频
      * @param isIFrame 是否为关键帧
      */
     private void writeVideo(byte[] video, int isIFrame) {
-        BitOperator bitOperator = BitOperator.getInstance() ;
-
-//        if (isIFrame.equals("0000"))
-//            LogUtils.e("isFrame -------------------------------------------------------");
+        LogUtils.d("phone:"+phone);
         //当前截取位置
         int nowPosition = 0;
         //  是否首次进入
         boolean isOne = true;
         //  记录时间值
-        long time_vd_vaule = OtherUtil.getTime();
 
         TerminalAVDataMsg.TerminalAVDataInfo terminalAVDataInfo ;
         TerminalAVDataMsg terminalAVDataMsg = new TerminalAVDataMsg() ;
@@ -169,24 +169,17 @@ public class UdpSend {
             System.arraycopy(video, nowPosition, tmpVideo, 0, sendUdplength);
             if (isOne) {
                 //  起始帧
-//                buffvideo.put(Byte.parseByte(isIFrame + "0001", 2));
-                terminalAVDataInfo = new TerminalAVDataMsg.TerminalAVDataInfo("23803641388", videoNum++,
-                        true, 1, isIFrame, 1, tmpVideo) ;
-                LogUtils.e("起始帧 -------------------------------------------------------"+isIFrame);
+                terminalAVDataInfo = new TerminalAVDataMsg.TerminalAVDataInfo(phone, videoNum++,
+                        true, channelNum, isIFrame, 1, tmpVideo) ;
             } else {
                 //  中间帧
-//                buffvideo.put(Byte.parseByte(isIFrame + "0011", 2));
-                terminalAVDataInfo = new TerminalAVDataMsg.TerminalAVDataInfo("23803641388", videoNum++,
-                        true, 1, isIFrame, 1, tmpVideo) ;
-                LogUtils.e("中间帧 -------------------------------------------------------"+isIFrame);
+                terminalAVDataInfo = new TerminalAVDataMsg.TerminalAVDataInfo(phone, videoNum++,
+                        true, channelNum, isIFrame, 11, tmpVideo) ;
             }
             //  添加视频数据
             //  30 数据体  长度不超过 950 byte ,平台要求固定 950 长度
-//            buffvideo.put(video, nowPosition, sendUdplength);
             terminalAVDataMsg.setTerminalAVDataInfo(terminalAVDataInfo);
             //  UPD发送
-            LogUtils.e("length:"+terminalAVDataMsg.packageDataBody2Byte().length+"\n "
-                    + HexStringUtils.toHexString(terminalAVDataMsg.packageDataBody2Byte()));
             addbytes(terminalAVDataMsg.packageDataBody2Byte());
             isOne = false;
             nowPosition += sendUdplength;
@@ -198,228 +191,16 @@ public class UdpSend {
             //  数据类型+分包处理
             if (isOne) {
                 //  完整帧
-//                buffvideo.put(Byte.parseByte(isIFrame + "0000", 2));
-                terminalAVDataInfo = new TerminalAVDataMsg.TerminalAVDataInfo("23803641388", videoNum++,
-                        true, 1, isIFrame, 0, tmpVideo) ;
-                LogUtils.e("完整帧 -------------------------------------------------------"+isIFrame+",tmp length:"+tmpVideo.length);
+                terminalAVDataInfo = new TerminalAVDataMsg.TerminalAVDataInfo(phone, videoNum++,
+                        true, channelNum, isIFrame, 0, tmpVideo) ;
             } else {
                 //  结束帧
-//                buffvideo.put(Byte.parseByte(isIFrame + "0010", 2));
-                terminalAVDataInfo = new TerminalAVDataMsg.TerminalAVDataInfo("23803641388", videoNum++,
-                        true, 1, isIFrame, 10, tmpVideo) ;
-                LogUtils.e("结束帧 -------------------------------------------------------"+isIFrame+",tmp length:"+tmpVideo.length);
+                terminalAVDataInfo = new TerminalAVDataMsg.TerminalAVDataInfo(phone, videoNum++,
+                        true, channelNum, isIFrame, 10, tmpVideo) ;
             }
             terminalAVDataMsg.setTerminalAVDataInfo(terminalAVDataInfo);
             //  UPD发送
-            LogUtils.e("(video.length - nowPosition) ---------------------length:"+terminalAVDataMsg.packageDataBody2Byte().length+"\n "
-                    + HexStringUtils.toHexString(terminalAVDataMsg.packageDataBody2Byte()));
             addbytes(terminalAVDataMsg.packageDataBody2Byte());
-        }
-    }
-
-
-    /**
-     * 发送视频
-     * @param isIFrame 是否为关键帧
-     */
-    private void writeVideo(byte[] video, String isIFrame) {
-        BitOperator bitOperator = BitOperator.getInstance() ;
-
-//        if (isIFrame.equals("0000"))
-//            LogUtils.e("isFrame -------------------------------------------------------");
-        //当前截取位置
-        int nowPosition = 0;
-        //是否首次进入
-        boolean isOne = true;
-        //记录时间值
-        long time_vd_vaule = OtherUtil.getTime();
-
-        while ((video.length - nowPosition) > sendUdplength) {
-            buffvideo.clear();
-            //  0 帧头标识
-            buffvideo.put(LOGO);
-            //  4 V / P / X / CC    bit
-            buffvideo.put(V_P_X_CC);
-            //  5 M / PT    bit
-            buffvideo.put(M_PT_VIDEO);
-            //  6 包序号
-            buffvideo.put(bitOperator.integerTo2Bytes(videoNum++));
-            //  8 SIM 卡号
-            buffvideo.put(BCD8421Operator.getInstance().string2Bcd("23803641388"));
-//          //  14 逻辑通道信号
-            buffvideo.put((byte) 1);
-            //  添加视频头
-            //  数据类型+分包处理
-            if (isOne) {
-                //  起始帧
-                buffvideo.put(Byte.parseByte(isIFrame + "0001", 2));
-                LogUtils.e("起始帧 -------------------------------------------------------"+isIFrame);
-            } else {
-                //  中间帧
-                buffvideo.put(Byte.parseByte(isIFrame + "0011", 2));
-                LogUtils.e("中间帧 -------------------------------------------------------"+isIFrame);
-            }
-            //  16 时间戳
-            buffvideo.put(bitOperator.toDDbyte(time_vd_vaule, 8));
-            //  26 上一帧间隔
-            buffvideo.put(FRAMETIMES);
-            //  28 数据体长度
-            buffvideo.put(bitOperator.toDDbyte(sendUdplength, 2));
-            //  添加视频数据
-            //  30 数据体  长度不超过 950 byte ,平台要求固定 950 长度
-            buffvideo.put(video, nowPosition, sendUdplength);
-            //  UPD发送
-            addbytes(buffvideo);
-            isOne = false;
-            nowPosition += sendUdplength;
-
-            LogUtils.e("length:"+buffvideo.array().length+"\n "
-                    + HexStringUtils.toHexString(buffvideo.array()));
-        }
-        if ((video.length - nowPosition) > 0) {
-            buffvideo.clear();
-            //    添加udp头
-            //  0 帧头标识
-            buffvideo.put(LOGO);
-            //  4 V / P / X / CC    bit
-            buffvideo.put(V_P_X_CC);
-            //  5 M / PT    bit
-            buffvideo.put(M_PT_VIDEO);
-            //  6 包序号
-            buffvideo.put(bitOperator.integerTo2Bytes(videoNum++));
-            //  8 SIM 卡号
-            buffvideo.put(BCD8421Operator.getInstance().string2Bcd("23803641388"));
-            //  14 逻辑通道信号
-            buffvideo.put((byte) 1);
-            //  添加视频头
-            //  数据类型+分包处理
-            if (isOne) {
-                //  完整帧
-                buffvideo.put(Byte.parseByte(isIFrame + "0000", 2));
-                LogUtils.e("完整帧 -------------------------------------------------------"+isIFrame);
-            } else {
-                //  结束帧
-                buffvideo.put(Byte.parseByte(isIFrame + "0010", 2));
-                LogUtils.e("结束帧 -------------------------------------------------------"+isIFrame);
-            }
-            buffvideo.put(bitOperator.toDDbyte(time_vd_vaule, 8));
-            //  26 上一帧间隔
-            buffvideo.put(FRAMETIMES);
-            //  28 数据体长度
-            buffvideo.put(bitOperator.toDDbyte(video.length - nowPosition, 2));
-            //  添加视频数据
-            //  30 数据体  长度不超过 950 byte
-            buffvideo.put(video, nowPosition, video.length - nowPosition);
-            LogUtils.e("(video.length - nowPosition) ---------------------length:"+buffvideo.array().length+"\n "
-                    + HexStringUtils.toHexString(buffvideo.array()));
-            //  UPD发送
-            addbytes(buffvideo);
-        }
-    }
-
-//    /**
-//     * 发送视频
-//     */
-//    private void writeVideo(byte[] video) {
-//        //当前截取位置
-//        int nowPosition = 0;
-//        //是否首次进入
-//        boolean isOne = true;
-//        //记录时间值
-//        int time_vd_vaule = OtherUtil.getTime();
-//
-//        while ((video.length - nowPosition) > sendUdplength) {
-//            buffvideo.clear();
-//            //添加udp头
-//            buffvideo.put((byte) 1);//视频TAG
-//            buffvideo.putInt(videoNum++);//序号
-//            //添加视频头
-//            if (isOne) {
-//                buffvideo.put((byte) 0);//起始帧
-//            } else {
-//                buffvideo.put((byte) 1);//中间帧
-//            }
-//            buffvideo.put(weight);//图像比
-//            buffvideo.putInt(time_vd_vaule);//时戳
-//            buffvideo.putShort((short) sendUdplength);//长度
-//            //添加视频数据
-//            buffvideo.put(video, nowPosition, sendUdplength);
-//            //UPD发送
-//            addbytes(buffvideo);
-//            isOne = false;
-//            nowPosition += sendUdplength;
-//        }
-//        if ((video.length - nowPosition) > 0) {
-//            buffvideo.clear();
-//            //添加udp头
-//            buffvideo.put((byte) 1);//视频TAG
-//            buffvideo.putInt(videoNum++);//序号
-//            //添加视频头
-//            if (isOne) {
-//                buffvideo.put((byte) 3);//完整帧
-//            } else {
-//                buffvideo.put((byte) 2);//结束帧
-//            }
-//            buffvideo.put(weight);//图像比
-//            buffvideo.putInt(time_vd_vaule);//时戳
-//            buffvideo.putShort((short) (video.length - nowPosition));//长度
-//            //添加视频数据
-//            buffvideo.put(video, nowPosition, video.length - nowPosition);
-//            //UPD发送
-//            addbytes(buffvideo);
-//        }
-//    }
-
-    /**
-     * 发送视频
-     */
-    private void writeVideo(byte[] video) {
-        //  当前截取位置
-        int nowPosition = 0;
-        //  是否首次进入
-        boolean isOne = true;
-        //  记录时间值
-        int time_vd_vaule = OtherUtil.getTime(1);
-
-        while ((video.length - nowPosition) > sendUdplength) {
-            buffvideo.clear();
-            //  添加udp头
-            buffvideo.put((byte) 1);//  视频TAG
-            buffvideo.putInt(videoNum++);// 序号
-            //  添加视频头
-            if (isOne) {
-                buffvideo.put((byte) 0);//  起始帧
-            } else {
-                buffvideo.put((byte) 1);//  中间帧
-            }
-            buffvideo.put(weight);//    图像比
-            buffvideo.putInt(time_vd_vaule);//  时戳
-            buffvideo.putShort((short) sendUdplength);//    长度
-            //  添加视频数据
-            buffvideo.put(video, nowPosition, sendUdplength);
-            //  UPD发送
-            addbytes(buffvideo);
-            isOne = false;
-            nowPosition += sendUdplength;
-        }
-        if ((video.length - nowPosition) > 0) {
-            buffvideo.clear();
-            //  添加udp头
-            buffvideo.put((byte) 1);//  视频TAG
-            buffvideo.putInt(videoNum++);// 序号
-            //  添加视频头
-            if (isOne) {
-                buffvideo.put((byte) 3);//  完整帧
-            } else {
-                buffvideo.put((byte) 2);//  结束帧
-            }
-            buffvideo.put(weight);//    图像比
-            buffvideo.putInt(time_vd_vaule);//  时戳
-            buffvideo.putShort((short) (video.length - nowPosition));// 长度
-            //  添加视频数据
-            buffvideo.put(video, nowPosition, video.length - nowPosition);
-            //  UPD发送
-            addbytes(buffvideo);
         }
     }
 
@@ -427,33 +208,76 @@ public class UdpSend {
      * 发送音频
      */
     private void writeVoice(byte[] voice) {
+        TerminalAVDataMsg.TerminalAVDataInfo terminalAVDataInfo ;
+        TerminalAVDataMsg terminalAVDataMsg = new TerminalAVDataMsg() ;
         if (voiceSendNum == 0) {
-            //  添加udp头
-            buffvoice.put((byte) 0);//  音频TAG
-            buffvoice.putInt(voiceNum++);// 序号
-            //  添加音频头
-            buffvoice.putInt(OtherUtil.getTime(1));//   时戳
-            buffvoice.putShort((short) voice.length);// 长度
+//            //  添加udp头
+//            buffvoice.put((byte) 0);//  音频TAG
+//            buffvoice.putInt(voiceNum++);// 序号
+//            //  添加音频头
+//            buffvoice.putInt(OtherUtil.getTime(1));//   时戳
+//            buffvoice.putShort((short) voice.length);// 长度
+
+            terminalAVDataInfo = new TerminalAVDataMsg.TerminalAVDataInfo(phone, videoNum++,
+                    false, channelNum, 11, 0, voice) ;
+            terminalAVDataMsg.setTerminalAVDataInfo(terminalAVDataInfo);
             //  添加音频数据
-            buffvoice.put(voice);// 数据
+            buffvoice.put(terminalAVDataMsg.packageDataBody2Byte());// 数据
+//            buffvoice.put(voice);// 数据
 
             voiceSendNum++;
         } else {
             //  添加音频头
-            buffvoice.putInt(OtherUtil.getTime(1));//   时戳
-            buffvoice.putShort((short) voice.length);// 长度
+//            buffvoice.putInt(OtherUtil.getTime(1));//   时戳
+//            buffvoice.putShort((short) voice.length);// 长度
+            terminalAVDataInfo = new TerminalAVDataMsg.TerminalAVDataInfo(phone, videoNum++,
+                    false, channelNum, 11, 0, voice) ;
+            terminalAVDataMsg.setTerminalAVDataInfo(terminalAVDataInfo);
             //  添加音频数据
-            buffvoice.put(voice);// 数据
+//            buffvoice.put(voice);// 数据
+            buffvoice.put(terminalAVDataMsg.packageDataBody2Byte());// 数据
             voiceSendNum++;
         }
 
         if (voiceSendNum == 5) {
             voiceSendNum = 0;// 5帧一包，标志置0
             //  UPD发送
-//            addbytes(buffvoice);
+            addbytes(buffvoice);
             buffvoice.clear();
         }
     }
+
+//    /**
+//     * 发送音频
+//     */
+//    private void writeVoice(byte[] voice) {
+//        if (voiceSendNum == 0) {
+//            //  添加udp头
+//            buffvoice.put((byte) 0);//  音频TAG
+//            buffvoice.putInt(voiceNum++);// 序号
+//            //  添加音频头
+//            buffvoice.putInt(OtherUtil.getTime(1));//   时戳
+//            buffvoice.putShort((short) voice.length);// 长度
+//            //  添加音频数据
+//            buffvoice.put(voice);// 数据
+//
+//            voiceSendNum++;
+//        } else {
+//            //  添加音频头
+//            buffvoice.putInt(OtherUtil.getTime(1));//   时戳
+//            buffvoice.putShort((short) voice.length);// 长度
+//            //  添加音频数据
+//            buffvoice.put(voice);// 数据
+//            voiceSendNum++;
+//        }
+//
+//        if (voiceSendNum == 5) {
+//            voiceSendNum = 0;// 5帧一包，标志置0
+//            //  UPD发送
+////            addbytes(buffvoice);
+//            buffvoice.clear();
+//        }
+//    }
 
     private synchronized void addbytes(ByteBuffer buff) {
         if (udpControl != null) {
@@ -537,9 +361,8 @@ public class UdpSend {
 
         public void connectSocket(String ip, int port){
             tcpClient.openAsyn(ip, port);
-            LogUtils.e("ip:"+ip+",port:"+port);
             thread = new Thread(this);
-            thread.setName("new tcp thread");
+            thread.setName("tcpvideo thread");
         }
 
         public void send(byte[] bytes){
@@ -551,6 +374,10 @@ public class UdpSend {
                 tcpClient.close();
                 isRunning = false ;
             }
+        }
+
+        public boolean isConnect(){
+            return tcpClient.isConnect();
         }
 
         TCPClient.TCPClientListener listener = new TCPClient.TCPClientListener() {

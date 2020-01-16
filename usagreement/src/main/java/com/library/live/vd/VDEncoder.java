@@ -140,14 +140,12 @@ public class VDEncoder {
                                 System.arraycopy(information, 0, outData, 0, information.length);
                                 outputBuffer.get(outData, information.length, bufferInfo.size);
                                 //  交给发送器等待发送
-//                                udpSend.addVideo(outData, "0000");
                                 udpSend.addVideo(outData, 0);
                             } else {
                                 //  普通帧
                                 //  添加将要发送的视频数据
                                 outData = new byte[bufferInfo.size];
                                 outputBuffer.get(outData);
-//                                udpSend.addVideo(outData, "0001");
                                 udpSend.addVideo(outData, 1);
                             }
                             mediaCodec.releaseOutputBuffer(outputBufferIndex, false);

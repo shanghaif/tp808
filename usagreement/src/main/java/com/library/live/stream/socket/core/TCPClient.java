@@ -125,7 +125,7 @@ public class TCPClient implements Runnable {
         socket = null;
     }
 
-    private boolean isConnect(){
+    public boolean isConnect(){
         if (socket == null) return false ;
         return socket.isConnected() ;
     }

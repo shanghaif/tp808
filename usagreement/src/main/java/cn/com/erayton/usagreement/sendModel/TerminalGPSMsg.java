@@ -1,4 +1,4 @@
-package cn.com.erayton.usagreement.model;
+package cn.com.erayton.usagreement.sendModel;
 
 
 import android.util.Log;
@@ -7,6 +7,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
+import cn.com.erayton.usagreement.model.PacketData;
 import cn.com.erayton.usagreement.utils.BitOperator;
 import cn.com.erayton.usagreement.utils.Utils;
 

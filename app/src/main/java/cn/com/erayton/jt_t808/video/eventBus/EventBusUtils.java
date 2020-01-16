@@ -32,7 +32,8 @@ public class EventBusUtils {
      * 通过code码区分事件类型
      */
     public static final class EventCode {
-        public static final int GetIP = 1;
+        public static final int OPEN_VIDEO = 1;
+        public static final int CLOSE_VIDEO = 2;
 
         // other more
     }

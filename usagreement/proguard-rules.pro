@@ -155,7 +155,11 @@ public <methods>;
 public <fields>;
 public <methods>;
 }
--keep class cn.com.erayton.usagreement.model.*{*;}
+
+-keep class cn.com.erayton.usagreement.sendModel.*{*;}
+#-keep class cn.com.erayton.usagreement.model.*{*;}
+
+
 #-keep class com.speedtalk.audio.AudioCodingEnvironment{
 #public <fields>;
 #public <methods>;

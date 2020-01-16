@@ -1,4 +1,4 @@
-package cn.com.erayton.usagreement.model;
+package cn.com.erayton.usagreement.sendModel;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

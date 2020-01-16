@@ -34,9 +34,10 @@ public class ClientManager {
     }
 
     private SocketClient.SocketClientListener socketClientListener = new SocketClient.SocketClientListener() {
+
         @Override
-        public void commomResp(int i, String s, PacketData packetData) {
-            LogUtils.d("i:"+i+",s:"+s+",packetData:"+packetData);
+        public void commomResp(int i, String s) {
+
         }
 
         @Override
@@ -61,9 +62,10 @@ public class ClientManager {
         }
 
         @Override
-        public void defaultResp(PacketData packetData, String s, int i) {
-            LogUtils.d("i:"+i+",s:"+s+",packetData:"+packetData);
+        public void defaultResp(String s, int i) {
+
         }
+
 
         @Override
         public void onConnect(int i) {
@@ -81,23 +83,24 @@ public class ClientManager {
         }
 
         @Override
-        public void onTernimalParameterSetting(ServerParametersMsg serverParametersMsg) {
-            LogUtils.d(serverParametersMsg.toString());
+        public void onTernimalParameterSetting(int i, int i1, int i2, int i3) {
+
         }
 
         @Override
         public void queryTernimalParameterSetting(int i) {
-            LogUtils.d("i:"+i);
+
         }
 
         @Override
-        public void onTernimalAVTranslate(ServerAVTranslateMsg serverAVTranslateMsg) {
-            LogUtils.d(serverAVTranslateMsg.toString());
+        public void onTernimalAVTranslate(String s, int i, int i1, int i2, int i3, int i4, int i5) {
+
         }
 
         @Override
-        public void onAVControl() {
+        public void onAVControl(int i, int i1, int i2, int i3) {
 
         }
+
     } ;
 }

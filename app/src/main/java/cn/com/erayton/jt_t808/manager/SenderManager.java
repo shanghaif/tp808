@@ -1,6 +1,6 @@
 package cn.com.erayton.jt_t808.manager;
-import cn.com.erayton.usagreement.model.TerminalAuthMsg;
-import cn.com.erayton.usagreement.model.TerminalRegisterMsg;
+import cn.com.erayton.usagreement.sendModel.TerminalAuthMsg;
+import cn.com.erayton.usagreement.sendModel.TerminalRegisterMsg;
 import cn.com.erayton.usagreement.socket.client.SocketClientSender;
 import cn.com.erayton.usagreement.utils.LogUtils;
 

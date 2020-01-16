@@ -5,23 +5,18 @@ import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.library.constants.PublicConstants;
 import com.library.util.mLog;
 
+import cn.com.erayton.jt_t808.constants.PublicConstants;
 import cn.com.erayton.jt_t808.video.eventBus.EventBusUtils;
 import cn.com.erayton.jt_t808.video.eventBus.event.BroadCastMainEvent;
 import cn.com.erayton.usagreement.data.Constants;
-import cn.com.erayton.usagreement.model.PacketData;
-import cn.com.erayton.usagreement.model.ServerAVTranslateMsg;
-import cn.com.erayton.usagreement.model.ServerParametersMsg;
-import cn.com.erayton.usagreement.model.TerminalAuthMsg;
-import cn.com.erayton.usagreement.model.TerminalGeneralMsg;
-import cn.com.erayton.usagreement.model.TerminalParametersMsg;
-import cn.com.erayton.usagreement.model.TerminalRegisterMsg;
+import cn.com.erayton.usagreement.sendModel.TerminalAuthMsg;
+import cn.com.erayton.usagreement.sendModel.TerminalGeneralMsg;
+import cn.com.erayton.usagreement.sendModel.TerminalParametersMsg;
+import cn.com.erayton.usagreement.sendModel.TerminalRegisterMsg;
 import cn.com.erayton.usagreement.socket.client.SocketClient;
 import cn.com.erayton.usagreement.socket.client.SocketClientSender;
-import cn.com.erayton.usagreement.utils.HexStringUtils;
-import cn.com.erayton.usagreement.utils.LogUtils;
 
 
 public class USManager {
@@ -204,7 +199,7 @@ public class USManager {
 
     SocketClient.SocketClientListener socketClientListener = new SocketClient.SocketClientListener() {
         @Override
-        public void commomResp(int result, String reason, PacketData packetData) {
+        public void commomResp(int result, String reason) {
 //            Decoder4LoggingOnly decoder4LoggingOnly = new Decoder4LoggingOnly() ;
 //            MsgTransformer msgTransformer = new MsgTransformer() ;
 //            try {
@@ -241,7 +236,7 @@ public class USManager {
         }
 
         @Override
-        public void defaultResp(PacketData packetData, String s, int i) {
+        public void defaultResp(String s, int i) {
             Log.d(TAG, "defaultResp: ");
         }
 
@@ -270,13 +265,13 @@ public class USManager {
 
         @Override
         public void onSend(byte[] bytes, boolean b) {
-            Log.d(TAG, "onSend: "+b+"\n HexStringUtils:"+ HexStringUtils.toHexString(bytes));
+            Log.d(TAG, "onSend: "+b);
         }
 
         @Override
-        public void onTernimalParameterSetting(ServerParametersMsg serverParametersMsg) {
-            int gpsDefInterval = serverParametersMsg.getGpsSleepInterval() ;
-            int gpsRunningInterval = serverParametersMsg.getGpsDefInterval() ;
+        public void onTernimalParameterSetting(int i, int i1, int i2, int i3) {
+            int gpsDefInterval = i2 ;
+            int gpsRunningInterval = i1 ;
             int code = 0 ;
 //            600s -> 10 分钟
             if ((5 <= gpsDefInterval && gpsDefInterval <= 600) && ( 5 <= gpsRunningInterval && gpsRunningInterval <= 600)){
@@ -289,7 +284,7 @@ public class USManager {
                 code = 1 ;
             }
 //            SendGeneralResp(serverParametersMsg.getSerialNumber(), serverParametersMsg.getMsgHeader().getMsgId(), code);
-            SendGeneralResp(serverParametersMsg.getMsgHeader().getFlowId(), serverParametersMsg.getMsgHeader().getMsgId(), code);
+            SendGeneralResp(i3, Constants.TERMINAL_PARAMETERS_SETTING, code);
         }
 
         @Override
@@ -298,36 +293,35 @@ public class USManager {
         }
 
         @Override
-        public void onTernimalAVTranslate(ServerAVTranslateMsg serverAVTranslateMsg) {
+        public void onTernimalAVTranslate(String s, int i, int i1, int i2, int i3, int i4, int i5) {
             int result = 1 ;
-            LogUtils.d("serverAVTranslateMsg:"+serverAVTranslateMsg);
-            if (!TextUtils.isEmpty(serverAVTranslateMsg.getHost())){ //  ip 不为空，返回通用回复成功
+
+            if (!TextUtils.isEmpty(s)){ //  ip 不为空，返回通用回复成功
                 result = 0 ;
-                serverAVTranslateMsg.getHost() ;
-                serverAVTranslateMsg.getTcpPort() ;
-                serverAVTranslateMsg.getChannelNum() ;
-                serverAVTranslateMsg.getSteamType() ;
-                serverAVTranslateMsg.getDataType() ;
-                LogUtils.d("Host:");
-                LogUtils.d("TcpPort:");
-                LogUtils.d("ChannelNum:");
-                LogUtils.d("SteamType:");
-                LogUtils.d("DataType:");
-                EventBusUtils.sendEvent(new BroadCastMainEvent(EventBusUtils.EventCode.GetIP,serverAVTranslateMsg));
+//                serverAVTranslateMsg.getHost() ;
+//                serverAVTranslateMsg.getTcpPort() ;
+//                serverAVTranslateMsg.getChannelNum() ;
+//                serverAVTranslateMsg.getSteamType() ;
+//                serverAVTranslateMsg.getDataType() ;
+                EventBusUtils.sendEvent(new BroadCastMainEvent(EventBusUtils.EventCode.OPEN_VIDEO, s, i, i1, i2, i3, i4, i5));
             }
 
 
             TerminalGeneralMsg.TerminalGeneralInfo info = new TerminalGeneralMsg.TerminalGeneralInfo() ;
             info.setResult(result);
-            info.setRespId(serverAVTranslateMsg.getMsgHeader().getMsgId());
-            info.setSeNum(serverAVTranslateMsg.getMsgHeader().getFlowId());
+            info.setRespId(Constants.SERVER_AVTRANSMISSION_REQUEST);
+            info.setSeNum(i5);
             SocketClientSender.sendGeneralReponse(info, true , false) ;
         }
 
         @Override
-        public void onAVControl() {
+        public void onAVControl(int i, int i1, int i2, int i3) {
 
+            if (i == 0){
+                EventBusUtils.sendEvent(new BroadCastMainEvent(EventBusUtils.EventCode.CLOSE_VIDEO, null));
+            }
         }
+
 
 
     } ;

@@ -511,6 +511,7 @@ public class Publish implements TextureView.SurfaceTextureListener {
 
     public void stop() {
         udpSend.stopsend();
+        udpSend.closeTCPSocket() ;
     }
 
     public void destroy() {
@@ -637,6 +638,9 @@ public class Publish implements TextureView.SurfaceTextureListener {
         }
 
         public Buider setCenterScaleType(boolean isCenterScaleType) {
+            if (!map.isPreview()) {
+                return this;
+            }
             map.getPublishView().setCenterScaleType(isCenterScaleType);
             return this;
         }

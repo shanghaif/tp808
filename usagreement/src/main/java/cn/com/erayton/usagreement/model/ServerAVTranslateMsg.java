@@ -9,7 +9,6 @@ import cn.com.erayton.usagreement.utils.LogUtils;
  * 平台下发的设置参数
  * */
 public class ServerAVTranslateMsg extends PacketData {
-    String TAG = ServerAVTranslateMsg.class.getName() ;
     //  服务器 IP 地址长度
     private int ipLength ;
     //  服务器 IP 地址
@@ -113,7 +112,6 @@ public class ServerAVTranslateMsg extends PacketData {
     @Override
     public String toString() {
         return "ServerAVTranslateMsg{" +
-                "TAG='" + TAG + '\'' +
                 ", ipLength=" + ipLength +
                 ", host='" + host + '\'' +
                 ", tcpPort=" + tcpPort +

@@ -30,7 +30,8 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
          *               3：不支持；4：报警处理确认；
          * @param reason 返回原因
          * */
-        void commomResp(int result, String reason, PacketData packetData) ;        //  通用应答
+//        void commomResp(int result, String reason, PacketData packetData) ;        //  通用应答
+        void commomResp(int result, String reason) ;        //  通用应答
         /**
          * @param result    0：成功；1：车辆已被注册；2：数据库中无该车辆；
          *                  3：终端已被注册；4：数据库中无该终端
@@ -40,16 +41,37 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
         void authResp(int result, String reason) ;           //  鉴权
         void heartResp(int result, String reason) ;          //  心跳
         void gpsResp(int result, String reason) ;            //  GPS 数据
-        void defaultResp(PacketData packetData, String errorMsg, int replyCode) ;       //  未加应答码
+//        void defaultResp(PacketData packetData, String errorMsg, int replyCode) ;       //  未加应答码
+        void defaultResp(String errorMsg, int replyCode) ;       //  未加应答码
         void onConnect(int i) ;          //  是否连接
         void onDisConnect() ;
         void onSend(byte[] data, boolean result) ;
-        //        设置终端参数
-        void onTernimalParameterSetting(ServerParametersMsg packetData) ;
+        /**     设置终端参数
+         * @param instructCount 指令数
+         * @param GpsSleepInterval GPS 休眠上传间隔
+         * @param GpsDefInterval GPS 缺省上传间隔
+         * @param flowId 流水号
+         * */
+        void onTernimalParameterSetting(int instructCount, int GpsSleepInterval, int GpsDefInterval, int flowId) ;
         void queryTernimalParameterSetting(int serNum) ;
-        void onTernimalAVTranslate(ServerAVTranslateMsg packetData) ;
-        //  音视频传输控制
-        void onAVControl() ;
+        /**     实时视频传输请求
+         * @param  host 服务器 IP 地址
+         * @param tcpPort 服务器 TCP 端口号
+         * @param udpPort 服务器 UDP 端口号
+         * @param channelNum 逻辑通道号
+         * @param dataType 数据类型
+         * @param steamType 码流类型
+         * @param flowId 流水号
+         * */
+        void onTernimalAVTranslate(String host, int tcpPort, int udpPort,
+                                   int channelNum, int dataType, int steamType, int flowId) ;
+        /**     音视频传输控制
+         * @param controlCode 控制指令
+         * @param channelNum 逻辑通道号
+         * @param avCode 音频类型
+         * @param steamType 码流类型
+         * */
+        void onAVControl(int controlCode, int channelNum, int avCode, int steamType) ;
     }
 
 
@@ -200,8 +222,6 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
     }}
 
     private boolean isOpenUdp = true ;
-    private boolean isConnect = false ;
-
 
     public SocketClient() {
         bitOperator = BitOperator.getInstance();
@@ -351,8 +371,6 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
 //      something here
 
         if (listener != null) {
-            LogUtils.d( "------------------------------ onTcpSend ---------------------------- \n"
-                    +HexStringUtils.toHexString(data)) ;
             listener.onSend(data, result) ;
         }
     }
@@ -443,10 +461,6 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
 
     //  解析指令
     private void OnDispathCmd(final byte[] page, final boolean isUpd){
-
-        LogUtils.d( "------------------------------ OnDispathCmd ---------------------------- \n"
-        + HexStringUtils.toHexString(page)
-        ) ;
         poolExecutor.execute(new Runnable() {
             @Override
             public void run() {
@@ -454,9 +468,7 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
                 byte[] data = new byte[page.length-2] ;
                 System.arraycopy(page, 1, data, 0, page.length-2);
                 try {
-                    LogUtils.d( "1-------------------------data.length--"+data.length+"--- OnDispathCmd ----------------------------") ;
                     data = Utils.doEscape4Receive(data, 0, data.length - 1);
-//                    decoder4LoggingOnly.decodeHex(data);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -466,7 +478,6 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
                 }else updateTcpLastHbDt();
 
                 PacketData packetData = null;
-//                PacketData packetData = new ServerRegisterMsg();
                 PacketData.MsgHeader msgHeader = new PacketData.MsgHeader();
                 msgHeader.setMsgId(bitOperator.parseIntFromBytes(data, 0, 2));
                 int msgBodyProps = bitOperator.parseIntFromBytes(data, 2, 2);
@@ -477,12 +488,10 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
                 msgHeader.setReservedBit(((msgBodyProps & 0xC000) >> 14));
                 msgHeader.setTerminalPhone(bitOperator.parseBcdStringFromBytes(data, 4, 6));
                 msgHeader.setFlowId(bitOperator.parseIntFromBytes(data, 10, 2));
-                LogUtils.d( "-----------------------------29- OnDispathCmd ---------------------------msgHeader\n-"+msgHeader+"\nmsgBodyProps"+msgBodyProps) ;
                 if (msgHeader.isHasSubPackage()) {      //  有分包
                     msgHeader.setPackageInfoField(bitOperator.parseIntFromBytes(data, 12, 4));
                     msgHeader.setTotalSubPackage(bitOperator.parseIntFromBytes(data, 12, 2));
                     msgHeader.setSubPackageSeq(bitOperator.parseIntFromBytes(data, 12, 2));
-                    LogUtils.d( "------------------------------ OnDispathCmd -------40--------------------msgHeader \n-"+msgHeader) ;
                 }
                 switch (msgHeader.getMsgId()){
                     case Constants.SERVER_COMMOM_RSP:           //  平台通用应答
@@ -499,7 +508,7 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
                             if (generalResult == 0)  setIsOpenHB(true);
                             listener.authResp(generalResult, ResponseReason.getInstance().GENERALRESULT[generalResult]);
                         }else {
-                            listener.commomResp(generalResult, ResponseReason.getInstance().GENERALRESULT[generalResult], packetData);
+                            listener.commomResp(generalResult, ResponseReason.getInstance().GENERALRESULT[generalResult]);
                         }
                         LogUtils.d( "----------------------平台通用应答-------- OnDispathCmd " +
                                 "--------------46------------\n packetData -"+packetData+
@@ -534,8 +543,9 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
                         packetData = new ServerParametersMsg() ;
                         packetData.setMsgHeader(msgHeader);
                         packetData.inflatePackageBody(page);
-                        LogUtils.d( "--------------------------------------------------\n getSerialNumber -"+((ServerParametersMsg) packetData).getSerialNumber()+"\n ((ServerParametersMsg) packetData)"+((ServerParametersMsg) packetData)) ;
-                        listener.onTernimalParameterSetting((ServerParametersMsg) packetData);
+                        LogUtils.d( "--------------------------------------------------\n ((ServerParametersMsg) packetData)"+((ServerParametersMsg) packetData)) ;
+                        listener.onTernimalParameterSetting(((ServerParametersMsg) packetData).getInstructCount(), ((ServerParametersMsg) packetData).getGpsSleepInterval(),
+                                ((ServerParametersMsg) packetData).getGpsDefInterval(), packetData.getMsgHeader().getFlowId());
                         break;
                     case Constants.TERMINAL_PARAMETERS_SPECIFY_QUERY:
                         LogUtils.d( "----------------------- 查询指定终端参数 ---------------------------\n packetData -"+packetData) ;
@@ -546,22 +556,26 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
                         packetData = new ServerAVTranslateMsg() ;
                         packetData.setMsgHeader(msgHeader);
                         packetData.inflatePackageBody(page);
-                        listener.onTernimalAVTranslate((ServerAVTranslateMsg) packetData);
+//                        listener.onTernimalAVTranslate((ServerAVTranslateMsg) packetData);
+                        listener.onTernimalAVTranslate(((ServerAVTranslateMsg) packetData).getHost(), ((ServerAVTranslateMsg) packetData).getTcpPort(),
+                                ((ServerAVTranslateMsg) packetData).getUdpPort(), ((ServerAVTranslateMsg) packetData).getChannelNum(),
+                                ((ServerAVTranslateMsg) packetData).getDataType(), ((ServerAVTranslateMsg) packetData).getSteamType(),
+                                packetData.getMsgHeader().getFlowId());
                         break;
                     case Constants.SERVER_AVTRANSMISSION_CONTROL:
                         packetData = new ServerAVTranslateControlMsg() ;
                         packetData.setMsgHeader(msgHeader);
                         packetData.inflatePackageBody(page);
-                        listener.onAVControl();
+                        listener.onAVControl(((ServerAVTranslateControlMsg) packetData).getControlCode(), ((ServerAVTranslateControlMsg) packetData).getChannelNum(),
+                                ((ServerAVTranslateControlMsg) packetData).getCloseType(), ((ServerAVTranslateControlMsg) packetData).getSteamType());
                         LogUtils.d( "----------------------- 音视频实时传输控制 ---------------------------\n packetData -"+packetData) ;
                         break;
-
 
                     default:
                         packetData = new ServerRegisterMsg();
                         packetData.setMsgHeader(msgHeader);
 //                        packetData.inflatePackageBody(data);                    //  有可能为空
-                        listener.defaultResp(packetData, Constants.NO_REPLY_CODE, msgHeader.getMsgId());
+                        listener.defaultResp(Constants.NO_REPLY_CODE, msgHeader.getMsgId());
 
                         LogUtils.d( "----------------------- 其它应答 ------- OnDispathCmd ---------------------------\n packetData -"+packetData+"\n hex:"+HexStringUtils.toHexString(page)) ;
                         break;

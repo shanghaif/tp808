@@ -1,15 +1,13 @@
 package cn.com.erayton.usagreement.socket.client;
 
-import android.util.Log;
-
 import cn.com.erayton.usagreement.data.Constants;
 import cn.com.erayton.usagreement.model.EmptyPacketData;
 import cn.com.erayton.usagreement.model.PacketData;
-import cn.com.erayton.usagreement.model.TerminalAuthMsg;
-import cn.com.erayton.usagreement.model.TerminalGPSMsg;
-import cn.com.erayton.usagreement.model.TerminalGeneralMsg;
-import cn.com.erayton.usagreement.model.TerminalParametersMsg;
-import cn.com.erayton.usagreement.model.TerminalRegisterMsg;
+import cn.com.erayton.usagreement.sendModel.TerminalAuthMsg;
+import cn.com.erayton.usagreement.sendModel.TerminalGPSMsg;
+import cn.com.erayton.usagreement.sendModel.TerminalGeneralMsg;
+import cn.com.erayton.usagreement.sendModel.TerminalParametersMsg;
+import cn.com.erayton.usagreement.sendModel.TerminalRegisterMsg;
 import cn.com.erayton.usagreement.utils.BCD8421Operator;
 import cn.com.erayton.usagreement.utils.LogUtils;
 
@@ -39,6 +37,10 @@ public class SocketClientSender {
 
     public static void setPhone(String phone){synchronized (phoneLock){
         SocketClientSender.phone = phone ;
+    }}
+
+    public static String getPhone() {synchronized (phoneLock){
+        return phone;
     }}
 
     private static PacketData.MsgHeader getHeader(){

@@ -11,8 +11,6 @@ import cn.com.erayton.usagreement.utils.LogUtils;
 public class ServerParametersMsg extends PacketData {
     String TAG = ServerParametersMsg.class.getName() ;
 
-    //    应答流水号     WORD
-    private int serialNumber ;
     //  指令数
     private int instructCount ;
     //  GPS 休眠上传间隔
@@ -45,14 +43,6 @@ public class ServerParametersMsg extends PacketData {
         GpsDefInterval = gpsDefInterval;
     }
 
-    public int getSerialNumber() {
-        return serialNumber;
-    }
-
-    public void setSerialNumber(int serialNumber) {
-        this.serialNumber = serialNumber;
-    }
-
     @Override
     public byte[] packageDataBody2Byte() {
         return new byte[0];
@@ -75,16 +65,7 @@ public class ServerParametersMsg extends PacketData {
         setInstructCount( BitOperator.getInstance().parseIntFromBytes(tmp,0,1));
         int loc = 1 ;
         LogUtils.d("inflatePackageBody_msgBodyLength: " + msgBodyLength+",getInstructCount():"+getInstructCount()+"\n"+ HexStringUtils.toHexString(tmp));
-//        for (int i=1; i< tmp.length; i = i+4){
-//            Log.d(TAG, "inflatePackageBody ----------- "+getParameterSettingsString(bitOperator.parseIntFromBytes(tmp, i, 4))+" ------------------------ "+i+" 4---"+ bitOperator.parseIntFromBytes(tmp,i,4)) ;
-//            if (bitOperator.parseIntFromBytes(tmp,i,4) == Constants.TERMINAL_PARAMETERS_SETTING_0X0029){
-//                setGpsDefInterval(bitOperator.parseIntFromBytes(tmp,i+5,4));
-//            }else if (bitOperator.parseIntFromBytes(tmp,i,4) == Constants.TERMINAL_PARAMETERS_SETTING_0X0027){
-//                setGpsSleepInterval(bitOperator.parseIntFromBytes(tmp,i+5,4));
-//            }
-//            i = i +5 ;
-//            Log.d(TAG, "inflatePackageBody ----------- value ------------------------ "+i+" 4---"+ bitOperator.parseIntFromBytes(tmp,i,4)) ;
-//        }
+
         while (loc < tmp.length){
             int valueId = bitOperator.parseIntFromBytes(tmp, loc, 4) ;
             int len = bitOperator.parseIntFromBytes(tmp, loc+4, 1) ;
