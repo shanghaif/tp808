@@ -12,7 +12,6 @@ import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import androidx.core.content.ContextCompat;
 import com.library.live.IsOutBuffer;
 import com.library.live.stream.IsInBuffer;
 import com.library.live.stream.WeightCallback;
@@ -44,7 +43,8 @@ public class PlayerView extends RelativeLayout implements IsInBuffer, WeightCall
 
     private void init(Context context) {
         LayoutInflater.from(context).inflate(R.layout.player_view, this, true);
-        setBackgroundColor(ContextCompat.getColor(context, R.color.black));
+//        setBackgroundColor(ContextCompat.getColor(context, R.color.black));
+        setBackgroundColor(context.getColor(R.color.black));
         loadimag = findViewById(R.id.loadimag);
         surfaceview = findViewById(R.id.surfaceview);
         loadtext = findViewById(R.id.loadtext);

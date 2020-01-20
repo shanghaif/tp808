@@ -10,7 +10,6 @@ import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Log;
 
-import androidx.annotation.Nullable;
 import com.library.live.Publish;
 import com.library.live.stream.UdpSend;
 import java.io.File;
@@ -35,7 +34,7 @@ public class VideoPushService extends Service {
 //    private int VIDEO_NOTIFICATION_LEVEL = NotificationManager.IMPORTANCE_DEFAULT ;
     private NotificationManager notificationManager ;
 
-    @Nullable
+
     @Override
     public IBinder onBind(Intent intent) {
 //        return null ;
@@ -103,7 +102,8 @@ public class VideoPushService extends Service {
     private void initPushVideo(String ip, int port, int channelNum){
 
         Log.d("cjh", "initPushVideo -------------------- "+phone ) ;
-        publish = new Publish.Buider(getApplicationContext(), null)
+
+        publish = new Publish.Buider(this, null)
                 .setPushMode(new UdpSend(phone, ip, port, channelNum))
                 //  帧率
                 .setFrameRate(Constants.FRAME_RATE)

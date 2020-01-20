@@ -25,11 +25,6 @@ import android.os.HandlerThread;
 import android.util.Size;
 import android.view.Surface;
 import android.view.TextureView;
-
-import androidx.annotation.IntDef;
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-
 import com.library.common.UdpControlInterface;
 import com.library.common.WriteFileCallback;
 import com.library.live.file.WriteMp4;
@@ -217,25 +212,26 @@ public class Publish implements TextureView.SurfaceTextureListener {
         if (isCameraBegin) {
             return;
         }
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+//        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+        if (context.checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
         try {
             //打开相机
             manager.openCamera(cameraId, new CameraDevice.StateCallback() {
                 @Override
-                public void onOpened(@NonNull CameraDevice device) {
+                public void onOpened( CameraDevice device) {
                     cameraDevice = device;
                     //开启预览
                     startPreview();
                 }
 
                 @Override
-                public void onDisconnected(@NonNull CameraDevice cameraDevice) {
+                public void onDisconnected( CameraDevice cameraDevice) {
                 }
 
                 @Override
-                public void onError(@NonNull CameraDevice cameraDevice, int i) {
+                public void onError( CameraDevice cameraDevice, int i) {
                 }
             }, camearHandler);
         } catch (CameraAccessException e) {
@@ -548,9 +544,9 @@ public class Publish implements TextureView.SurfaceTextureListener {
         private Context context;
         private ParameterMap map;
 
-        @IntDef({CONVERSION, TAKEPHOTO})
-        private @interface ScreenshotsMode {
-        }
+//        @IntDef({CONVERSION, TAKEPHOTO})
+//        private @interface ScreenshotsMode {
+//        }
 
         public Buider(Context context, PublishView publishView) {
             map = new ParameterMap();
@@ -611,7 +607,11 @@ public class Publish implements TextureView.SurfaceTextureListener {
             return this;
         }
 
-        public Buider setScreenshotsMode(@ScreenshotsMode int screenshotsMode) {
+//        public Buider setScreenshotsMode(@ScreenshotsMode int screenshotsMode) {
+//            map.setScreenshotsMode(screenshotsMode);
+//            return this;
+//        }
+        public Buider setScreenshotsMode(int screenshotsMode) {
             map.setScreenshotsMode(screenshotsMode);
             return this;
         }

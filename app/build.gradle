@@ -49,7 +49,8 @@ dependencies {
 //    implementation (name: 'usagreement-debug3', ext: 'aar')
 //    implementation (name: 'usagreement-debug4', ext: 'aar')
 //    implementation (name: 'usagreement-debug5f', ext: 'aar')
-    implementation (name: 'usagreement6', ext: 'aar')
+    implementation (name: 'usagreement-debug7', ext: 'aar')
+//    implementation (name: 'usagreement6', ext: 'aar')
 //    implementation (name: 'usagreement-release', ext: 'aar')
 
 }
