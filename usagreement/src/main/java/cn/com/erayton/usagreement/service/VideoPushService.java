@@ -1,15 +1,9 @@
 package cn.com.erayton.usagreement.service;
 
-import android.app.Notification;
-import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.BitmapFactory;
 import android.os.Binder;
-import android.os.Build;
 import android.os.Environment;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -17,14 +11,10 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
-import androidx.core.app.NotificationCompat;
-
 import com.library.live.Publish;
 import com.library.live.stream.UdpSend;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
-
-import cn.com.erayton.usagreement.R;
 import cn.com.erayton.usagreement.VideoPushAIDL;
 import cn.com.erayton.usagreement.data.Constants;
 import io.reactivex.Flowable;
@@ -42,7 +32,7 @@ public class VideoPushService extends Service {
     private String DEFAULT_NAME = "易对讲" ;
     private String DEFAULT_CONTENT = "易对讲" ;
 
-    private int VIDEO_NOTIFICATION_LEVEL = NotificationManager.IMPORTANCE_DEFAULT ;
+//    private int VIDEO_NOTIFICATION_LEVEL = NotificationManager.IMPORTANCE_DEFAULT ;
     private NotificationManager notificationManager ;
 
     @Nullable
@@ -55,7 +45,7 @@ public class VideoPushService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        initNotification() ;
+//        initNotification() ;
     }
 
     @Override
@@ -111,6 +101,8 @@ public class VideoPushService extends Service {
 
 
     private void initPushVideo(String ip, int port, int channelNum){
+
+        Log.d("cjh", "initPushVideo -------------------- "+phone ) ;
         publish = new Publish.Buider(getApplicationContext(), null)
                 .setPushMode(new UdpSend(phone, ip, port, channelNum))
                 //  帧率
@@ -143,6 +135,8 @@ public class VideoPushService extends Service {
 
     Disposable disposable ;
     private void timeDisposable(){
+
+        Log.d("cjh", "timeDisposable -------------------- ") ;
         disposable = Flowable.intervalRange(0, Constants.VIDEO_INIT_TIME, 0, 1, TimeUnit.SECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnComplete(new Action() {
@@ -159,7 +153,7 @@ public class VideoPushService extends Service {
 
     private boolean startVideo(){
         Log.d("cjh", "startVideo -------------------- ") ;
-        setNotificationMessage(DEFAULT_NAME, getString(R.string.tip_video_recording)) ;
+//        setNotificationMessage(DEFAULT_NAME, getString(R.string.tip_video_recording)) ;
         try {
             publish.start();
             return true ;
@@ -170,7 +164,7 @@ public class VideoPushService extends Service {
 
     private boolean stopVideo(){
         Log.d("cjh", "stopVideo -------------------- ") ;
-        setNotificationMessage(DEFAULT_NAME, getString(R.string.tip_video_record_pause)) ;
+//        setNotificationMessage(DEFAULT_NAME, getString(R.string.tip_video_record_pause)) ;
         try {
             publish.stop();
             return true ;
@@ -181,7 +175,7 @@ public class VideoPushService extends Service {
 
     private boolean destoryVideo(){
         Log.d("cjh", "destoryVideo -------------------- ") ;
-        setNotificationMessage(DEFAULT_NAME, getString(R.string.tip_video_record_finish)) ;
+//        setNotificationMessage(DEFAULT_NAME, getString(R.string.tip_video_record_finish)) ;
         try {
             publish.destroy();
             return true ;
@@ -190,28 +184,29 @@ public class VideoPushService extends Service {
         }
     }
 
-    /**
-     * 初始化通知
-     * 初始化文字为
-     * */
-    private void initNotification(){
-        notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        setNotificationMessage(DEFAULT_NAME, DEFAULT_CONTENT);
+//    /**
+//     * 初始化通知
+//     * 初始化文字为
+//     * */
+//    private void initNotification(){
+//        Log.d("cjh", "initNotification -------------------- ") ;
+//        notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+//        setNotificationMessage(DEFAULT_NAME, DEFAULT_CONTENT);
+//
+//    }
 
-    }
-
-    private void setNotificationMessage(String name, String msg){
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext());
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {  //  Android4.1以上
-            builder.setSmallIcon(R.drawable.loading)
-                    .setContentTitle(name)
-                    .setContentText(msg)
-                    .setOnlyAlertOnce(false)        //  用于多次通知
-            ;
-            notificationManager.notify(VIDEO_NOTIFICATION_CODE, builder.getNotification());
-        }
-
-    }
+//    private void setNotificationMessage(String name, String msg){
+//        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext());
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {  //  Android4.1以上
+//            builder.setSmallIcon(R.drawable.loading)
+//                    .setContentTitle(name)
+//                    .setContentText(msg)
+//                    .setOnlyAlertOnce(false)        //  用于多次通知
+//            ;
+//            notificationManager.notify(VIDEO_NOTIFICATION_CODE, builder.getNotification());
+//        }
+//
+//    }
 
 //    private void delNotification(){
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {

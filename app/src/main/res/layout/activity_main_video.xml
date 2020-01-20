@@ -9,7 +9,7 @@
 
     <Button
         android:id="@+id/push"
-        android:layout_width="match_parent"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:text="视频推流端" />
 

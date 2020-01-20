@@ -28,7 +28,6 @@ import cn.com.erayton.jt_t808.video.eventBus.event.BroadCastMainEvent;
 import cn.com.erayton.jt_t808.video.manager.USManager;
 import cn.com.erayton.jt_t808.video.video.Send;
 import cn.com.erayton.usagreement.VideoPushAIDL;
-import cn.com.erayton.usagreement.model.ServerAVTranslateMsg;
 import cn.com.erayton.usagreement.service.VideoPushService;
 import cn.com.erayton.usagreement.utils.LogUtils;
 
@@ -56,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void requestpermission() {
-        //SD卡读写权限
+        //  SD卡读写权限
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
             //权限已授权，功能操作
             gostart();
