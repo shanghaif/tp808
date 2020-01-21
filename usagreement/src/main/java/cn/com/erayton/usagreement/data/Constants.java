@@ -230,13 +230,13 @@ public class Constants {
     private static int SCALE = 1024 ;
 
     //  帧率
-    public static int FRAME_RATE = 15 ;
+    public static int FRAME_RATE = 28 ;
     //  推流分辨率
-    public static int PUSHER_RESOLUTION_W = 352 ;
-    public static int PUSHER_RESOLUTION_H = 288 ;
+    public static int PUSHER_RESOLUTION_W = 640 ;
+    public static int PUSHER_RESOLUTION_H = 480 ;
     //  预览分辨率
-    public static int PREVIEW_RESOLUTION_W = 352 ;
-    public static int PREVIEW_RESOLUTION_H = 288 ;
+    public static int PREVIEW_RESOLUTION_W = 1280 ;
+    public static int PREVIEW_RESOLUTION_H = 960 ;
 
     //  视频推流码率
     public static int VIDEO_PUSH_RATE = 100 * SCALE ;
