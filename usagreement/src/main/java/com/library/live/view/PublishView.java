@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.TextureView;
 import android.widget.RelativeLayout;
 
+import androidx.core.content.ContextCompat;
 
 import cn.com.erayton.usagreement.R;
 
@@ -32,10 +33,10 @@ public class PublishView extends RelativeLayout {
 
     private void init(Context context) {
         LayoutInflater.from(context).inflate(R.layout.publish_view, this, true);
-//        setBackgroundColor(ContextCompat.getColor(context, R.color.black));
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            setBackgroundColor(context.getColor(R.color.black));
-        }
+        setBackgroundColor(ContextCompat.getColor(context, R.color.black));
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            setBackgroundColor(context.getColor(R.color.black));
+//        }
         textureView = findViewById(R.id.textureView);
         handler = new Handler(Looper.getMainLooper());
         weightRunnable = new WeightRunnable(this, textureView);

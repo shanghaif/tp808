@@ -230,18 +230,20 @@ public class Constants {
     private static int SCALE = 1024 ;
 
     //  帧率
-    public static int FRAME_RATE = 15 ;
+    public static int FRAME_RATE = 29 ;
     //  推流分辨率
     public static int PUSHER_RESOLUTION_W = 352 ;
+//    public static int PUSHER_RESOLUTION_W = 704 ;
     public static int PUSHER_RESOLUTION_H = 288 ;
+//    public static int PUSHER_RESOLUTION_H = 576 ;
     //  预览分辨率
-    public static int PREVIEW_RESOLUTION_W = 352 ;
-    public static int PREVIEW_RESOLUTION_H = 288 ;
+    public static int PREVIEW_RESOLUTION_W = 1408 ;
+    public static int PREVIEW_RESOLUTION_H = 1152 ;
 
     //  视频推流码率
-    public static int VIDEO_PUSH_RATE = 100 * SCALE ;
+    public static int VIDEO_PUSH_RATE = 300 * SCALE ;
     //  视频采集码率
-    public static int VIDEO_SAMPLING_RATE = 300 * SCALE ;
+    public static int VIDEO_SAMPLING_RATE = 600 * SCALE ;
 
     //  编码方式
     public static String VIDEO_ENCODING = VDEncoder.H264 ;
@@ -249,6 +251,7 @@ public class Constants {
     public static boolean PREVIEW = false ;
     //  摄像头 true 前置， false 后置
     public static boolean CAMERA = false ;
+//    public static boolean CAMERA = false ;
     //  音频推流码率
     public static int VOICE_PUSH_RATE = 8 * SCALE ;
     //  音频采集码率
