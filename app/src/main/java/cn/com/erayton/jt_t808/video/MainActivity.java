@@ -77,18 +77,50 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void gostart() {
-        push = findViewById(R.id.push);
-        push.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+//        push = findViewById(R.id.push);
+//        push.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                try {
+//                    videoPushAIDL.distoryVideo();
+//                } catch (RemoteException e) {
+//                    e.printStackTrace();
+//                }
+////                startActivity(new Intent(MainActivity.this, Send.class));
+//            }
+//        });
+    }
+
+    boolean isRecord = true ;
+
+    public void buttonClick(View view){
+        switch (view.getId()){
+            case R.id.push:
                 try {
                     videoPushAIDL.distoryVideo();
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
-//                startActivity(new Intent(MainActivity.this, Send.class));
-            }
-        });
+                break;
+            case R.id.tackPhoto:
+                try {
+                    videoPushAIDL.tackPicture();
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+                break;
+            case R.id.recordVideo:
+                try {
+                    videoPushAIDL.recordVideo(isRecord);
+                    isRecord = !isRecord ;
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+                break;
+                default:
+                    break;
+        }
+
     }
 
     @Override

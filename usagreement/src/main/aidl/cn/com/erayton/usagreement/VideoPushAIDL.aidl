@@ -18,5 +18,10 @@ interface VideoPushAIDL {
     //  关闭摄像头，关闭视频，关闭服务
     void distoryVideo() ;
 
+    //  拍照
+    void tackPicture() ;
+
+    //  录制
+    void recordVideo(boolean isRecord) ;
 
 }

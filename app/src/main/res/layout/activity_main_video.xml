@@ -9,15 +9,23 @@
 
     <Button
         android:id="@+id/push"
-        android:layout_width="100dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:onClick="buttonClick"
         android:text="视频推流端" />
 
-    <!--<Button-->
-        <!--android:id="@+id/pull"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="视频播放端" />-->
+    <Button
+        android:id="@+id/tackPhoto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="buttonClick"
+        android:text="tackPhoto" />
+    <Button
+        android:id="@+id/recordVideo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="buttonClick"
+        android:text="recordVideo" />
 
     <!--<Button-->
         <!--android:id="@+id/voice"-->

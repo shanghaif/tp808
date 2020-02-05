@@ -222,26 +222,30 @@ public class Constants {
     public static final int MSGBODY_SUBPACKAGE_DEFAULT_START_INDEX = 16 ;
 
 
-//    ============================================================================================
+
+    //    ============================================================================================
     //  视频初始化时长 sec
     public static int VIDEO_INIT_TIME = 3 ;
 
     //  kpbs 进制 ？
-    private static int SCALE = 1024 ;
+    private static int SCALE = 1000 ;
+//    private static int SCALE = 1024 ;
 
     //  帧率
     public static int FRAME_RATE = 28 ;
     //  推流分辨率
-    public static int PUSHER_RESOLUTION_W = 640 ;
-    public static int PUSHER_RESOLUTION_H = 480 ;
+//    public static int PUSHER_RESOLUTION_W = 352 ;
+        public static int PUSHER_RESOLUTION_W = 700 ;
+//    public static int PUSHER_RESOLUTION_H = 288 ;
+        public static int PUSHER_RESOLUTION_H = 525 ;
     //  预览分辨率
-    public static int PREVIEW_RESOLUTION_W = 1280 ;
-    public static int PREVIEW_RESOLUTION_H = 960 ;
+    public static int PREVIEW_RESOLUTION_W = 1400 ;
+    public static int PREVIEW_RESOLUTION_H = 1050 ;
 
-    //  视频推流码率
-    public static int VIDEO_PUSH_RATE = 100 * SCALE ;
-    //  视频采集码率
-    public static int VIDEO_SAMPLING_RATE = 300 * SCALE ;
+    //  视频推流码率      kpbs
+    public static int VIDEO_PUSH_RATE = 400 * SCALE ;
+    //  视频采集码率      kpbs
+    public static int VIDEO_SAMPLING_RATE = 800 * SCALE ;
 
     //  编码方式
     public static String VIDEO_ENCODING = VDEncoder.H264 ;
@@ -249,6 +253,7 @@ public class Constants {
     public static boolean PREVIEW = false ;
     //  摄像头 true 前置， false 后置
     public static boolean CAMERA = false ;
+    //    public static boolean CAMERA = false ;
     //  音频推流码率
     public static int VOICE_PUSH_RATE = 8 * SCALE ;
     //  音频采集码率

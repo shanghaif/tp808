@@ -96,6 +96,16 @@ public class VideoPushService extends Service {
         public void distoryVideo() throws RemoteException {
             onDestroy();
         }
+
+        @Override
+        public void tackPicture() throws RemoteException {
+            tackPhoto();
+        }
+
+        @Override
+        public void recordVideo(boolean isRecord) throws RemoteException {
+            startRecord(isRecord);
+        }
     } ;
 
 
@@ -152,7 +162,6 @@ public class VideoPushService extends Service {
     }
 
     private boolean startVideo(){
-        Log.d("cjh", "startVideo -------------------- ") ;
 //        setNotificationMessage(DEFAULT_NAME, getString(R.string.tip_video_recording)) ;
         try {
             publish.start();
@@ -163,7 +172,6 @@ public class VideoPushService extends Service {
     }
 
     private boolean stopVideo(){
-        Log.d("cjh", "stopVideo -------------------- ") ;
 //        setNotificationMessage(DEFAULT_NAME, getString(R.string.tip_video_record_pause)) ;
         try {
             publish.stop();
@@ -174,7 +182,6 @@ public class VideoPushService extends Service {
     }
 
     private boolean destoryVideo(){
-        Log.d("cjh", "destoryVideo -------------------- ") ;
 //        setNotificationMessage(DEFAULT_NAME, getString(R.string.tip_video_record_finish)) ;
         try {
             publish.destroy();
@@ -214,4 +221,18 @@ public class VideoPushService extends Service {
 //        }
 //    }
 
+
+    //  拍照
+    public void tackPhoto(){
+        publish.takePicture();
+    }
+
+    //  录制
+    public void startRecord(boolean isStartRecord){
+        if (isStartRecord) {
+            publish.startRecode();
+        } else {
+            publish.stopRecode();
+        }
+    }
 }
