@@ -5,7 +5,7 @@ package cn.com.erayton.usagreement;
 
 interface VideoPushAIDL {
     //  设置进程 IP 和 PORT
-    void setServerAddress(String userName, String ip, int port, int channelNum) ;
+    void setServerAddress(String userName, String ip, int port, int channelNum, boolean needPublish) ;
 //    void setServerAddress(String ip, int port, int channelNum) ;
 //    void setServerAddress(String ip, int port) ;
 //    void setServerAddress(int channelNum) ;
@@ -23,5 +23,7 @@ interface VideoPushAIDL {
 
     //  录制
     void recordVideo(boolean isRecord) ;
+
+    void openCamera(boolean isOpen) ;
 
 }

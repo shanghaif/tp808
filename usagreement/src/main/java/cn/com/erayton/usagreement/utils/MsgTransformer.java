@@ -5,9 +5,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import cn.com.erayton.usagreement.data.Constants;
-import cn.com.erayton.usagreement.model.DataHeader;
-import cn.com.erayton.usagreement.model.PacketData;
-import cn.com.erayton.usagreement.model.ServerRegisterMsg;
+import cn.com.erayton.usagreement.model.decode.DataHeader;
+import cn.com.erayton.usagreement.model.decode.PacketData;
+import cn.com.erayton.usagreement.model.decode.ServerRegisterMsg;
 
 /**
  * * Created by Kent_Lee on 2017/3/31.

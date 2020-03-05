@@ -5,10 +5,10 @@ import android.media.MediaFormat;
 import android.media.MediaMuxer;
 import android.os.Environment;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.library.common.WriteFileCallback;
 import com.library.util.OtherUtil;
-import com.library.util.mLog;
 
 import java.io.File;
 import java.io.IOException;
@@ -88,7 +88,7 @@ public class WriteMp4 {
                     presentationTimeUsVD = 0;
                     frameNum = 0;
                     RECODE_STATUS = RECODE_STATUS_START;
-                    mLog.log("app_WriteMp4", "文件录制启动");
+                    Log.d("app_WriteMp4", "文件录制启动");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -136,7 +136,7 @@ public class WriteMp4 {
                     if (frameNum >= 20) {
                         writeFileCallback.success(path);
                     }
-                    mLog.log("app_WriteMp4", "文件录制关闭");
+                    Log.d("app_WriteMp4", "文件录制关闭");
                 } catch (Exception e) {
                     iscatch = true;
                 } finally {

@@ -2,6 +2,7 @@ package com.library.util;
 
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
@@ -132,7 +133,7 @@ public class OtherUtil {
             MediaCodecInfo info = MediaCodecList.getCodecInfoAt(i);
             String name = info.getName();
             boolean b = info.isEncoder();
-            mLog.log("RecordEncoderVD", " ----------isH265EncoderSupport:"+name+",b:"+b);
+            Log.d("RecordEncoderVD", " ----------isH265EncoderSupport:"+name+",b:"+b);
             if(b && (name.contains("hevc")||name.contains("h265"))){
                 return true;
             }
@@ -150,7 +151,7 @@ public class OtherUtil {
 //            MediaCodecInfo info = MediaCodecList.getCodecInfoAt(i);
 //            String name = info.getName();
 //            boolean b = info.isEncoder();
-//            mLog.log("RecordEncoderVD", " ----------isH265EncoderSupport:"+name+",b:"+b+",type:"+type.split("/")[1]);
+//            Log.d("RecordEncoderVD", " ----------isH265EncoderSupport:"+name+",b:"+b+",type:"+type.split("/")[1]);
 //            if(b && name.contains(type.split("/")[1])){
 //                return true;
 //            }
@@ -167,7 +168,7 @@ public class OtherUtil {
         for(int i=0;i<count;i++){
             MediaCodecInfo info = MediaCodecList.getCodecInfoAt(i);
             String name = info.getName();
-            mLog.log("RecordEncoderVD", " ----------isH265DecoderSupport:"+name);
+            Log.d("RecordEncoderVD", " ----------isH265DecoderSupport:"+name);
             if(name.contains("decoder") && (name.contains("hevc")||name.contains("h265"))){
                 return true;
             }
@@ -184,7 +185,7 @@ public class OtherUtil {
 //        for(int i=0;i<count;i++){
 //            MediaCodecInfo info = MediaCodecList.getCodecInfoAt(i);
 //            String name = info.getName();
-//            mLog.log("RecordEncoderVD", " ----------isH265DecoderSupport:"+name+",type:"+type.split("/")[1]);
+//            Log.d("RecordEncoderVD", " ----------isH265DecoderSupport:"+name+",type:"+type.split("/")[1]);
 //            if(name.contains("decoder") && name.contains(type.split("/")[1])){
 //                return true;
 //            }

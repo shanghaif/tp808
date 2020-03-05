@@ -1,10 +1,11 @@
 package com.library.live.stream;
 
+import android.util.Log;
+
 import com.library.common.UdpControlInterface;
 import com.library.live.stream.socket.core.TCPClient;
 import com.library.util.OtherUtil;
 import com.library.util.SingleThreadExecutor;
-import com.library.util.mLog;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -15,7 +16,8 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import cn.com.erayton.usagreement.sendModel.TerminalAVDataMsg;
+import cn.com.erayton.usagreement.model.encode.TerminalAVDataMsg;
+import cn.com.erayton.usagreement.model.model.TerminalAVDataInfo;
 import cn.com.erayton.usagreement.utils.LogUtils;
 
 /**
@@ -162,18 +164,18 @@ public class UdpSend {
         boolean isOne = true;
         //  记录时间值
 
-        TerminalAVDataMsg.TerminalAVDataInfo terminalAVDataInfo ;
+        TerminalAVDataInfo terminalAVDataInfo ;
         TerminalAVDataMsg terminalAVDataMsg = new TerminalAVDataMsg() ;
         byte[] tmpVideo = new byte[sendUdplength] ;
         while ((video.length - nowPosition) > sendUdplength) {
             System.arraycopy(video, nowPosition, tmpVideo, 0, sendUdplength);
             if (isOne) {
                 //  起始帧
-                terminalAVDataInfo = new TerminalAVDataMsg.TerminalAVDataInfo(phone, videoNum++,
+                terminalAVDataInfo = new TerminalAVDataInfo(phone, videoNum++,
                         true, channelNum, isIFrame, 1, tmpVideo) ;
             } else {
                 //  中间帧
-                terminalAVDataInfo = new TerminalAVDataMsg.TerminalAVDataInfo(phone, videoNum++,
+                terminalAVDataInfo = new TerminalAVDataInfo(phone, videoNum++,
                         true, channelNum, isIFrame, 11, tmpVideo) ;
             }
             //  添加视频数据
@@ -191,11 +193,11 @@ public class UdpSend {
             //  数据类型+分包处理
             if (isOne) {
                 //  完整帧
-                terminalAVDataInfo = new TerminalAVDataMsg.TerminalAVDataInfo(phone, videoNum++,
+                terminalAVDataInfo = new TerminalAVDataInfo(phone, videoNum++,
                         true, channelNum, isIFrame, 0, tmpVideo) ;
             } else {
                 //  结束帧
-                terminalAVDataInfo = new TerminalAVDataMsg.TerminalAVDataInfo(phone, videoNum++,
+                terminalAVDataInfo = new TerminalAVDataInfo(phone, videoNum++,
                         true, channelNum, isIFrame, 10, tmpVideo) ;
             }
             terminalAVDataMsg.setTerminalAVDataInfo(terminalAVDataInfo);
@@ -208,7 +210,7 @@ public class UdpSend {
      * 发送音频
      */
     private void writeVoice(byte[] voice) {
-        TerminalAVDataMsg.TerminalAVDataInfo terminalAVDataInfo ;
+        TerminalAVDataInfo terminalAVDataInfo ;
         TerminalAVDataMsg terminalAVDataMsg = new TerminalAVDataMsg() ;
         if (voiceSendNum == 0) {
 //            //  添加udp头
@@ -218,7 +220,7 @@ public class UdpSend {
 //            buffvoice.putInt(OtherUtil.getTime(1));//   时戳
 //            buffvoice.putShort((short) voice.length);// 长度
 
-            terminalAVDataInfo = new TerminalAVDataMsg.TerminalAVDataInfo(phone, videoNum++,
+            terminalAVDataInfo = new TerminalAVDataInfo(phone, videoNum++,
                     false, channelNum, 11, 0, voice) ;
             terminalAVDataMsg.setTerminalAVDataInfo(terminalAVDataInfo);
             //  添加音频数据
@@ -230,7 +232,7 @@ public class UdpSend {
             //  添加音频头
 //            buffvoice.putInt(OtherUtil.getTime(1));//   时戳
 //            buffvoice.putShort((short) voice.length);// 长度
-            terminalAVDataInfo = new TerminalAVDataMsg.TerminalAVDataInfo(phone, videoNum++,
+            terminalAVDataInfo = new TerminalAVDataInfo(phone, videoNum++,
                     false, channelNum, 11, 0, voice) ;
             terminalAVDataMsg.setTerminalAVDataInfo(terminalAVDataInfo);
             //  添加音频数据
@@ -316,7 +318,7 @@ public class UdpSend {
                                 LogUtils.d("starsendThread:"+data.length);
 //                                socket.send(packetsendPush);
 //                            } catch (IOException e) {
-//                                mLog.log("senderror", "发送失败");
+//                                Log.d("senderror", "发送失败");
 //                                e.printStackTrace();
 //                            }
                             Thread.sleep(10);
@@ -325,7 +327,7 @@ public class UdpSend {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                mLog.log("interrupt_Thread", "关闭发送线程");
+                Log.d("interrupt_Thread", "关闭发送线程");
             }
         });
     }

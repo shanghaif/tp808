@@ -1,10 +1,9 @@
 package com.library.live.view;
 
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
-
-import com.library.util.mLog;
 
 /**
  * Created by android1 on 2018/1/4.
@@ -30,7 +29,7 @@ public class WeightRunnable implements Runnable {
             lp.width = (int) (layout.getHeight() * weight);
             lp.height = layout.getHeight();
         }
-        mLog.log("View_Size", lp.width + "--" + lp.height + "--" + weight);
+        Log.d("View_Size", lp.width + "--" + lp.height + "--" + weight);
         view.setLayoutParams(lp);
     }
 

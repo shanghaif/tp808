@@ -12,6 +12,7 @@ import cn.com.erayton.jt_t808.video.eventBus.EventBusUtils;
 import cn.com.erayton.jt_t808.video.eventBus.event.BroadCastMainEvent;
 import cn.com.erayton.usagreement.data.Constants;
 import cn.com.erayton.usagreement.sendModel.TerminalAuthMsg;
+import cn.com.erayton.usagreement.sendModel.TerminalGPSMsg;
 import cn.com.erayton.usagreement.sendModel.TerminalGeneralMsg;
 import cn.com.erayton.usagreement.sendModel.TerminalParametersMsg;
 import cn.com.erayton.usagreement.sendModel.TerminalRegisterMsg;
@@ -35,7 +36,7 @@ public class USManager {
     private boolean isLocation = true;//标志是否有效定位
 
     public static USManager getSingleton() {
-        mLog.log("USManager", "public static USManager getSingleton() {\n");
+        Log.d("USManager", "public static USManager getSingleton() {\n");
         if(singleton == null){
             singleton = new USManager();
         }
@@ -90,7 +91,7 @@ public class USManager {
 //}
 
     private USManager() {
-        mLog.log("USManager", "USManager ------------ \n");
+        Log.d("USManager", "USManager ------------ \n");
         socketClient = new SocketClient() ;
         socketClient.listener = socketClientListener ;
     }
@@ -124,7 +125,7 @@ public class USManager {
         SocketClientSender.sendRegister(regInfo, false ,false) ;
     }
 
-//    //  发送GPS
+    //  发送GPS
 //    public void SendGPS(Gps gps){
 //        TerminalGPSMsg.TerminalGPSInfo terminalGPSInfo = new TerminalGPSMsg.TerminalGPSInfo() ;
 //        terminalGPSInfo.setWarningMark(0);
@@ -295,7 +296,7 @@ public class USManager {
         @Override
         public void onTernimalAVTranslate(String s, int i, int i1, int i2, int i3, int i4, int i5) {
             int result = 1 ;
-
+            Log.d(TAG, "onTernimalAVTranslate:"+s+","+i1+","+i2+","+i3+","+i4+","+i5) ;
             if (!TextUtils.isEmpty(s)){ //  ip 不为空，返回通用回复成功
                 result = 0 ;
 //                serverAVTranslateMsg.getHost() ;

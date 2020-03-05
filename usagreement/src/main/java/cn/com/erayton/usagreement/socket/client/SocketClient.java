@@ -5,12 +5,12 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import cn.com.erayton.usagreement.data.Constants;
 import cn.com.erayton.usagreement.data.ResponseReason;
-import cn.com.erayton.usagreement.model.PacketData;
-import cn.com.erayton.usagreement.model.ServerAVTranslateControlMsg;
-import cn.com.erayton.usagreement.model.ServerAVTranslateMsg;
-import cn.com.erayton.usagreement.model.ServerGeneralMsg;
-import cn.com.erayton.usagreement.model.ServerParametersMsg;
-import cn.com.erayton.usagreement.model.ServerRegisterMsg;
+import cn.com.erayton.usagreement.model.decode.PacketData;
+import cn.com.erayton.usagreement.model.decode.ServerAVTranslateControlMsg;
+import cn.com.erayton.usagreement.model.decode.ServerAVTranslateMsg;
+import cn.com.erayton.usagreement.model.decode.ServerGeneralMsg;
+import cn.com.erayton.usagreement.model.decode.ServerParametersMsg;
+import cn.com.erayton.usagreement.model.decode.ServerRegisterMsg;
 import cn.com.erayton.usagreement.socket.core.TCPClient;
 import cn.com.erayton.usagreement.socket.core.UDPClient;
 import cn.com.erayton.usagreement.utils.BitOperator;
@@ -30,7 +30,6 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
          *               3：不支持；4：报警处理确认；
          * @param reason 返回原因
          * */
-//        void commomResp(int result, String reason, PacketData packetData) ;        //  通用应答
         void commomResp(int result, String reason) ;        //  通用应答
         /**
          * @param result    0：成功；1：车辆已被注册；2：数据库中无该车辆；
@@ -41,7 +40,6 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
         void authResp(int result, String reason) ;           //  鉴权
         void heartResp(int result, String reason) ;          //  心跳
         void gpsResp(int result, String reason) ;            //  GPS 数据
-//        void defaultResp(PacketData packetData, String errorMsg, int replyCode) ;       //  未加应答码
         void defaultResp(String errorMsg, int replyCode) ;       //  未加应答码
         void onConnect(int i) ;          //  是否连接
         void onDisConnect() ;

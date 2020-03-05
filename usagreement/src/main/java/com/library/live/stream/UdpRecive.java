@@ -10,7 +10,6 @@ import com.library.common.VoiceCallback;
 import com.library.live.vd.VideoInformationInterface;
 import com.library.util.OtherUtil;
 import com.library.util.SingleThreadExecutor;
-import com.library.util.mLog;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -113,7 +112,7 @@ public class UdpRecive implements CachingStrategyCallback {
                             e.printStackTrace();
                         }
                     }
-                    mLog.log("interrupt_Thread", "关闭接收线程");
+                    Log.d("interrupt_Thread", "关闭接收线程");
                 }
             });
         }
@@ -124,11 +123,11 @@ public class UdpRecive implements CachingStrategyCallback {
         public void run() {
             while (!udpQueue.isEmpty()) {
 //                try {
-                    mLog.log(TAG, "udprunnable --------------------------------------- udpQueue.size() :"+udpQueue.size()); ;
+                    Log.d(TAG, "udprunnable --------------------------------------- udpQueue.size() :"+udpQueue.size()); ;
                     write(udpQueue.poll());
 //                }catch (MediaCodec.CodecException e){
 //                    e.printStackTrace();
-//                    mLog.log(TAG, "udprunnable --------------------------------------- MediaCodec.CodecException :"+e.toString()); ;
+//                    Log.d(TAG, "udprunnable --------------------------------------- MediaCodec.CodecException :"+e.toString()); ;
 //                }
             }
         }
@@ -163,7 +162,7 @@ public class UdpRecive implements CachingStrategyCallback {
 
                 //从排好序的队列中取出数据
                 if (videoList.size() >= videoUdpPacketMin) {
-                    mLog.log("videoUdpPacket", "当前数量 " + videoList.size() + " 允许数量 " + videoUdpPacketMin);
+                    Log.d("videoUdpPacket", "当前数量 " + videoList.size() + " 允许数量 " + videoUdpPacketMin);
                     mosaicVideoFrame(videoList.removeFirst());
                 }
             } else if (udpBytes.getTag() == (byte) 0x00) {

@@ -23,6 +23,7 @@ import io.reactivex.functions.Action;
 
 
 public class VideoPushService extends Service {
+    private String TAG = VideoPushService.class.getName() ;
 //    private String IP ;
 //    private int Port ;
     private Publish publish ;
@@ -37,7 +38,6 @@ public class VideoPushService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-//        return null ;
         return binder;
     }
 
@@ -64,16 +64,16 @@ public class VideoPushService extends Service {
 
     private Binder binder = new VideoPushAIDL.Stub() {
         @Override
-        public void setServerAddress(String userName, String ip, int port, int channelNum) throws RemoteException {
-            Log.d("cjh", "setServerAddress -------------------- "+ip+","+port+","+channelNum) ;
+        public void setServerAddress(String userName, String ip, int port, int channelNum, boolean needPublish) throws RemoteException {
+            Log.d(TAG, "setServerAddress -------------------- "+ip+","+port+","+channelNum) ;
 //            IP = ip ;
 //            Port = port ;
             phone = userName ;
             if (TextUtils.isEmpty(ip) || port == 0){
-                Log.d("cjh", "setServerAddress -------------------- null ") ;
+                Log.d(TAG, "setServerAddress -------------------- null ") ;
             }else {
                 initPushVideo(ip, port, channelNum);
-                timeDisposable();
+                if (needPublish) timeDisposable();
             }
         }
 
@@ -106,13 +106,15 @@ public class VideoPushService extends Service {
         public void recordVideo(boolean isRecord) throws RemoteException {
             startRecord(isRecord);
         }
+
+        @Override
+        public void openCamera(boolean isOpen) throws RemoteException {
+            cameraStatus(isOpen);
+        }
     } ;
 
 
     private void initPushVideo(String ip, int port, int channelNum){
-
-        Log.d("cjh", "initPushVideo -------------------- "+phone ) ;
-
         publish = new Publish.Buider(this, null)
                 .setPushMode(new UdpSend(phone, ip, port, channelNum))
                 //  帧率
@@ -135,8 +137,8 @@ public class VideoPushService extends Service {
                 .setPreviewSize(Constants.PREVIEW_RESOLUTION_W, Constants.PREVIEW_RESOLUTION_H)
                 //  摄像头选择
                 .setRotate(Constants.CAMERA)
-                .setVideoDirPath(Environment.getExternalStorageDirectory().getPath() + File.separator + "VideoLive")
-                .setPictureDirPath(Environment.getExternalStorageDirectory().getPath() + File.separator + "VideoPicture")
+                .setVideoDirPath(Environment.getExternalStorageDirectory().getPath() + File.separator + "erayTonLive")
+                .setPictureDirPath(Environment.getExternalStorageDirectory().getPath() + File.separator + "erayTonPicture")
                 .setCenterScaleType(true)
                 .setScreenshotsMode(Publish.TAKEPHOTO)
                 .build();
@@ -146,7 +148,6 @@ public class VideoPushService extends Service {
     Disposable disposable ;
     private void timeDisposable(){
 
-        Log.d("cjh", "timeDisposable -------------------- ") ;
         disposable = Flowable.intervalRange(0, Constants.VIDEO_INIT_TIME, 0, 1, TimeUnit.SECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnComplete(new Action() {
@@ -223,16 +224,25 @@ public class VideoPushService extends Service {
 
 
     //  拍照
-    public void tackPhoto(){
+    private void tackPhoto(){
         publish.takePicture();
     }
 
     //  录制
-    public void startRecord(boolean isStartRecord){
+    private void startRecord(boolean isStartRecord){
         if (isStartRecord) {
             publish.startRecode();
         } else {
             publish.stopRecode();
+        }
+    }
+
+    //  是否释放摄像头
+    private void cameraStatus(boolean isOpen){
+        if (isOpen) {
+            publish.open();
+        }else {
+            publish.release();
         }
     }
 }

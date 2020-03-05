@@ -36,7 +36,7 @@ public class RecordEncoderVD {
         width = csize.getHeight();
         height = csize.getWidth();
 
-//        mLog.log("RecordEncoderVD"," --------codetype:"+codetype
+//        Log.d("RecordEncoderVD"," --------codetype:"+codetype
 //                        + "\n OtherUtil.isH265EncoderSupport():"+OtherUtil.isH265EncoderSupport()
 ////                        + "\n OtherUtil.isH265EncoderSupport(codetype)"+OtherUtil.isH265EncoderSupport(codetype)
 //                        + "\n OtherUtil.isH265DecoderSupport()"+OtherUtil.isH265DecoderSupport()

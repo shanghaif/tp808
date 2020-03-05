@@ -115,7 +115,7 @@
 
 
 #-libraryjars "C:\Program Files\Java\jre1.8.0_151\lib\rt.jar"
--libraryjars "F:\Java\jdk1.8.0_91\jre\lib\rt.jar"
+#-libraryjars "F:\Java\jdk1.8.0_91\jre\lib\rt.jar"
 #-libraryjars "G:\Downloads\360 Output\360 jiagu\protocol-1.3.jar"
 #-libraryjars "G:\AndoridSDK\platforms\android-26\android.jar"
 #-libraryjars "C:\Users\admin\AppData\Local\Android\sdk\platforms\android-26\android.jar"
@@ -155,8 +155,11 @@ public <methods>;
 public <fields>;
 public <methods>;
 }
-
--keep class cn.com.erayton.usagreement.sendModel.*{*;}
+# 2020.02.11    关闭 model
+-keep class cn.com.erayton.usagreement.model.model.*{*;}
+-keep class com.library.USVideo{*;}
+-keep class cn.com.erayton.usagreement.data.Constants{*;}
+-keep class cn.com.erayton.usagreement.service.VideoPushService{*;}
 #-keep class cn.com.erayton.usagreement.model.*{*;}
 
 

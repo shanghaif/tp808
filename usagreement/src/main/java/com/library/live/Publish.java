@@ -22,6 +22,7 @@ import android.media.ImageReader;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.util.Log;
 import android.util.Size;
 import android.view.Surface;
 import android.view.TextureView;
@@ -36,7 +37,6 @@ import com.library.live.view.PublishView;
 import com.library.util.ImagUtil;
 import com.library.util.OtherUtil;
 import com.library.util.Rotate3dAnimation;
-import com.library.util.mLog;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -170,8 +170,8 @@ public class Publish implements TextureView.SurfaceTextureListener {
             publishSize = initSize(publishSize, outputSizes);
             previewSize = initSize(previewSize, outputSizes);
 
-            mLog.log("pictureSize", "推流分辨率  =  " + publishSize.getWidth() + " * " + publishSize.getHeight());
-            mLog.log("pictureSize", "预览分辨率  =  " + previewSize.getWidth() + " * " + previewSize.getHeight());
+            Log.d("pictureSize", "推流分辨率  =  " + publishSize.getWidth() + " * " + publishSize.getHeight());
+            Log.d("pictureSize", "预览分辨率  =  " + previewSize.getWidth() + " * " + previewSize.getHeight());
 
             //计算比例(需对调宽高)
             udpSend.setWeight((double) publishSize.getHeight() / publishSize.getWidth());
@@ -194,7 +194,7 @@ public class Publish implements TextureView.SurfaceTextureListener {
         int numh = 10000;
         int num = 0;
         for (int i = 0; i < outputSizes.length; i++) {
-            mLog.log("Size_app", outputSizes[i].getWidth() + "--" + outputSizes[i].getHeight());
+            Log.d("Size_app", outputSizes[i].getWidth() + "--" + outputSizes[i].getHeight());
             if (Math.abs(outputSizes[i].getWidth() - publishSize.getWidth()) <= numw) {
                 numw = Math.abs(outputSizes[i].getWidth() - publishSize.getWidth());
                 if (Math.abs(outputSizes[i].getHeight() - publishSize.getHeight()) <= numh) {
@@ -359,10 +359,10 @@ public class Publish implements TextureView.SurfaceTextureListener {
                     //推流编码器
                     vdEncoder.addFrame(input);
 //                    if ((System.currentTimeMillis() - time) > (1000 / frameRate)) {
-//                        mLog.log("Frame_slow", "图像处理速度过慢");
+//                        Log.d("Frame_slow", "图像处理速度过慢");
 //                    }
                 } else {
-                    mLog.log("Frame_loss", "图像采集速率不够");
+                    Log.d("Frame_loss", "图像采集速率不够");
                 }
             }
         });
@@ -476,6 +476,15 @@ public class Publish implements TextureView.SurfaceTextureListener {
             Rotate3dAnimation.rotate3dDegrees180(map.getPublishView(), 700, 500, Rotate3dAnimation.ROTATE_Y_AXIS);
         }
     }
+
+    public void release(){
+        releaseCamera();
+    }
+
+    public void open(){
+        openCamera();
+    }
+
 
     public void takePicture() {
         if (map.getScreenshotsMode() == CONVERSION) {

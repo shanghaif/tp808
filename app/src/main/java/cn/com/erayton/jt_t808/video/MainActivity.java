@@ -30,6 +30,7 @@ import cn.com.erayton.jt_t808.video.video.Send;
 import cn.com.erayton.usagreement.VideoPushAIDL;
 import cn.com.erayton.usagreement.service.VideoPushService;
 import cn.com.erayton.usagreement.utils.LogUtils;
+import cn.erayton.voicelib.Mp3Lib;
 
 public class MainActivity extends AppCompatActivity {
     private final int REQUEST_CAMERA = 666;
@@ -77,7 +78,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void gostart() {
-//        push = findViewById(R.id.push);
+        String s = Mp3Lib.getHello()+Mp3Lib.getLameVersion() ;
+        push = findViewById(R.id.push);
+        push.setText(s);
 //        push.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View view) {

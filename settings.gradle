@@ -1,1 +1,1 @@
-include ':app', ':EasyToolsJava', ':EasyToolsAndroid', 'usagreement'
+include ':app', ':EasyToolsJava', ':EasyToolsAndroid', ':voicelib', ':videolib',  'usagreement'

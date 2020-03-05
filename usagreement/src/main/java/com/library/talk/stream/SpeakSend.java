@@ -1,9 +1,10 @@
 package com.library.talk.stream;
 
+import android.util.Log;
+
 import com.library.common.UdpControlInterface;
 import com.library.util.OtherUtil;
 import com.library.util.SingleThreadExecutor;
-import com.library.util.mLog;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -153,7 +154,7 @@ public class SpeakSend {
                             try {
                                 socket.send(packetsendPush);
                             } catch (IOException e) {
-                                mLog.log("senderror", "发送失败");
+                                Log.d("senderror", "发送失败");
                                 e.printStackTrace();
                             }
                             Thread.sleep(1);
@@ -162,7 +163,7 @@ public class SpeakSend {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                mLog.log("interrupt_Thread", "speak关闭发送线程");
+                Log.d("interrupt_Thread", "speak关闭发送线程");
             }
         });
     }

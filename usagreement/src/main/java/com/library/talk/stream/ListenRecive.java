@@ -2,13 +2,13 @@ package com.library.talk.stream;
 
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.util.Log;
 
 import com.library.common.UdpBytes;
 import com.library.common.UdpControlInterface;
 import com.library.common.VoiceCallback;
 import com.library.util.OtherUtil;
 import com.library.util.SingleThreadExecutor;
-import com.library.util.mLog;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -105,7 +105,7 @@ public class ListenRecive implements ListenCachingStrategyCallback {
                             e.printStackTrace();
                         }
                     }
-                    mLog.log("interrupt_Thread", "ListenRecive关闭线程");
+                    Log.d("interrupt_Thread", "ListenRecive关闭线程");
                 }
             });
         }

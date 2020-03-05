@@ -6,7 +6,7 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "cn.com.erayton.jt_t808"
-        minSdkVersion 21
+        minSdkVersion 23
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
@@ -55,6 +55,7 @@ dependencies {
 //    implementation (name: 'usagreement-debug9', ext: 'aar')
 //    implementation (name: 'usagreement6', ext: 'aar')
 //    implementation (name: 'usagreement-release', ext: 'aar')
+    implementation (name: 'voicelib-debug1', ext: 'aar')
 
 }
 repositories {

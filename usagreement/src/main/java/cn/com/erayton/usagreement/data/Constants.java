@@ -224,6 +224,10 @@ public class Constants {
 
 
     //    ============================================================================================
+    //    视频服务器参数
+    public static String VIDEO_IP = "video.erayton.cn" ;
+    public static int VIDEO_PORT = 7000;
+
     //  视频初始化时长 sec
     public static int VIDEO_INIT_TIME = 3 ;
 
@@ -258,5 +262,11 @@ public class Constants {
     public static int VOICE_PUSH_RATE = 8 * SCALE ;
     //  音频采集码率
     public static int VOICE_SAMPLING_RATE = 8 * SCALE ;
+
+
+
+//    ============================================================================================
+    //  默认 authCode
+    public static String USAUTHCODE = "0" ;
 
 }

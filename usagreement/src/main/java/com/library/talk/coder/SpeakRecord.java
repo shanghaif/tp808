@@ -3,12 +3,12 @@ package com.library.talk.coder;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
+import android.util.Log;
 
 import com.library.common.WriteFileCallback;
 import com.library.talk.stream.SpeakSend;
 import com.library.util.OtherUtil;
 import com.library.util.SingleThreadExecutor;
-import com.library.util.mLog;
 
 /**
  * Created by android1 on 2017/12/23.
@@ -77,7 +77,7 @@ public class SpeakRecord {
                     speakEncoder.encode(buffer, bufferReadResult);
                     setDecibel(buffer, bufferReadResult / 2);
                 }
-                mLog.log("interrupt_Thread", "speak关闭线程");
+                Log.d("interrupt_Thread", "speak关闭线程");
             }
         });
     }

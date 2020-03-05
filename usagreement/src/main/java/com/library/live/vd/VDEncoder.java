@@ -3,6 +3,7 @@ package com.library.live.vd;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
+import android.util.Log;
 import android.util.Size;
 
 import com.library.live.stream.UdpSend;
@@ -10,7 +11,6 @@ import com.library.util.ByteUtil;
 import com.library.util.ImagUtil;
 import com.library.util.OtherUtil;
 import com.library.util.SingleThreadExecutor;
-import com.library.util.mLog;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -133,7 +133,7 @@ public class VDEncoder {
                                 outData = new byte[bufferInfo.size];
                                 outputBuffer.get(outData);
                                 information = outData;
-                                mLog.log("publish_sps_pps", ByteUtil.byte_to_16(information));
+                                Log.d("publish_sps_pps", ByteUtil.byte_to_16(information));
                             } else if (bufferInfo.flags == MediaCodec.BUFFER_FLAG_KEY_FRAME) {
                                 //  关键帧
                                 outData = new byte[bufferInfo.size + information.length];

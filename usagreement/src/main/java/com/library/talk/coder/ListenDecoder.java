@@ -3,11 +3,11 @@ package com.library.talk.coder;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
+import android.util.Log;
 
 import com.library.common.VoiceCallback;
 import com.library.common.VoicePlayer;
 import com.library.util.OtherUtil;
-import com.library.util.mLog;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -67,7 +67,7 @@ public class ListenDecoder implements VoiceCallback {
                 dstBuf.put(voice, 0, voice.length);
                 mDecoder.queueInputBuffer(inputBufIndex, 0, voice.length, 0, 0);
             } else {
-                mLog.log("dcoder_failure", "dcoder failure_VC");
+                Log.d("dcoder_failure", "dcoder failure_VC");
                 return;
             }
             outputBufferIndex = mDecoder.dequeueOutputBuffer(info, OtherUtil.waitTime);
