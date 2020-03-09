@@ -1,35 +1,28 @@
 package cn.com.erayton.testMp3;
 
 import android.Manifest;
-import android.content.Context;
-import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.gz.testmp3.R;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+
 
 import java.io.File;
 import java.io.IOException;
 
-import jaygoo.library.converter.MP3Converter;
+import cn.com.erayton.jt_t808.R;
+import cn.erayton.voicelib.Mp3Lib;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
     private String TAG = "MainActivity";
@@ -47,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main_testmp3);
         startButton = findViewById(R.id.startBut);
         stopButton = findViewById(R.id.stopBut);
         startConverter = findViewById(R.id.startConverter);
@@ -64,11 +57,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         playMp3.setOnClickListener(this);
         playMav.setOnClickListener(this);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
+//        Toolbar toolbar = findViewById(R.id.toolbar);
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
             ActivityCompat.requestPermissions(this, new String[]{ Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.RECORD_AUDIO}, PERMISSION_REQUEST);
         }
-        setSupportActionBar(toolbar);
+//        setSupportActionBar(toolbar);
     }
 
     /**
@@ -100,9 +93,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.obtainV:
-                String str = MP3Converter.getLameVersion();
+                String str = Mp3Lib.getLameVersion();
                 Log.e(TAG, "onClick: "+str);
-                Toast.makeText(MainActivity.this,str,Toast.LENGTH_SHORT);
+                Toast.makeText(MainActivity.this,str,Toast.LENGTH_SHORT).show();
                 break;
             case R.id.startBut:
                 Log.e(TAG, "onClick: 开始录音");
@@ -167,17 +160,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 将录音文件wav转为MP3
      */
     long fileSize;
+    int channel = 1 ;
     long bytes = 0;
     private void startConverterMP3() {
         final String wavPath = AudioFileFuncWav.getDiskCachePath(MainActivity.this)+"/FinalAudio.wav";
         final String mp3Path = AudioFileFuncWav.getDiskCachePath(MainActivity.this)+"/converter.mp3";
-        MP3Converter.init(44100,1,0,44100,96,9);
+        Mp3Lib.init(AudioFileFuncWav.AUDIO_SAMPLE_RATE,1,0,AudioFileFuncWav.AUDIO_SAMPLE_RATE,96,9);
         fileSize = new File(wavPath).length();
         Log.e("fileSize",fileSize+"  大小");
         new Thread(new Runnable() {
             @Override
             public void run() {
-                MP3Converter.convertMp3(wavPath,mp3Path);
+                Mp3Lib.convertMp3(wavPath,mp3Path);
             }
         }).start();
         handlerMP3.postDelayed(runnableMP3, 500);
@@ -186,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Runnable runnableMP3 = new Runnable() {
         @Override
         public void run() {
-            bytes = MP3Converter.getConvertBytes();
+            bytes = Mp3Lib.getConvertBytes();
             float progress = (100f * bytes / fileSize);
             if (bytes == -1){
                 progress = 100;

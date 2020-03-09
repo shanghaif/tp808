@@ -94,12 +94,16 @@ public class AudioRecorderWav {
         NewAudioName = AudioFileFuncWav.getWavFilePath(context);
 
         // 获得缓冲区字节大小
+//        bufferSizeInBytes = AudioRecord.getMinBufferSize(AudioFileFuncWav.AUDIO_SAMPLE_RATE,
+//                AudioFormat.CHANNEL_IN_STEREO, AudioFormat.ENCODING_PCM_16BIT);
         bufferSizeInBytes = AudioRecord.getMinBufferSize(AudioFileFuncWav.AUDIO_SAMPLE_RATE,
-                AudioFormat.CHANNEL_IN_STEREO, AudioFormat.ENCODING_PCM_16BIT);
+                AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
 
         // 创建AudioRecord对象
+//        audioRecord = new AudioRecord(AudioFileFuncWav.AUDIO_INPUT, AudioFileFuncWav.AUDIO_SAMPLE_RATE,
+//                AudioFormat.CHANNEL_IN_STEREO, AudioFormat.ENCODING_PCM_16BIT, bufferSizeInBytes);
         audioRecord = new AudioRecord(AudioFileFuncWav.AUDIO_INPUT, AudioFileFuncWav.AUDIO_SAMPLE_RATE,
-                AudioFormat.CHANNEL_IN_STEREO, AudioFormat.ENCODING_PCM_16BIT, bufferSizeInBytes);
+                AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, bufferSizeInBytes);
     }
 
 
@@ -155,7 +159,7 @@ public class AudioRecorderWav {
         long totalAudioLen = 0;
         long totalDataLen = totalAudioLen + 36;
         long longSampleRate = AudioFileFuncWav.AUDIO_SAMPLE_RATE;
-        int channels = 2;
+        int channels = 1;
         long byteRate = 16 * AudioFileFuncWav.AUDIO_SAMPLE_RATE * channels / 8;
         byte[] data = new byte[bufferSizeInBytes];
         try {

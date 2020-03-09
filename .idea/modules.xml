@@ -7,6 +7,8 @@
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/tp808.iml" filepath="$PROJECT_DIR$/tp808.iml" />
       <module fileurl="file://$PROJECT_DIR$/usagreement/usagreement.iml" filepath="$PROJECT_DIR$/usagreement/usagreement.iml" />
+      <module fileurl="file://$PROJECT_DIR$/videolib/videolib.iml" filepath="$PROJECT_DIR$/videolib/videolib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/voicelib/voicelib.iml" filepath="$PROJECT_DIR$/voicelib/voicelib.iml" />
     </modules>
   </component>
 </project>

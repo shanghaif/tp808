@@ -78,9 +78,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void gostart() {
-        String s = Mp3Lib.getHello()+Mp3Lib.getLameVersion() ;
+//        String s = Mp3Lib.getHello()+Mp3Lib.getLameVersion() ;
         push = findViewById(R.id.push);
-        push.setText(s);
+        push.setText(Mp3Lib.getLameVersion());
 //        push.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View view) {

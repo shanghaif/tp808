@@ -5,10 +5,11 @@ public class Mp3Lib {
         System.loadLibrary("lame-utils");
     }
 
-    //测试环境是否成功
+    //  测试环境是否成功
     public static native String getHello();
-    //测试lame环境是否安装成功
+    //  测试lame环境是否安装成功
     public static native String getLameVersion();
+
     /**
      * init lame
      * @param inSampleRate
@@ -30,6 +31,7 @@ public class Mp3Lib {
      */
     public native static void init(int inSampleRate, int channel, int mode,
                                    int outSampleRate, int outBitRate, int quality);
+
     /**
      * file convert to mp3
      * it may cost a lot of time and better put it in a thread
@@ -39,6 +41,7 @@ public class Mp3Lib {
      *          mp3 output file path
      */
     public native  static void convertMp3(String inputPath, String mp3Path);
+
     /**
      * get converted bytes in inputBuffer
      * @return
