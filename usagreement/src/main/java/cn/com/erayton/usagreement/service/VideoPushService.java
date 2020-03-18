@@ -24,15 +24,9 @@ import io.reactivex.functions.Action;
 
 public class VideoPushService extends Service {
     private String TAG = VideoPushService.class.getName() ;
-//    private String IP ;
-//    private int Port ;
     private Publish publish ;
     private String phone ;
-    private int VIDEO_NOTIFICATION_CODE = 0x120 ;
-    private String DEFAULT_NAME = "易对讲" ;
-    private String DEFAULT_CONTENT = "易对讲" ;
 
-//    private int VIDEO_NOTIFICATION_LEVEL = NotificationManager.IMPORTANCE_DEFAULT ;
     private NotificationManager notificationManager ;
 
 

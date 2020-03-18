@@ -218,7 +218,8 @@ public class Publish implements TextureView.SurfaceTextureListener {
             return;
         }
         try {
-            //打开相机
+            manager.setTorchMode(cameraId, false);
+            //  打开相机
             manager.openCamera(cameraId, new CameraDevice.StateCallback() {
                 @Override
                 public void onOpened( CameraDevice device) {
@@ -278,7 +279,7 @@ public class Publish implements TextureView.SurfaceTextureListener {
                 @Override
                 public void onConfigured( CameraCaptureSession session) {
                     Publish.this.session = session;
-                    //设置反复捕获数据的请求，这样预览界面就会一直有数据显示
+                    //  设置反复捕获数据的请求，这样预览界面就会一直有数据显示
                     try {
                         session.setRepeatingRequest(previewRequestBuilder.build(), null, camearHandler);
                     } catch (CameraAccessException e) {
@@ -477,8 +478,21 @@ public class Publish implements TextureView.SurfaceTextureListener {
         }
     }
 
+    //  不能随意释放
     public void release(){
-        releaseCamera();
+        if (session != null) {
+            session.close();
+            session = null;
+        }
+        if (cameraDevice != null) {
+            cameraDevice.close();
+            cameraDevice = null;
+        }
+        if (previewImageReader != null) {
+            previewImageReader.close();
+            previewImageReader = null;
+        }
+
     }
 
     public void open(){

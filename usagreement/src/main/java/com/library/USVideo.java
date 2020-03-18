@@ -94,7 +94,7 @@ public class USVideo {
      * 开启关闭摄像头
      * @param isOpen    是否开启摄像头
      */
-    public void opCamera(boolean isOpen) throws RemoteException {
+    public void openCamera(boolean isOpen) throws RemoteException {
         videoPushAIDL.openCamera(isOpen);
     }
 }

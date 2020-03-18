@@ -229,7 +229,7 @@ public class Constants {
     public static int VIDEO_PORT = 7000;
 
     //  视频初始化时长 sec
-    public static int VIDEO_INIT_TIME = 3 ;
+    public static int VIDEO_INIT_TIME = 2 ;
 
     //  kpbs 进制 ？
     private static int SCALE = 1000 ;
