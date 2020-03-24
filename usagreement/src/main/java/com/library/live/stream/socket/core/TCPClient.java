@@ -133,7 +133,7 @@ public class TCPClient implements Runnable {
     public boolean sendAsyn(final byte[] bytes){
         if (socket == null) return false ;
         if (!socket.isConnected()) return  false ;
-
+        LogUtils.d("sendAsyn---------------:"+bytes.length);
         threadPoolExecutor.execute(new Runnable() {
             @Override
             public void run() {
@@ -181,7 +181,7 @@ public class TCPClient implements Runnable {
         }
         receiveThread = new Thread(this) ;
         setReceiveStop(false);
-        receiveThread.setName("TCP RECEIVE THREAD");
+        receiveThread.setName("video TCP RECEIVE THREAD");
         receiveThread.start();
     }
 

@@ -19,6 +19,7 @@ import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
+import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -26,10 +27,9 @@ import android.util.Log;
 import android.util.Size;
 import android.view.Surface;
 import android.view.TextureView;
-import com.library.common.UdpControlInterface;
 import com.library.common.WriteFileCallback;
 import com.library.live.file.WriteMp4;
-import com.library.live.stream.UdpSend;
+import com.library.live.stream.TcpSend;
 import com.library.live.vc.VoiceRecord;
 import com.library.live.vd.RecordEncoderVD;
 import com.library.live.vd.VDEncoder;
@@ -61,7 +61,8 @@ public class Publish implements TextureView.SurfaceTextureListener {
     //音频采集
     private VoiceRecord voiceRecord;
     //UDP发送类
-    private UdpSend udpSend;
+//    private UdpSend udpSend;
+    private TcpSend udpSend;
     private int rotateAngle = 90;//270 图片需要翻转角度
     private boolean isCameraBegin = false;
     private boolean useuvPicture = false;
@@ -155,6 +156,10 @@ public class Publish implements TextureView.SurfaceTextureListener {
                     StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
                     //选取最佳分辨率初始化编码器（未必和设置的匹配，由于摄像头不支持设置的分辨率）
                     this.cameraId = cameraId;
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        manager.setTorchMode(cameraId, false);
+                    }
                     rotateAngle = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
                     initCode(map.getOutputSizes(SurfaceTexture.class));
                     break;
@@ -214,11 +219,12 @@ public class Publish implements TextureView.SurfaceTextureListener {
             return;
         }
 //        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-        if (context.checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            return;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (context.checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
         }
         try {
-            manager.setTorchMode(cameraId, false);
             //  打开相机
             manager.openCamera(cameraId, new CameraDevice.StateCallback() {
                 @Override
@@ -616,7 +622,7 @@ public class Publish implements TextureView.SurfaceTextureListener {
         }
 
         public Buider setPublishBitrateVC(int publishbitrate_vc) {
-            //限制最大48，因为发送会合并5个包，过大会导致溢出
+            //  限制最大48，因为发送会合并5个包，过大会导致溢出
             map.setPublishbitrate_vc(Math.min(48 * 1024, publishbitrate_vc));
             return this;
         }
@@ -656,7 +662,11 @@ public class Publish implements TextureView.SurfaceTextureListener {
             return this;
         }
 
-        public Buider setPushMode(UdpSend pushMode) {
+//        public Buider setPushMode(UdpSend pushMode) {
+//            map.setPushMode(pushMode);
+//            return this;
+//        }
+        public Buider setPushMode(TcpSend pushMode) {
             map.setPushMode(pushMode);
             return this;
         }
@@ -669,10 +679,10 @@ public class Publish implements TextureView.SurfaceTextureListener {
             return this;
         }
 
-        public Buider setUdpControl(UdpControlInterface udpControl) {
-            map.getPushMode().setUdpControl(udpControl);
-            return this;
-        }
+//        public Buider setUdpControl(UdpControlInterface udpControl) {
+//            map.getPushMode().setUdpControl(udpControl);
+//            return this;
+//        }
 
         public Publish build() {
             return new Publish(context, map);
@@ -701,7 +711,8 @@ public class Publish implements TextureView.SurfaceTextureListener {
         private String videodirpath = null;
         //拍照地址
         private String picturedirpath = Environment.getExternalStorageDirectory().getPath() + File.separator + "VideoPicture";
-        private UdpSend pushMode;
+        private TcpSend pushMode;
+//        private UdpSend pushMode;
 
         private PublishView getPublishView() {
             return publishView;
@@ -807,11 +818,17 @@ public class Publish implements TextureView.SurfaceTextureListener {
             this.picturedirpath = picturedirpath;
         }
 
-        private UdpSend getPushMode() {
+//        private UdpSend getPushMode() {
+//            return pushMode;
+//        }
+        private TcpSend getPushMode() {
             return pushMode;
         }
 
-        private void setPushMode(UdpSend pushMode) {
+//        private void setPushMode(UdpSend pushMode) {
+//            this.pushMode = pushMode;
+//        }
+        private void setPushMode(TcpSend pushMode) {
             this.pushMode = pushMode;
         }
 

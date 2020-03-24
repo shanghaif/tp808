@@ -28,6 +28,7 @@ import cn.com.erayton.jt_t808.video.eventBus.event.BroadCastMainEvent;
 import cn.com.erayton.jt_t808.video.manager.USManager;
 import cn.com.erayton.jt_t808.video.video.Send;
 import cn.com.erayton.usagreement.VideoPushAIDL;
+import cn.com.erayton.usagreement.VideoPushCallback;
 import cn.com.erayton.usagreement.service.VideoPushService;
 import cn.com.erayton.usagreement.utils.LogUtils;
 import cn.erayton.voicelib.Mp3Lib;
@@ -106,9 +107,23 @@ public class MainActivity extends AppCompatActivity {
                 }
                 break;
             case R.id.tackPhoto:
+                LogUtils.d("tackPhoto---------------------------------");
                 try {
-                    videoPushAIDL.tackPicture();
+
+                    videoPushAIDL.tackPicture() ;
+//                    videoPushAIDL.tackPicture(new VideoPushCallback.Stub() {
+//                        @Override
+//                        public void setPicturePath(String s) throws RemoteException {
+//                            LogUtils.d("setPicturePath:"+s);
+//                        }
+//
+//                        @Override
+//                        public void Error(int i, String s) throws RemoteException {
+//
+//                        }
+//                    });
                 } catch (RemoteException e) {
+                    LogUtils.d("Exception ---------------------------------"+e.getMessage());
                     e.printStackTrace();
                 }
                 break;
@@ -195,7 +210,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
                 videoPushAIDL = VideoPushAIDL.Stub.asInterface(service) ;
+//                register() ;
             }
+
 
             @Override
             public void onServiceDisconnected(ComponentName name) {
@@ -206,12 +223,32 @@ public class MainActivity extends AppCompatActivity {
 //        stopService(intent) ;
     }
 
+    private void register() {
+        try {
+            videoPushAIDL.registerCallback(new VideoPushCallback.Stub() {
+                @Override
+                public void setPicturePath(String s) throws RemoteException {
+                    LogUtils.d("setPicturePath:"+s);
+                }
+
+                @Override
+                public void Error(int i, String s) throws RemoteException {
+
+                }
+            });
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
     private void setService(String ip, int port, int channelNum){
         Log.d("cjh", "setService --------------------------------"+ip+port) ;
         if (videoPushAIDL != null){
             try {
                 Log.d("cjh", "setService -----------------2---------------"+ip+port) ;
-                videoPushAIDL.setServerAddress(PublicConstants.ApiConstants.USER_NAME, ip, port, channelNum);
+                videoPushAIDL.setServerAddress(PublicConstants.ApiConstants.USER_NAME, ip, port, channelNum, true);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }

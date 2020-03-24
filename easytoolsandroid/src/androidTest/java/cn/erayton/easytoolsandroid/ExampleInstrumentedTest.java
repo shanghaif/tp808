@@ -1,4 +1,4 @@
-package com.arvin.easytoolsandroid;
+package cn.erayton.easytoolsandroid;
 
 import android.content.Context;
 
@@ -22,6 +22,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("top.newjourney.easytoolsandroid.test", appContext.getPackageName());
+        assertEquals("cn.erayton.easytoolsandroid.test", appContext.getPackageName());
     }
 }

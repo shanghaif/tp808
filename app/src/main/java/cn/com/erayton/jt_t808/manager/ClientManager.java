@@ -3,9 +3,6 @@ package cn.com.erayton.jt_t808.manager;
 import java.util.Arrays;
 
 import cn.com.erayton.jt_t808.constants.PublicConstants;
-import cn.com.erayton.usagreement.model.PacketData;
-import cn.com.erayton.usagreement.model.ServerAVTranslateMsg;
-import cn.com.erayton.usagreement.model.ServerParametersMsg;
 import cn.com.erayton.usagreement.socket.client.SocketClient;
 import cn.com.erayton.usagreement.socket.client.SocketClientSender;
 import cn.com.erayton.usagreement.utils.LogUtils;

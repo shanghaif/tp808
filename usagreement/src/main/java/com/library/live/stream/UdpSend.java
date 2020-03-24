@@ -284,6 +284,7 @@ public class UdpSend {
     private synchronized void addbytes(ByteBuffer buff) {
         if (udpControl != null) {
             //如果自定义UPD发送
+            LogUtils.d("addbytes:sendQueue");
             OtherUtil.addQueue(sendQueue, udpControl.Control(buff.array(), 0, buff.position()));
         } else {
             OtherUtil.addQueue(sendQueue, Arrays.copyOfRange(buff.array(), 0, buff.position()));//  复制数组
@@ -291,12 +292,12 @@ public class UdpSend {
     }
 
     private synchronized void addbytes(byte[] bytes) {
-        if (udpControl != null) {
+//        if (udpControl != null) {
             //如果自定义UPD发送
-            OtherUtil.addQueue(sendQueue, udpControl.Control(bytes, 0, bytes.length));
-        } else {
+//            OtherUtil.addQueue(sendQueue, udpControl.Control(bytes, 0, bytes.length));
+//        } else {
             OtherUtil.addQueue(sendQueue, Arrays.copyOfRange(bytes, 0, bytes.length));//  复制数组
-        }
+//        }
     }
 
     /**
@@ -310,12 +311,12 @@ public class UdpSend {
                 try {
                     while (PUBLISH_STATUS == PUBLISH_STATUS_START) {
                         data = sendQueue.take();
+                        LogUtils.d("sendQueue.take():"+data.length);
                         if (data != null) {
-                            packetsendPush.setData(data);
 //                            try {
                                 tcpManager.send(data);
 //                                SocketClientSender.send(data, false, false) ;
-                                LogUtils.d("starsendThread:"+data.length);
+
 //                                socket.send(packetsendPush);
 //                            } catch (IOException e) {
 //                                Log.d("senderror", "发送失败");
@@ -368,7 +369,7 @@ public class UdpSend {
         }
 
         public void send(byte[] bytes){
-            LogUtils.d("onTcpSend:"+tcpClient.send(bytes));
+            LogUtils.d("onTcpSend:"+tcpClient.sendAsyn(bytes));
         }
 
         public void closeSocket(){

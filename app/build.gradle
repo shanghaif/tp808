@@ -43,9 +43,9 @@ dependencies {
 
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
     implementation "org.reactivestreams:reactive-streams:1.0.2"
-    implementation (name: 'usagreement-debug5', ext: 'aar')
+    implementation(name: 'usagreement-debug3', ext: 'aar')
 //    implementation (name: 'voicelib-debug1', ext: 'aar')
-    implementation (name: 'voicelib-release2', ext: 'aar')
+    implementation(name: 'voicelib-release2', ext: 'aar')
 
 }
 repositories {

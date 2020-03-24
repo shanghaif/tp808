@@ -4,7 +4,7 @@ import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
 
-import com.library.live.stream.UdpSend;
+import com.library.live.stream.TcpSend;
 import com.library.util.OtherUtil;
 import com.library.util.VoiceUtil;
 
@@ -18,9 +18,10 @@ import java.nio.ByteBuffer;
 public class VCEncoder {
     private final String AAC_MIME = MediaFormat.MIMETYPE_AUDIO_AAC;
     private MediaCodec mediaCodec;
-    private UdpSend udpSend;
+    private TcpSend udpSend;
 
-    public VCEncoder(int bitrate, int recBufSize, UdpSend udpSend) {
+//    public VCEncoder(int bitrate, int recBufSize, UdpSend udpSend) {
+    public VCEncoder(int bitrate, int recBufSize, TcpSend udpSend) {
         this.udpSend = udpSend;
         try {
             mediaCodec = MediaCodec.createEncoderByType(AAC_MIME);

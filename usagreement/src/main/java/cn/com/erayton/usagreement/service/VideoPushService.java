@@ -6,16 +6,20 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.Environment;
 import android.os.IBinder;
+import android.os.RemoteCallbackList;
 import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.library.live.PictureCallback;
 import com.library.live.Publish;
-import com.library.live.stream.UdpSend;
+import com.library.live.stream.TcpSend;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 import cn.com.erayton.usagreement.VideoPushAIDL;
+import cn.com.erayton.usagreement.VideoPushCallback;
 import cn.com.erayton.usagreement.data.Constants;
+import cn.com.erayton.usagreement.utils.LogUtils;
 import io.reactivex.Flowable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -28,7 +32,8 @@ public class VideoPushService extends Service {
     private String phone ;
 
     private NotificationManager notificationManager ;
-
+    private int NOTIFI_ID = 123456;
+    private RemoteCallbackList<VideoPushCallback> remoteCallbackList = new RemoteCallbackList<>() ;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -38,7 +43,11 @@ public class VideoPushService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+//        init() ;
 //        initNotification() ;
+    }
+
+    private void init() {
     }
 
     @Override
@@ -56,15 +65,16 @@ public class VideoPushService extends Service {
         destoryVideo() ;
     }
 
+
     private Binder binder = new VideoPushAIDL.Stub() {
         @Override
         public void setServerAddress(String userName, String ip, int port, int channelNum, boolean needPublish) throws RemoteException {
-            Log.d(TAG, "setServerAddress -------------------- "+ip+","+port+","+channelNum) ;
+            LogUtils.d("setServerAddress -------------------- "+ip+","+port+","+channelNum) ;
 //            IP = ip ;
 //            Port = port ;
             phone = userName ;
             if (TextUtils.isEmpty(ip) || port == 0){
-                Log.d(TAG, "setServerAddress -------------------- null ") ;
+                LogUtils.d("setServerAddress -------------------- null ") ;
             }else {
                 initPushVideo(ip, port, channelNum);
                 if (needPublish) timeDisposable();
@@ -92,6 +102,19 @@ public class VideoPushService extends Service {
         }
 
         @Override
+        public void registerCallback(VideoPushCallback callback){
+            if (remoteCallbackList != null) remoteCallbackList.register(callback) ;
+        }
+        public void unRegisterCallback(VideoPushCallback callback){
+                remoteCallbackList.unregister(callback) ;
+        }
+
+//        @Override
+//        public void tackPicture() throws RemoteException {
+//            tackPhoto();
+//        }
+
+        @Override
         public void tackPicture() throws RemoteException {
             tackPhoto();
         }
@@ -110,7 +133,8 @@ public class VideoPushService extends Service {
 
     private void initPushVideo(String ip, int port, int channelNum){
         publish = new Publish.Buider(this, null)
-                .setPushMode(new UdpSend(phone, ip, port, channelNum))
+//                .setPushMode(new UdpSend(phone, ip, port, channelNum))
+                .setPushMode(new TcpSend(phone, ip, port, channelNum))
                 //  帧率
                 .setFrameRate(Constants.FRAME_RATE)
                 //  编码方式
@@ -180,6 +204,7 @@ public class VideoPushService extends Service {
 //        setNotificationMessage(DEFAULT_NAME, getString(R.string.tip_video_record_finish)) ;
         try {
             publish.destroy();
+
             return true ;
         }catch (Exception e) {
             return false;
@@ -219,6 +244,24 @@ public class VideoPushService extends Service {
 
     //  拍照
     private void tackPhoto(){
+        publish.setPictureCallback(new PictureCallback() {
+            @Override
+            public void Success(String path) {
+                int N = remoteCallbackList.beginBroadcast() ;
+                try {
+                    for (int i=0 ;i<N ; i++) {
+                        remoteCallbackList.getBroadcastItem(i).setPicturePath(path);
+                    }
+
+                    remoteCallbackList.finishBroadcast();
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+        });
+
         publish.takePicture();
     }
 

@@ -1,4 +1,4 @@
-package com.arvin.easytoolsandroid;
+package cn.erayton.easytoolsandroid;
 
 import org.junit.Test;
 

@@ -10,6 +10,7 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import cn.com.erayton.usagreement.VideoPushAIDL;
+import cn.com.erayton.usagreement.VideoPushCallback;
 import cn.com.erayton.usagreement.service.VideoPushService;
 
 /**
@@ -55,6 +56,7 @@ public class USVideo {
     }
 
     /**  设置视频服务参数，设置之后自动开始视频录制
+     *
      * @param phone 手机号
      * @param ip    视频服务器
      * @param port  视频服务器端口
@@ -75,13 +77,20 @@ public class USVideo {
 //        videoPushAIDL.recordVideo(isStart);
 //    }
 
-    /**
-     * 停止视频传输
+    /** 停止视频传输
+     *
      * */
     public void stopRecord() throws RemoteException {
         videoPushAIDL.distoryVideo() ;
     }
 
+//    /**截屏
+//     *
+//     * @throws RemoteException
+//     */
+//    public void tackPicture() throws RemoteException {
+//        videoPushAIDL.tackPicture();
+//    }
     /**截屏
      *
      * @throws RemoteException
@@ -90,11 +99,28 @@ public class USVideo {
         videoPushAIDL.tackPicture();
     }
 
-    /**
-     * 开启关闭摄像头
+    /** 开启关闭摄像头
+     *
      * @param isOpen    是否开启摄像头
      */
     public void openCamera(boolean isOpen) throws RemoteException {
         videoPushAIDL.openCamera(isOpen);
+    }
+
+    /** 服务状态回调注册
+     *
+     * @throws RemoteException
+     * */
+    public void registerCallbackListener(VideoPushCallback callback) throws RemoteException {
+        videoPushAIDL.registerCallback(callback);
+    }
+
+
+    /** 服务状态回调取消注册
+     *
+     * @throws RemoteException
+     * */
+    public void unRegisterCallbackListener(VideoPushCallback callback) throws RemoteException {
+        videoPushAIDL.unRegisterCallback(callback);
     }
 }

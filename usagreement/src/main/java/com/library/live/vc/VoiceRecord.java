@@ -5,7 +5,7 @@ import android.media.AudioRecord;
 import android.media.MediaRecorder;
 
 import com.library.live.file.WriteMp4;
-import com.library.live.stream.UdpSend;
+import com.library.live.stream.TcpSend;
 import com.library.util.OtherUtil;
 import com.library.util.SingleThreadExecutor;
 
@@ -23,7 +23,8 @@ public class VoiceRecord {
 
     private SingleThreadExecutor singleThreadExecutor;
 
-    public VoiceRecord(UdpSend udpSend, int collectionbitrate_vc, int publishbitrate_vc, WriteMp4 writeMp4) {
+//    public VoiceRecord(UdpSend udpSend, int collectionbitrate_vc, int publishbitrate_vc, WriteMp4 writeMp4) {
+    public VoiceRecord(TcpSend udpSend, int collectionbitrate_vc, int publishbitrate_vc, WriteMp4 writeMp4) {
         recBufSize = AudioRecord.getMinBufferSize(
                 OtherUtil.samplerate,
                 AudioFormat.CHANNEL_IN_STEREO,

@@ -5,17 +5,14 @@ import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.library.util.mLog;
-
 import cn.com.erayton.jt_t808.constants.PublicConstants;
 import cn.com.erayton.jt_t808.video.eventBus.EventBusUtils;
 import cn.com.erayton.jt_t808.video.eventBus.event.BroadCastMainEvent;
 import cn.com.erayton.usagreement.data.Constants;
-import cn.com.erayton.usagreement.sendModel.TerminalAuthMsg;
-import cn.com.erayton.usagreement.sendModel.TerminalGPSMsg;
-import cn.com.erayton.usagreement.sendModel.TerminalGeneralMsg;
-import cn.com.erayton.usagreement.sendModel.TerminalParametersMsg;
-import cn.com.erayton.usagreement.sendModel.TerminalRegisterMsg;
+import cn.com.erayton.usagreement.model.model.TerminalAuthInfo;
+import cn.com.erayton.usagreement.model.model.TerminalGeneralInfo;
+import cn.com.erayton.usagreement.model.model.TerminalParametersInfo;
+import cn.com.erayton.usagreement.model.model.TerminalRegInfo;
 import cn.com.erayton.usagreement.socket.client.SocketClient;
 import cn.com.erayton.usagreement.socket.client.SocketClientSender;
 
@@ -113,7 +110,7 @@ public class USManager {
 
     //  登陆 即 socketClientSender register    成功之后自动发送心跳
     public void USLogin(){
-        TerminalRegisterMsg.TerminalRegInfo regInfo = new TerminalRegisterMsg.TerminalRegInfo() ;
+        TerminalRegInfo regInfo = new TerminalRegInfo() ;
         regInfo.setProvinceId(0x00);
         regInfo.setCityId(0x00);
         regInfo.setManufacturerId("12345");
@@ -154,7 +151,7 @@ public class USManager {
 
     //  发送鉴权
     public void SendAuth() {
-        TerminalAuthMsg.TerminalAuthInfo authInfo = new TerminalAuthMsg.TerminalAuthInfo();
+        TerminalAuthInfo authInfo = new TerminalAuthInfo();
         if (authCode == null){
             if (PublicConstants.ApiConstants.USAUTHCODE.equals("0")){
                 USLogin() ;     //  重新登陆
@@ -169,7 +166,7 @@ public class USManager {
     }
 
     public void SendGeneralResp(int seNum ,int respId, int code){
-        TerminalGeneralMsg.TerminalGeneralInfo terminalGeneralInfo = new TerminalGeneralMsg.TerminalGeneralInfo() ;
+        TerminalGeneralInfo terminalGeneralInfo = new TerminalGeneralInfo() ;
         terminalGeneralInfo.setSeNum(seNum);
         terminalGeneralInfo.setRespId(respId);
         terminalGeneralInfo.setResult(code);
@@ -177,7 +174,7 @@ public class USManager {
     }
 
     public void SendParamenter(int seNum){
-        TerminalParametersMsg.TerminalParametersInfo parametersInfo = new TerminalParametersMsg.TerminalParametersInfo() ;
+        TerminalParametersInfo parametersInfo = new TerminalParametersInfo() ;
         parametersInfo.setSerialNumber(seNum);
         parametersInfo.setSerialNumber(10);
         parametersInfo.setInstructCount(8);
@@ -308,7 +305,7 @@ public class USManager {
             }
 
 
-            TerminalGeneralMsg.TerminalGeneralInfo info = new TerminalGeneralMsg.TerminalGeneralInfo() ;
+            TerminalGeneralInfo info = new TerminalGeneralInfo() ;
             info.setResult(result);
             info.setRespId(Constants.SERVER_AVTRANSMISSION_REQUEST);
             info.setSeNum(i5);

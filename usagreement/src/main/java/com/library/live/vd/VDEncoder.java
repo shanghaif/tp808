@@ -6,7 +6,7 @@ import android.media.MediaFormat;
 import android.util.Log;
 import android.util.Size;
 
-import com.library.live.stream.UdpSend;
+import com.library.live.stream.TcpSend;
 import com.library.util.ByteUtil;
 import com.library.util.ImagUtil;
 import com.library.util.OtherUtil;
@@ -16,12 +16,14 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.ArrayBlockingQueue;
 
+import cn.com.erayton.usagreement.utils.LogUtils;
+
 
 public class VDEncoder {
     public static final String H264 = MediaFormat.MIMETYPE_VIDEO_AVC;
     public static final String H265 = MediaFormat.MIMETYPE_VIDEO_HEVC;
     private MediaCodec mediaCodec;
-    private UdpSend udpSend;
+    private TcpSend udpSend;
 
     //编码参数
     private byte[] information;
@@ -35,7 +37,8 @@ public class VDEncoder {
     private int COLOR_FORMAT;
     private SingleThreadExecutor singleThreadExecutor;
 
-    public VDEncoder(Size csize, Size psize, int framerate, int publishBitrate, String codetype, UdpSend udpSend) {
+    public VDEncoder(Size csize, Size psize, int framerate, int publishBitrate, String codetype, TcpSend udpSend) {
+//    public VDEncoder(Size csize, Size psize, int framerate, int publishBitrate, String codetype, UdpSend udpSend) {
         //UPD实例
         this.udpSend = udpSend;
         //由于图片旋转过，所以高度宽度需要对调
@@ -100,6 +103,7 @@ public class VDEncoder {
                 while (isRuning) {
                     try {
                         take = YUVQueue.take();
+                        LogUtils.d("YUVQueue.take()----------------------------------------");
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                         break;
@@ -127,7 +131,7 @@ public class VDEncoder {
                         while (outputBufferIndex >= 0) {
                             //  源流
                             outputBuffer = mediaCodec.getOutputBuffer(outputBufferIndex);
-
+                            LogUtils.d("outputBuffer----------------------------------------");
                             if (bufferInfo.flags == MediaCodec.BUFFER_FLAG_CODEC_CONFIG) {
                                 //  sps pps 信息
                                 outData = new byte[bufferInfo.size];

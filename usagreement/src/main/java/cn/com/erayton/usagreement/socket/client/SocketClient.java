@@ -283,15 +283,15 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
     }
 
     public boolean sendTcpMsg(byte[] data, boolean isAsyn){
-        if (!isAsyn) {
-//            LogUtils.d( "------------------------------ !isAsyn ----------------------------") ;
+        if (isAsyn) {
+//            LogUtils.d( "------------------------------ isAsyn ----------------------------") ;
 //            tcpClient.sendAsyn(data) ;
             if (!tcpClient.sendAsyn(data)) {
                 LogUtils.d( "Send " + data + " to fail. [Asyn][TCP] error:" + data);
                 return false;
             }
         }else {
-//            LogUtils.d( "------------------------------ isAsyn ----------------------------") ;
+//            LogUtils.d( "------------------------------ !isAsyn ----------------------------") ;
             if (!tcpClient.send(data)) {
                 LogUtils.d( "Send " + data + " to fail. [Sync][TCP] error:" + data);
                 return false;

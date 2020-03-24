@@ -1,5 +1,6 @@
 // VideoPushAIDL.aidl
 package cn.com.erayton.usagreement;
+import cn.com.erayton.usagreement.VideoPushCallback ;
 
 // Declare any non-default types here with import statements
 
@@ -17,10 +18,10 @@ interface VideoPushAIDL {
     void setVideoParameter(int streamType, boolean isVideo, int k) ;
     //  关闭摄像头，关闭视频，关闭服务
     void distoryVideo() ;
-
+    void registerCallback(VideoPushCallback callback) ;
+    void unRegisterCallback(VideoPushCallback callback) ;
     //  拍照
     void tackPicture() ;
-
     //  录制
     void recordVideo(boolean isRecord) ;
 

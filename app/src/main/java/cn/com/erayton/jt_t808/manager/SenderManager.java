@@ -1,13 +1,13 @@
 package cn.com.erayton.jt_t808.manager;
-import cn.com.erayton.usagreement.sendModel.TerminalAuthMsg;
-import cn.com.erayton.usagreement.sendModel.TerminalRegisterMsg;
+import cn.com.erayton.usagreement.model.model.TerminalAuthInfo;
+import cn.com.erayton.usagreement.model.model.TerminalRegInfo;
 import cn.com.erayton.usagreement.socket.client.SocketClientSender;
 import cn.com.erayton.usagreement.utils.LogUtils;
 
 public class SenderManager {
 
     public static void SendLogin(){
-        TerminalRegisterMsg.TerminalRegInfo regInfo = new TerminalRegisterMsg.TerminalRegInfo() ;
+        TerminalRegInfo regInfo = new TerminalRegInfo() ;
         regInfo.setProvinceId(0x00);
         regInfo.setCityId(0x00);
         regInfo.setManufacturerId("12345");
@@ -22,7 +22,7 @@ public class SenderManager {
 
     //  发送鉴权
     public static void SendAuth(String authCode) {
-        TerminalAuthMsg.TerminalAuthInfo authInfo = new TerminalAuthMsg.TerminalAuthInfo();
+        TerminalAuthInfo authInfo = new TerminalAuthInfo();
         authInfo.setAuth(authCode);
         LogUtils.d("SendAuth ---------------------------------"+authCode) ;
         SocketClientSender.sendAuth(authInfo, false, false) ;
