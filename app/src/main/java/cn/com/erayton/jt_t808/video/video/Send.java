@@ -8,7 +8,6 @@ import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.library.live.Publish;
-import com.library.live.stream.TcpSend;
 import com.library.live.stream.UdpSend;
 import com.library.live.view.PublishView;
 
@@ -40,7 +39,8 @@ public class Send extends AppCompatActivity {
 //        record = findViewById(R.id.record);
 
         publish = new Publish.Buider(this, (PublishView) findViewById(R.id.publishView))
-                .setPushMode(new TcpSend(getIntent().getExtras().getString("ip"), getIntent().getExtras().getInt("port")))
+                .setPushMode(new UdpSend(getIntent().getExtras().getString("ip"), getIntent().getExtras().getInt("port")))
+//                .setPushMode(new TcpSend(getIntent().getExtras().getString("ip"), getIntent().getExtras().getInt("port")))
                 //  帧率
                 .setFrameRate(Constants.FRAME_RATE)
                 //  编码方式

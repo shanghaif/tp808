@@ -3,7 +3,6 @@ package com.library.live.stream;
 import android.util.Log;
 
 import com.library.common.UdpControlInterface;
-import com.library.live.stream.socket.core.TCPClient;
 import com.library.util.OtherUtil;
 import com.library.util.SingleThreadExecutor;
 
@@ -31,7 +30,7 @@ public class UdpSend {
 
     private UdpControlInterface udpControl = null;
 
-    private TCPManager tcpManager = new TCPManager() ;
+//    private TCPManager tcpManager = new TCPManager() ;
     private String phone ;
     private String ip ;
     private int port ;
@@ -49,7 +48,7 @@ public class UdpSend {
     private ByteBuffer buffvoice = ByteBuffer.allocate(1024);
     private boolean ismysocket = false;//用于判断是否需要销毁socket
     private int voiceSendNum = 0;//控制语音包合并发送，5个包发送一次
-    private byte weight;//图像比
+    private byte weight;    //  图像比
 
     private SingleThreadExecutor singleThreadExecutor = null;
 
@@ -66,12 +65,12 @@ public class UdpSend {
         initSocket(ip, port);
     }
 
-    private void initSocket(String ip, int port){
+    public void initSocket(String ip, int port){
         try {
             socket = new DatagramSocket(port+1);
             socket.setSendBufferSize(1024 * 1024);
             ismysocket = true;
-            tcpManager.connectSocket(ip, port);
+//            tcpManager.connectSocket(ip, port);
         } catch (SocketException e) {
             e.printStackTrace();
         }
@@ -96,9 +95,9 @@ public class UdpSend {
 
     public void startsend() {
         if (packetsendPush != null) {
-            if (!tcpManager.isConnect()) {
-                tcpManager.connectSocket(ip, port);
-            }
+//            if (!tcpManager.isConnect()) {
+//                tcpManager.connectSocket(ip, port);
+//            }
             buffvoice.clear();
             voiceSendNum = 0;
             PUBLISH_STATUS = PUBLISH_STATUS_START;
@@ -111,7 +110,7 @@ public class UdpSend {
     }
 
     public void destroy() {
-        tcpManager.closeSocket();
+//        tcpManager.closeSocket();
         stopsend();
         if (ismysocket) {
             OtherUtil.close(socket);
@@ -122,11 +121,11 @@ public class UdpSend {
         }
     }
 
-    public void closeTCPSocket(){
-        if (tcpManager!= null){
-            tcpManager.closeSocket();
-        }
-    }
+//    public void closeTCPSocket(){
+//        if (tcpManager!= null){
+//            tcpManager.closeSocket();
+//        }
+//    }
 
     public void addVideo(byte[] video, int isIFrame) {
         if (PUBLISH_STATUS == PUBLISH_STATUS_START) {
@@ -156,7 +155,7 @@ public class UdpSend {
      * 发送视频
      * @param isIFrame 是否为关键帧
      */
-    private void writeVideo(byte[] video, int isIFrame) {
+    public void writeVideo(byte[] video, int isIFrame) {
         LogUtils.d("phone:"+phone);
         //当前截取位置
         int nowPosition = 0;
@@ -209,7 +208,7 @@ public class UdpSend {
     /**
      * 发送音频
      */
-    private void writeVoice(byte[] voice) {
+    public void writeVoice(byte[] voice) {
         TerminalAVDataInfo terminalAVDataInfo ;
         TerminalAVDataMsg terminalAVDataMsg = new TerminalAVDataMsg() ;
         if (voiceSendNum == 0) {
@@ -314,7 +313,7 @@ public class UdpSend {
                         LogUtils.d("sendQueue.take():"+data.length);
                         if (data != null) {
 //                            try {
-                                tcpManager.send(data);
+//                                tcpManager.send(data);
 //                                SocketClientSender.send(data, false, false) ;
 
 //                                socket.send(packetsendPush);
@@ -353,78 +352,78 @@ public class UdpSend {
 //        return (byte)(((byte)DataType << 4) | (byte)SubpackageType);
 //    }
 
-    class TCPManager implements Runnable{
-        TCPClient tcpClient = new TCPClient() ;
-        private boolean isRunning = false ;
-        Thread thread = null ;
-
-        public TCPManager() {
-            this.tcpClient.listener = listener;
-        }
-
-        public void connectSocket(String ip, int port){
-            tcpClient.openAsyn(ip, port);
-            thread = new Thread(this);
-            thread.setName("tcpvideo thread");
-        }
-
-        public void send(byte[] bytes){
-            LogUtils.d("onTcpSend:"+tcpClient.sendAsyn(bytes));
-        }
-
-        public void closeSocket(){
-            if (tcpClient != null){
-                tcpClient.close();
-                isRunning = false ;
-            }
-        }
-
-        public boolean isConnect(){
-            return tcpClient.isConnect();
-        }
-
-        TCPClient.TCPClientListener listener = new TCPClient.TCPClientListener() {
-            @Override
-            public void onTcpConnect(int result) {
-                if (result == 0){
-                    if (!isRunning){
-                        thread.start();
-                        isRunning = true ;
-                    }
-                }
-                LogUtils.d("onTcpConnect:"+result);
-            }
-
-            @Override
-            public void onTcpDisConnect() {
-                LogUtils.e("onTcpDisConnect:");
-            }
-
-            @Override
-            public void onTcpSend(byte[] data, boolean result) {
-                LogUtils.d("onTcpSend:"+result);
-            }
-
-            @Override
-            public void onTcpReceive(byte[] receiveBytes) {
-                LogUtils.d("onTcpReceive:"+receiveBytes.length);
-            }
-        } ;
-
-        @Override
-        public void run() {
-//            while (isRunning){
-//                try {
-//                    Thread.sleep(1000);
-//                    send("111".getBytes());
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
+//    class TCPManager implements Runnable{
+//        TCPClient tcpClient = new TCPClient() ;
+//        private boolean isRunning = false ;
+//        Thread thread = null ;
+//
+//        public TCPManager() {
+//            this.tcpClient.listener = listener;
+//        }
+//
+//        public void connectSocket(String ip, int port){
+//            tcpClient.openAsyn(ip, port);
+//            thread = new Thread(this);
+//            thread.setName("tcpvideo thread");
+//        }
+//
+//        public void send(byte[] bytes){
+//            LogUtils.d("onTcpSend:"+tcpClient.sendAsyn(bytes));
+//        }
+//
+//        public void closeSocket(){
+//            if (tcpClient != null){
+//                tcpClient.close();
+//                isRunning = false ;
 //            }
-//            isRunning = false ;
-            LogUtils.d("other thread");
-        }
-    }
+//        }
+//
+//        public boolean isConnect(){
+//            return tcpClient.isConnect();
+//        }
+//
+//        TCPClient.TCPClientListener listener = new TCPClient.TCPClientListener() {
+//            @Override
+//            public void onTcpConnect(int result) {
+//                if (result == 0){
+//                    if (!isRunning){
+//                        thread.start();
+//                        isRunning = true ;
+//                    }
+//                }
+//                LogUtils.d("onTcpConnect:"+result);
+//            }
+//
+//            @Override
+//            public void onTcpDisConnect() {
+//                LogUtils.e("onTcpDisConnect:");
+//            }
+//
+//            @Override
+//            public void onTcpSend(byte[] data, boolean result) {
+//                LogUtils.d("onTcpSend:"+result);
+//            }
+//
+//            @Override
+//            public void onTcpReceive(byte[] receiveBytes) {
+//                LogUtils.d("onTcpReceive:"+receiveBytes.length);
+//            }
+//        } ;
+//
+//        @Override
+//        public void run() {
+////            while (isRunning){
+////                try {
+////                    Thread.sleep(1000);
+////                    send("111".getBytes());
+////                } catch (InterruptedException e) {
+////                    e.printStackTrace();
+////                }
+////            }
+////            isRunning = false ;
+//            LogUtils.d("other thread");
+//        }
+//    }
 
 
     //  ByteBuffer to byte[]

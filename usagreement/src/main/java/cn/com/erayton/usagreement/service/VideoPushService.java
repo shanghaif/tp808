@@ -1,9 +1,14 @@
 package cn.com.erayton.usagreement.service;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Environment;
 import android.os.IBinder;
 import android.os.RemoteCallbackList;
@@ -16,6 +21,8 @@ import com.library.live.Publish;
 import com.library.live.stream.TcpSend;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
+
+import cn.com.erayton.usagreement.R;
 import cn.com.erayton.usagreement.VideoPushAIDL;
 import cn.com.erayton.usagreement.VideoPushCallback;
 import cn.com.erayton.usagreement.data.Constants;
@@ -32,7 +39,8 @@ public class VideoPushService extends Service {
     private String phone ;
 
     private NotificationManager notificationManager ;
-    private int NOTIFI_ID = 123456;
+    //	前台服务序列号
+    public static final int NOTICE_ID = 0x0100;
     private RemoteCallbackList<VideoPushCallback> remoteCallbackList = new RemoteCallbackList<>() ;
 
     @Override
@@ -44,7 +52,7 @@ public class VideoPushService extends Service {
     public void onCreate() {
         super.onCreate();
 //        init() ;
-//        initNotification() ;
+        initNotification() ;
     }
 
     private void init() {
@@ -181,7 +189,7 @@ public class VideoPushService extends Service {
     }
 
     private boolean startVideo(){
-//        setNotificationMessage(DEFAULT_NAME, getString(R.string.tip_video_recording)) ;
+        setNotificationMessage(getString(R.string.tip_video_recording), false) ;
         try {
             publish.start();
             return true ;
@@ -191,7 +199,7 @@ public class VideoPushService extends Service {
     }
 
     private boolean stopVideo(){
-//        setNotificationMessage(DEFAULT_NAME, getString(R.string.tip_video_record_pause)) ;
+        setNotificationMessage(getString(R.string.tip_video_record_pause), true) ;
         try {
             publish.stop();
             return true ;
@@ -201,10 +209,10 @@ public class VideoPushService extends Service {
     }
 
     private boolean destoryVideo(){
-//        setNotificationMessage(DEFAULT_NAME, getString(R.string.tip_video_record_finish)) ;
+        setNotificationMessage(getString(R.string.tip_video_record_finish), true) ;
         try {
             publish.destroy();
-
+            delNotification();
             return true ;
         }catch (Exception e) {
             return false;
@@ -215,12 +223,12 @@ public class VideoPushService extends Service {
 //     * 初始化通知
 //     * 初始化文字为
 //     * */
-//    private void initNotification(){
-//        Log.d("cjh", "initNotification -------------------- ") ;
-//        notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-//        setNotificationMessage(DEFAULT_NAME, DEFAULT_CONTENT);
-//
-//    }
+    private void initNotification(){
+        Log.d("cjh", "initNotification -------------------- ") ;
+        notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        setNotificationMessage(getString(R.string.tip_video_record), true);
+
+    }
 
 //    private void setNotificationMessage(String name, String msg){
 //        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext());
@@ -235,11 +243,45 @@ public class VideoPushService extends Service {
 //
 //    }
 
-//    private void delNotification(){
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-//            notificationManager.cancel(VIDEO_NOTIFICATION_CODE);
-//        }
-//    }
+    private void delNotification(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            if (notificationManager != null)
+                notificationManager.cancel(NOTICE_ID);
+        }
+    }
+
+    private void setNotificationMessage(String msg, boolean autoCancel){
+//        Intent nfIntent = new Intent(this, LoginActivity.class);
+        Notification.Builder builder = new Notification.Builder(this.getApplicationContext())
+//                .setContentIntent(PendingIntent.getActivity(this, 0, nfIntent, 0)) // 设置PendingIntent
+                .setSmallIcon(R.drawable.loading) // 设置状态栏内的小图标
+                .setContentTitle(getResources().getString(R.string.app_name))
+                .setContentText(msg) // 设置上下文内容
+                .setWhen(System.currentTimeMillis()); // 设置该通知发生的时间
+
+        //----------------  新增代码 --------------------------------------
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            //  修改安卓8.1以上系统报错
+
+//		NotificationChannel notificationChannel = new NotificationChannel(CHANNEL_ONE_ID, CHANNEL_ONE_NAME,NotificationManager.IMPORTANCE_MIN);
+            NotificationChannel notificationChannel = new NotificationChannel(String.valueOf(NOTICE_ID),
+                    getResources().getString(R.string.app_name),
+                    NotificationManager.IMPORTANCE_MIN);
+            notificationChannel.enableLights(false);//如果使用中的设备支持通知灯，则说明此通知通道是否应显示灯
+            notificationChannel.setShowBadge(false);//是否显示角标
+            notificationChannel.setLockscreenVisibility(Notification.VISIBILITY_SECRET);
+            notificationManager.createNotificationChannel(notificationChannel);
+            builder.setChannelId(String.valueOf(NOTICE_ID));
+        }
+
+
+        Notification notification = builder.build(); // 获取构建好的Notification
+//        notification.defaults = Notification.DEFAULT_SOUND; //  设置为默认的声音
+//	notification.flags |= Notification.FLAG_NO_CLEAR;
+        notification.flags = autoCancel?Notification.FLAG_AUTO_CANCEL:Notification.FLAG_NO_CLEAR;
+
+        startForeground(NOTICE_ID, notification);
+    }
 
 
     //  拍照

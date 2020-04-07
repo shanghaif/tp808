@@ -5,6 +5,7 @@ import java.util.List;
 import cn.com.erayton.usagreement.utils.BitOperator;
 import cn.com.erayton.usagreement.utils.USGate;
 import cn.com.erayton.usagreement.utils.Utils;
+import io.reactivex.functions.Consumer;
 
 public class APITest {
     static String msid= "23803641400" ;
@@ -49,34 +50,87 @@ public class APITest {
 //            e.printStackTrace();
 //        }
 
+//        mUSGate = new USGate();
+//        Utils.print("msid:"+msid);
+//        mUSGate.setCommand(msid)
+//                .getGateWay(new USGate.IPCallback() {
+//            @Override
+//            public void IPCallback(int ipCount, List<String[]> ip) {
+//
+//                Utils.print("IpCallback, ip0:"+ip.get(0)[1]+",tport:"+ip.get(0)[2]+",uport:"+ip.get(0)[3]);
+//                for (String[] i :ip){
+//                    Utils.print("IpCallback, ip:"+i[1]+",tport:"+i[2]+",uport:"+i[3]);
+//                }
+//            }
+//
+//            @Override
+//            public void error(int errorCode, Object s) {
+//                Utils.print("ErrorCode:"+errorCode+",reason:"+s);
+//            }
+//        }).subscribe(new Consumer<String>() {
+//            @Override
+//            public void accept(String s) throws Exception {
+//                Utils.print("Status:" + s);
+//            }
+//        }, new Consumer<Throwable>() {
+//            @Override
+//            public void accept(Throwable throwable) throws Exception {
+//                Utils.print("Throwable:" + throwable);
+//            }
+//        });
+
     }
 
 
-    public static class USThread extends Thread {
-        @Override
-        public void run() {
-            super.run();
-            try {
-                mUSGate = new USGate();
-                mUSGate.setCommand(msid);
-                mUSGate.setIPCallback(new USGate.IPCallback() {
-                    @Override
-                    public void IpCallback(int count, List<String[]> ip) {
-                        Utils.print("IpCallback, ip0:"+ip.get(0)[1]+",tport:"+ip.get(0)[2]+",uport:"+ip.get(0)[3]);
-                        for (String[] i :ip){
-                            Utils.print("IpCallback, ip:"+i[1]+",tport:"+i[2]+",uport:"+i[3]);
-                        }
-                    }
-                    @Override
-                    public void IpCallBackError() {
-//                        808 fail
-                    }
-                });
-                mUSGate.IpInt();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
+//    public static class USThread extends Thread {
+//        @Override
+//        public void run() {
+//            super.run();
+//            try {
+//                mUSGate = new USGate();
+//                mUSGate.setCommand(msid).getGateWay(new USGate.IPCallback() {
+//                    @Override
+//                    public void IPCallback(int ipCount, List<String[]> ip) {
+//
+//                        Utils.print("IpCallback, ip0:"+ip.get(0)[1]+",tport:"+ip.get(0)[2]+",uport:"+ip.get(0)[3]);
+//                        for (String[] i :ip){
+//                            Utils.print("IpCallback, ip:"+i[1]+",tport:"+i[2]+",uport:"+i[3]);
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void error(int errorCode, Object s) {
+//                        Utils.print("ErrorCode:"+errorCode+",reason:"+s);
+//                    }
+//                }).subscribe(new Consumer<String>() {
+//                    @Override
+//                    public void accept(String s) throws Exception {
+//                        Utils.print("Status:" + s);
+//                    }
+//                }, new Consumer<Throwable>() {
+//                    @Override
+//                    public void accept(Throwable throwable) throws Exception {
+//                        Utils.print("Throwable:" + throwable);
+//                    }
+//                });
+////                mUSGate.setIPCallback(new USGate.IPCallback() {
+////                    @Override
+////                    public void IpCallback(int count, List<String[]> ip) {
+////                        Utils.print("IpCallback, ip0:"+ip.get(0)[1]+",tport:"+ip.get(0)[2]+",uport:"+ip.get(0)[3]);
+////                        for (String[] i :ip){
+////                            Utils.print("IpCallback, ip:"+i[1]+",tport:"+i[2]+",uport:"+i[3]);
+////                        }
+////                    }
+////                    @Override
+////                    public void IpCallBackError() {
+//////                        808 fail
+////                    }
+////                });
+////                mUSGate.IpInt();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
 
 }
