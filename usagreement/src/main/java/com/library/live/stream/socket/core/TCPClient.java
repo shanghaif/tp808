@@ -1,7 +1,5 @@
 package com.library.live.stream.socket.core;
 
-import android.util.Log;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;

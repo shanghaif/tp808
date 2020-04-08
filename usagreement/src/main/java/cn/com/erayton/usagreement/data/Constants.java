@@ -4,6 +4,8 @@ import com.library.live.vd.VDEncoder;
 
 import java.nio.charset.Charset;
 
+import cn.com.erayton.usagreement.service.VideoPushService;
+
 /**
  * Created by android on 2017/3/31.
  */
@@ -224,6 +226,24 @@ public class Constants {
 
 
     //    ============================================================================================
+
+    /** 视频支持分辨率
+      * 1920--1088
+      * 1920--1080
+      * 1440--1080
+      * 1280--720
+      * 960--540
+      * 800--600
+      * 864--480
+      * 800--480
+      * 720--480
+      * 640--480
+      * 480--368
+      * 480--320
+      * 352--288
+      * 320--240
+      * 176--144
+    */
     //    视频服务器参数
     public static String VIDEO_IP = "video.erayton.cn" ;
     public static int VIDEO_PORT = 7000;
@@ -238,13 +258,15 @@ public class Constants {
     //  帧率
     public static int FRAME_RATE = 28 ;
     //  推流分辨率
-//    public static int PUSHER_RESOLUTION_W = 352 ;
-        public static int PUSHER_RESOLUTION_W = 700 ;
-//    public static int PUSHER_RESOLUTION_H = 288 ;
-        public static int PUSHER_RESOLUTION_H = 525 ;
+//        public static int PUSHER_RESOLUTION_W = 700 ;
+//        public static int PUSHER_RESOLUTION_H = 525 ;
+    public static int PUSHER_RESOLUTION_W = 700 ;
+    public static int PUSHER_RESOLUTION_H = 525 ;
     //  预览分辨率
-    public static int PREVIEW_RESOLUTION_W = 1400 ;
-    public static int PREVIEW_RESOLUTION_H = 1050 ;
+    public static int PREVIEW_RESOLUTION_W = 1920 ;
+    public static int PREVIEW_RESOLUTION_H = 1080 ;
+//    public static int PREVIEW_RESOLUTION_W = 1400 ;
+//    public static int PREVIEW_RESOLUTION_H = 1050 ;
 
     //  视频推流码率      kpbs
     public static int VIDEO_PUSH_RATE = 400 * SCALE ;
@@ -256,8 +278,8 @@ public class Constants {
     //  预览
     public static boolean PREVIEW = false ;
     //  摄像头 true 前置， false 后置
+//    public static boolean CAMERA = true ;
     public static boolean CAMERA = false ;
-    //    public static boolean CAMERA = false ;
     //  音频推流码率
     public static int VOICE_PUSH_RATE = 8 * SCALE ;
     //  音频采集码率

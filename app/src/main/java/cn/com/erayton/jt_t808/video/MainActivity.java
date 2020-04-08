@@ -11,6 +11,7 @@ import android.os.RemoteException;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -38,7 +39,9 @@ public class MainActivity extends AppCompatActivity {
     private Button changeIp;
     private String host1 = "106.14.186.44" ;
     private String host2 = "video.erayton.cn" ;
+    private String phone ;
     private String host = host1 ;
+    private EditText editText ;
 
 //    private Button pull;
 //    private Button voice;
@@ -89,6 +92,8 @@ public class MainActivity extends AppCompatActivity {
         changeIp = findViewById(R.id.changeIp);
         push.setText(Mp3Lib.getLameVersion());
         changeIp.setText(host);
+        editText = findViewById(R.id.loginId) ;
+        editText.setText(PublicConstants.ApiConstants.USER_NAME);
 //        push.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View view) {
@@ -146,10 +151,15 @@ public class MainActivity extends AppCompatActivity {
                 if (host.equals(host1)){
                     host = host2 ;
                 }else host = host1 ;
-
-                USManager.getSingleton().ServerLogin(PublicConstants.ApiConstants.USER_NAME, host,
-                        7000, 7000, false);
-                changeIp.setText(host);
+                String msg = editText.getText().toString() ;
+                if (msg.length() == 11) {
+                    phone = msg ;
+                    USManager.getSingleton().ServerLogin(msg, host,
+                            7000, 7000, false);
+                    changeIp.setText(host);
+                }else {
+                    Toast.makeText(this, "ID 格式不正确", Toast.LENGTH_SHORT).show();
+                }
                 break;
             case R.id.sendGeneral:
 
@@ -266,7 +276,9 @@ public class MainActivity extends AppCompatActivity {
         if (videoPushAIDL != null){
             try {
                 Log.d("cjh", "setService -----------------2---------------"+ip+","+port) ;
-                videoPushAIDL.setServerAddress(PublicConstants.ApiConstants.USER_NAME, ip, port, channelNum, true);
+//                phone != null ? phone :PublicConstants.ApiConstants.USER_NAME ;
+                videoPushAIDL.setServerAddress(phone != null ? phone :PublicConstants.ApiConstants.USER_NAME,
+                        ip, port, channelNum, true);
 //                videoPushAIDL.setServerAddress(PublicConstants.ApiConstants.USER_NAME, ip, port, channelNum);
             } catch (RemoteException e) {
                 e.printStackTrace();

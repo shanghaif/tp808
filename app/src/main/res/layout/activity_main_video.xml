@@ -7,7 +7,18 @@
     android:orientation="vertical"
     tools:context=".video.MainActivity">
 
+    <EditText
+        app:layout_constraintTop_toTopOf="parent"
+        android:id="@+id/loginId"
+        android:hint="请输入登陆ID"
+        android:inputType="number"
+        android:maxLength="11"
+        app:layout_constraintBottom_toTopOf="@id/btnll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
     <LinearLayout
+        android:id="@+id/btnll"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"

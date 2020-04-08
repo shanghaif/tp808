@@ -15,10 +15,16 @@ import android.os.RemoteCallbackList;
 import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.WindowManager;
 
 import com.library.live.PictureCallback;
 import com.library.live.Publish;
 import com.library.live.stream.TcpSend;
+import com.library.live.view.PublishView;
+
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
@@ -45,6 +51,8 @@ public class VideoPushService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
+        //  悬浮框点击事件的处理
+//        initFloating();
         return binder;
     }
 
@@ -53,6 +61,7 @@ public class VideoPushService extends Service {
         super.onCreate();
 //        init() ;
         initNotification() ;
+//        initWindow();
     }
 
     private void init() {
@@ -71,6 +80,7 @@ public class VideoPushService extends Service {
     public void onDestroy() {
         super.onDestroy();
         destoryVideo() ;
+        destoryFloatWindow();
     }
 
 
@@ -140,7 +150,7 @@ public class VideoPushService extends Service {
 
 
     private void initPushVideo(String ip, int port, int channelNum){
-        publish = new Publish.Buider(this, null)
+        publish = new Publish.Buider(this, publishView)
 //                .setPushMode(new UdpSend(phone, ip, port, channelNum))
                 .setPushMode(new TcpSend(phone, ip, port, channelNum))
                 //  帧率
@@ -278,8 +288,15 @@ public class VideoPushService extends Service {
         Notification notification = builder.build(); // 获取构建好的Notification
 //        notification.defaults = Notification.DEFAULT_SOUND; //  设置为默认的声音
 //	notification.flags |= Notification.FLAG_NO_CLEAR;
-        notification.flags = autoCancel?Notification.FLAG_AUTO_CANCEL:Notification.FLAG_NO_CLEAR;
-
+        if(autoCancel){
+//            notification.flags = Notification.FLAG_NO_CLEAR; // 点击清除按钮时就会清除消息通知,但是点击通知栏的通知时不会消失
+//            notification.flags = Notification.FLAG_ONGOING_EVENT; // 点击清除按钮不会清除消息通知,可以用来表示在正在运行
+//            notification.flags |= Notification.FLAG_AUTO_CANCEL; // 点击清除按钮或点击通知后会自动消失
+//            notification.flags |= Notification.FLAG_INSISTENT; // 一直进行，比如音乐一直播放，知道用户响应
+            notification.flags |= Notification.FLAG_AUTO_CANCEL ;
+        }else
+            notification.flags = Notification.FLAG_NO_CLEAR;
+//        notification.flags |= autoCancel ? Notification.FLAG_AUTO_CANCEL : Notification.FLAG_INSISTENT ;
         startForeground(NOTICE_ID, notification);
     }
 
@@ -322,6 +339,91 @@ public class VideoPushService extends Service {
             publish.open();
         }else {
             publish.release();
+        }
+    }
+
+
+
+    //  ----------------------------- test float window preview
+    private WindowManager windowManager;
+    private WindowManager.LayoutParams layoutParams;
+    private LayoutInflater inflater;
+    //  浮动布局view
+    private View floatingLayout;
+    //  容器父布局
+    private View mainView;
+    private PublishView publishView ;
+    /**
+     * 设置悬浮框基本参数（位置、宽高等）
+     */
+    private void initWindow() {
+        Log.d(TAG, "initWindow ------------------") ;
+        windowManager = (WindowManager) getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
+        //设置好悬浮窗的参数
+        layoutParams = getParams();
+        // 悬浮窗默认显示以左上角为起始坐标
+        layoutParams.gravity = Gravity.RIGHT | Gravity.TOP;
+        //悬浮窗的开始位置，因为设置的是从右上角开始，所以屏幕左上角是x=屏幕最大值;y=0
+        layoutParams.x = 10;
+        layoutParams.y = 120;
+        //得到容器，通过这个inflater来获得悬浮窗控件
+        inflater = LayoutInflater.from(getApplicationContext());
+        // 获取浮动窗口视图所在布局
+        floatingLayout = inflater.inflate(R.layout.view_float_video, null);
+        publishView = floatingLayout.findViewById(R.id.publishView) ;
+        // 添加悬浮窗的视图
+        windowManager.addView(floatingLayout, layoutParams);
+    }
+
+    private WindowManager.LayoutParams getParams() {
+        layoutParams = new WindowManager.LayoutParams();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            layoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+        } else {
+            layoutParams.type = WindowManager.LayoutParams.TYPE_PHONE;
+        }
+        //设置可以显示在状态栏上
+        layoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL |
+                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR |
+                WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH;
+
+        //设置悬浮窗口长宽数据
+        layoutParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
+        layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
+        return layoutParams;
+    }
+
+    //  加载远端视屏：在这对悬浮窗内内容做操作
+    private void initFloating() {
+//        //将子View加载进悬浮窗View
+//        mainView = floatingLayout.findViewById(R.id.trtc_video_view_layout_float);  //  悬浮窗父布局
+//        View mChildView = renderView.getChildView();    //  加载进悬浮窗的子View，这个VIew来自天转过来的那个Activity里面的那个需要加载的View
+//        mainView.addView(mChildView);   //  将需要悬浮显示的Viewadd到mTXCloudVideoView中
+
+//        windowManager.addView(mChildView, layoutParams);
+
+//        //悬浮框触摸事件，设置悬浮框可拖动
+//        mTXCloudVideoView.setOnTouchListener(this::onTouch);
+//        //悬浮框点击事件
+//        mTXCloudVideoView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                //在这里实现点击重新回到Activity
+//                Intent intent =
+//                        new Intent(FloatWindowService.this, RtcActivity.class);//从该service跳转至该activity会将该activity从后台唤醒，所以activity会走onReStart（）
+//                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);//从Service跳转至RTCActivity，需要Intent.FLAG_ACTIVITY_NEW_TASK，不然会崩溃
+//                startActivity(intent);
+//            }
+//        });
+
+    }
+
+    private void destoryFloatWindow(){
+
+        if (floatingLayout != null) {
+            // 移除悬浮窗口
+            windowManager.removeView(floatingLayout);
+            floatingLayout = null;
         }
     }
 }

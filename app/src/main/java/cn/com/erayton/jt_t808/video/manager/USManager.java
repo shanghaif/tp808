@@ -5,6 +5,8 @@ import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.speedtalk.protocol.tscobjs.paramobjs.IP;
+
 import cn.com.erayton.jt_t808.constants.PublicConstants;
 import cn.com.erayton.jt_t808.video.eventBus.EventBusUtils;
 import cn.com.erayton.jt_t808.video.eventBus.event.BroadCastMainEvent;
@@ -337,7 +339,7 @@ public class USManager {
         @Override
         public void onTernimalAVTranslate(String s, int i, int i1, int i2, int i3, int i4, int i5) {
             int result = 1 ;
-            Log.d(TAG, "onTernimalAVTranslate:"+s+","+i1+","+i2+","+i3+","+i4+","+i5) ;
+            Log.d(TAG, "onTernimalAVTranslate:"+s+"，服务器 TCP 端口号:"+i+"，服务器 UDP 端口号:"+i1+"，逻辑通道号:"+i2+"，数据类型:"+i3+"，码流类型:"+i4+"，流水号:"+i5) ;
             if (!TextUtils.isEmpty(s)){ //  ip 不为空，返回通用回复成功
                 result = 0 ;
 //                serverAVTranslateMsg.getHost() ;
