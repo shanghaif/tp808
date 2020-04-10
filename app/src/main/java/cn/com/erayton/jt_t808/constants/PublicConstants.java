@@ -1,5 +1,7 @@
 package cn.com.erayton.jt_t808.constants;
 
+import android.text.TextUtils;
+
 /**
  * Created by jeam on 2018/4/27.
  */
@@ -15,6 +17,5 @@ public interface PublicConstants {
     }
 
     class GeneralConstants{
-
     }
 }

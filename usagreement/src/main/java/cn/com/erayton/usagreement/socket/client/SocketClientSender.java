@@ -15,7 +15,7 @@ import cn.com.erayton.usagreement.model.model.TerminalGPSInfo;
 import cn.com.erayton.usagreement.model.model.TerminalGeneralInfo;
 import cn.com.erayton.usagreement.model.model.TerminalParametersInfo;
 import cn.com.erayton.usagreement.model.model.TerminalRegInfo;
-import cn.com.erayton.usagreement.utils.BCD8421Operator;
+import cn.com.erayton.usagreement.utils.BitOperator;
 import cn.com.erayton.usagreement.utils.LogUtils;
 
 public class SocketClientSender {
@@ -141,7 +141,7 @@ public class SocketClientSender {
         if (socketClient == null)   return false ;
 
         TerminalGPSMsg msg = new TerminalGPSMsg();
-        terminalAuthInfo.setBCDTime(BCD8421Operator.getInstance().getBCDTime());
+        terminalAuthInfo.setBCDTime(BitOperator.getInstance().getBCDTime());
         msg.setTerminalGPSInfo(terminalAuthInfo);
         //  header
         PacketData.MsgHeader header = getHeader();

@@ -29,7 +29,6 @@ public class BitOperator {
      *
      * @param value
      * @return
-     * @throws Exception
      */
     public byte integerTo1Byte(int value) {
         return (byte) (value & 0xFF);
@@ -40,7 +39,6 @@ public class BitOperator {
      *
      * @param value
      * @return
-     * @throws Exception
      */
     public byte[] integerTo1Bytes(int value) {
         byte[] result = new byte[1];
@@ -53,7 +51,6 @@ public class BitOperator {
      *
      * @param value
      * @return
-     * @throws Exception
      */
     public byte[] integerTo2Bytes(int value) {
         byte[] result = new byte[2];
@@ -67,7 +64,6 @@ public class BitOperator {
      *
      * @param value
      * @return
-     * @throws Exception
      */
     public byte[] integerTo3Bytes(int value) {
         byte[] result = new byte[3];
@@ -82,7 +78,6 @@ public class BitOperator {
      *
      * @param value
      * @return
-     * @throws Exception
      */
     public byte[] integerTo4Bytes(int value) {
         byte[] result = new byte[4];
@@ -98,7 +93,6 @@ public class BitOperator {
      *
      * @param value
      * @return
-     * @throws Exception
      */
     public int byteToInteger(byte[] value) {
         int result;
@@ -121,7 +115,6 @@ public class BitOperator {
      *
      * @param value
      * @return
-     * @throws Exception
      */
     public int oneByteToInteger(byte value) {
         return (int) value & 0xFF;
@@ -132,7 +125,6 @@ public class BitOperator {
      *
      * @param value
      * @return
-     * @throws Exception
      */
     public int twoBytesToInteger(byte[] value) {
         // if (value.length < 2) {
@@ -148,7 +140,6 @@ public class BitOperator {
      *
      * @param value
      * @return
-     * @throws Exception
      */
     public int threeBytesToInteger(byte[] value) {
         int temp0 = value[0] & 0xFF;
@@ -162,7 +153,6 @@ public class BitOperator {
      *
      * @param value
      * @return
-     * @throws Exception
      */
     public int fourBytesToInteger(byte[] value) {
         // if (value.length < 4) {
@@ -180,7 +170,6 @@ public class BitOperator {
      *
      * @param value
      * @return
-     * @throws Exception
      */
     public long fourBytesToLong(byte[] value) throws Exception {
         // if (value.length < 4) {
@@ -198,7 +187,6 @@ public class BitOperator {
      *
      * @param value
      * @return
-     * @throws Exception
      */
     public long bytes2Long(byte[] value) {
         long result = 0;
@@ -220,7 +208,6 @@ public class BitOperator {
      *
      * @param value
      * @return
-     * @throws Exception
      */
     public byte[] longToBytes(long value) {
         return longToBytes(value, 8);
@@ -231,7 +218,6 @@ public class BitOperator {
      *
      * @param value
      * @return
-     * @throws Exception
      */
     public byte[] longToBytes(long value, int len) {
         byte[] result = new byte[len];
@@ -251,7 +237,6 @@ public class BitOperator {
      * 得到一个消息ID
      *
      * @return
-     * @throws Exception
      */
     public byte[] generateTransactionID() throws Exception {
         byte[] id = new byte[16];
@@ -271,7 +256,6 @@ public class BitOperator {
      *
      * @param ip
      * @return
-     * @throws Exception
      */
     public int[] getIntIPValue(String ip) throws Exception {
         String[] sip = ip.split("[.]");
@@ -288,7 +272,6 @@ public class BitOperator {
      *
      * @param address
      * @return
-     * @throws Exception
      */
     public String getStringIPValue(byte[] address) throws Exception {
         int first = this.oneByteToInteger(address[0]);
@@ -374,7 +357,7 @@ public class BitOperator {
         try {
             byte[] tmp = new byte[length];
             System.arraycopy(data, startIndex, tmp, 0, length);
-            return BCD8421Operator.getInstance().bcd2String(tmp);
+            return bcd2String(tmp);
         } catch (Exception e) {
             Log.e(TAG, "parseBcdStringFromBytes: ", e);
             return defaultVal;
@@ -588,7 +571,7 @@ public class BitOperator {
             byte high = ascII2Bcd(bs[2 * i]);
             byte low = ascII2Bcd(bs[2 * i + 1]);
 
-            // TODO 只遮罩BCD低四位?
+            // 只遮罩BCD低四位?
             ret[i] = (byte) ((high << 4) | low);
         }
         Log.i(TAG,"bcdtime -byte - "+ret.length) ;
@@ -641,7 +624,7 @@ public class BitOperator {
     private final long[] fflong = {0xFF,0xFF00,0xFF0000,0xFF000000,0xFF000000};
 
 //    //将小端byte[]转成数字　例子: ([1,0],0,2)=1
-//    public static long toXDint(byte[] byteData,int startPos,int length){
+//    public long toXDint(byte[] byteData,int startPos,int length){
 //        if(byteData == null){
 //            return 0;
 //        }
@@ -884,7 +867,7 @@ public class BitOperator {
 //     * @param buffer
 //     * @return
 //     */
-//    public static byte[] readBufLen(ByteBuf buffer,int len){
+//    public byte[] readBufLen(ByteBuf buffer,int len){
 //        byte[] data = new byte[len];
 //        buffer.readBytes(data);
 //        return data;
@@ -895,7 +878,7 @@ public class BitOperator {
 //     * @param buffer
 //     * @return
 //     */
-//    public static byte[] readBuf(ByteBuf buffer){
+//    public byte[] readBuf(ByteBuf buffer){
 //        byte[] data = new byte[buffer.readableBytes()];
 //        buffer.readBytes(data);
 //        buffer.release();
@@ -952,5 +935,25 @@ public class BitOperator {
             value |= (byteData[i]<<(index*8)) & fflong[index];
         }
         return value;
+    }
+
+    /**
+     * BCC 校验算法
+     *
+     * @param data
+     * @return 十六进制
+     */
+    public String getBCC(byte[] data) {
+        String ret = "";
+        byte BCC[] = new byte[1];
+        for (int i = 0; i < data.length; i++) {
+            BCC[0] = (byte) (BCC[0] ^ data[i]);
+        }
+        String hex = Integer.toHexString(BCC[0] & 0xFF);
+        if (hex.length() == 1) {
+            hex = '0' + hex;
+        }
+        ret += hex.toUpperCase();
+        return ret;
     }
 }

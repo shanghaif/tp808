@@ -259,23 +259,28 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
     }
 
     public boolean sendTcpMsg(PacketData packetData, boolean isAsyn){
-        MsgTransformer msgTransformer = new MsgTransformer() ;
+//        MsgTransformer msgTransformer = new MsgTransformer() ;
         try {
         } catch (Exception e) {
             e.printStackTrace();
         }
         if (!isAsyn){
-            if (!tcpClient.sendAsyn(msgTransformer.packageDataToByte(packetData))) {
-                LogUtils.d( "Send " + msgTransformer.packageDataToByte(packetData)  + " to fail. [Asyn][TCP] error:" + msgTransformer.packageDataToByte(packetData) );
+            if (!tcpClient.sendAsyn(packetData.packageDataToByte())) {
+//            if (!tcpClient.sendAsyn(msgTransformer.packageDataToByte(packetData))) {
+                LogUtils.d( "Send " + packetData.packageDataToByte()  + " to fail. [Asyn][TCP] error:" + packetData.packageDataToByte() );
+//                LogUtils.d( "Send " + msgTransformer.packageDataToByte(packetData)  + " to fail. [Asyn][TCP] error:" + msgTransformer.packageDataToByte(packetData) );
                 return false;
             }
         }else {
 //            LogUtils.d( "------------------------------ isAsyn ----------------------------") ;
-            if (!tcpClient.send(msgTransformer.packageDataToByte(packetData))) {
-                LogUtils.d( "Send " + msgTransformer.packageDataToByte(packetData) + " to fail. [Sync][TCP] error:" + msgTransformer.packageDataToByte(packetData));
+            if (!tcpClient.send(packetData.packageDataToByte())) {
+//            if (!tcpClient.send(msgTransformer.packageDataToByte(packetData))) {
+                LogUtils.d( "Send " + packetData.packageDataToByte() + " to fail. [Sync][TCP] error:" + packetData.packageDataToByte());
+//                LogUtils.d( "Send " + msgTransformer.packageDataToByte(packetData) + " to fail. [Sync][TCP] error:" + msgTransformer.packageDataToByte(packetData));
                 return false;
             } else {
-                LogUtils.d( "Send " + msgTransformer.packageDataToByte(packetData) + " success.[TCP][Sync]");
+//                LogUtils.d( "Send " + msgTransformer.packageDataToByte(packetData) + " success.[TCP][Sync]");
+                LogUtils.d( "Send " + packetData.packageDataToByte() + " success.[TCP][Sync]");
             }
         }
 

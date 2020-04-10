@@ -4,6 +4,8 @@ import com.alibaba.fastjson.annotation.JSONField;
 
 import java.util.Arrays;
 
+import cn.com.erayton.usagreement.model.encode.HeaderMsg;
+
 public abstract class PacketData {
 
     /**
@@ -211,5 +213,23 @@ public abstract class PacketData {
         }
 
     }
+
+    public byte[] packageDataToByte() {
+        MsgHeader msgHeader = getMsgHeader();
+        HeaderMsg headerMsg = new HeaderMsg() ;
+        DataHeader dataHeader = new DataHeader() ;
+        headerMsg.setPhone(msgHeader.getTerminalPhone());
+        headerMsg.setMsgId(msgHeader.getMsgId());
+        return dataHeader.generate808(headerMsg, packageDataBody2Byte());
+    }
+
+//    public byte[] packageDataToByte(PacketData data) {
+//        PacketData.MsgHeader msgHeader = data.getMsgHeader();
+//        DataHeader.HeaderMsg headerMsg = new DataHeader.HeaderMsg() ;
+//        DataHeader dataHeader = new DataHeader() ;
+//        headerMsg.setPhone(msgHeader.getTerminalPhone());
+//        headerMsg.setMsgId(msgHeader.getMsgId());
+//        return dataHeader.generate808(headerMsg, data.packageDataBody2Byte());
+//    }
 
 }

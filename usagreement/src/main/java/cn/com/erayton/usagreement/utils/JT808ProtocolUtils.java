@@ -2,9 +2,6 @@ package cn.com.erayton.usagreement.utils;
 
 import java.io.ByteArrayOutputStream;
 
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
-
 /**
  * JT808协议转义工具类
  * 
@@ -19,11 +16,9 @@ import java.io.ByteArrayOutputStream;
 public class JT808ProtocolUtils {
 //	private final Logger log = LoggerFactory.getLogger(getClass());
 	private BitOperator bitOperator;
-	private BCD8421Operator mBcd8421Operator;
 
 	public JT808ProtocolUtils() {
 		this.bitOperator = BitOperator.getInstance();
-		this.mBcd8421Operator = BCD8421Operator.getInstance();
 	}
 
 	/**
@@ -150,7 +145,7 @@ public class JT808ProtocolUtils {
 			// 2. 消息体属性 word(16)
 			baos.write(bitOperator.integerTo2Bytes(msgBodyProps));
 			// 3. 终端手机号 bcd[6]
-			baos.write(mBcd8421Operator.string2Bcd(phone));
+			baos.write(bitOperator.string2Bcd(phone));
 			// 4. 消息流水号 word(16),按发送顺序从 0 开始循环累加
 			baos.write(bitOperator.integerTo2Bytes(flowId));
 			// 消息包封装项 此处不予考虑
