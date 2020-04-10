@@ -1,6 +1,7 @@
 <resources>
-    <string name="app_name">USAgreement</string>
+    <string name="app_name">视频录制</string>
 
+    <string name="tip_video_record">正在使用摄像头</string>
     <string name="tip_video_recording">视频录制中&#8230;&#8230;&#8230;</string>
     <string name="tip_video_record_pause">视频录制暂停</string>
     <string name="tip_video_record_finish">视频录制结束</string>

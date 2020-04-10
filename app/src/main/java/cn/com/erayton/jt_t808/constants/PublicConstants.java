@@ -12,7 +12,8 @@ public interface PublicConstants {
         public static final int PORT = 7000 ;
 //        public static final String HOST = "222.222.19.34" ;
 //        public static final int PORT = 7808 ;
-        public static final String USER_NAME = "23803641388" ;
+        public static final String USER_NAME = "23803560285" ;
+//        public static final String USER_NAME = "23803641388" ;
         public static String USAUTHCODE = "0" ;
     }
 

@@ -51,12 +51,14 @@ public class TcpSend implements Runnable{
         initSocket(ip, port);
     }
 
-    private void initSocket(String ip, int port){
+    public void initSocket(String ip, int port){
         this.tcpClient.listener = listener;
         tcpClient.openAsyn(ip, port);
         thread = new Thread(this);
         thread.setName("tcp video send thread");
     }
+
+
 
 
 
@@ -127,7 +129,7 @@ public class TcpSend implements Runnable{
      * 发送视频
      * @param isIFrame 是否为关键帧
      */
-    private void writeVideo(byte[] video, int isIFrame) {
+    public void writeVideo(byte[] video, int isIFrame) {
         LogUtils.d("phone:"+phone);
         //当前截取位置
         int nowPosition = 0;
@@ -178,7 +180,7 @@ public class TcpSend implements Runnable{
     /**
      * 发送音频
      */
-    private void writeVoice(byte[] voice) {
+    public void writeVoice(byte[] voice) {
         TerminalAVDataInfo terminalAVDataInfo ;
         TerminalAVDataMsg terminalAVDataMsg = new TerminalAVDataMsg() ;
         if (voiceSendNum == 0) {

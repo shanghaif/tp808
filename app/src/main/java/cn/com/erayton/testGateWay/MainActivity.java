@@ -3,23 +3,31 @@ package cn.com.erayton.testGateWay;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.jakewharton.rxbinding2.view.RxView;
 import com.speedtalk.protocol.utils.MessageUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import cn.com.erayton.jt_t808.R;
 import cn.com.erayton.usagreement.utils.LogUtils;
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Observer;
 import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
@@ -40,6 +48,48 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         LogUtils.d("onClick---------------------------");
+//        RxView.clicks(v).throttleFirst(2, TimeUnit.SECONDS)
+//                .doOnNext(
+//                        new Consumer<Object>() {
+//                    @Override
+//                    public void accept(Object o) throws Exception {
+//                        LogUtils.d("accept -----------"+o);
+//
+//                    }
+//                }
+//                )
+//                .timeInterval(TimeUnit.SECONDS)
+//        .subscribe(new Observer<Object>() {
+//            @Override
+//            public void onSubscribe(Disposable d) {
+//                LogUtils.d("onSubscribe -----------");
+//            }
+//
+//            @Override
+//            public void onNext(Object o) {
+//                LogUtils.d("onNext -----------"+o);
+//            }
+//
+//            @Override
+//            public void onError(Throwable e) {
+//
+//                LogUtils.d("onError -----------"+e);
+//            }
+//
+//            @Override
+//            public void onComplete() {
+//                LogUtils.d("onComplete -----------");
+//            }
+//        })
+////                .subscribe(new Consumer<Object>() {
+////                    @Override
+////                    public void accept(Object o) throws Exception {
+////                        LogUtils.d("click -----------"+o);
+////                    }
+////
+////
+////                })
+//                ;
         switch (v.getId()){
             case R.id.testBtn:
 
@@ -55,8 +105,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 RxSocket.getInstance().setResultListener(new SocketListener(){
                     @Override
                     public void onSuccess(BaseRequestBean bean){
+
+                        LogUtils.d("BaseRequestBean");
                         if(bean.method.equals(login.method)){
-                            LogUtils.d(bean.method);
+                            LogUtils.d("bean.method："+bean.method);
                         }
 //                else if(bean.method.eqals(login3.method)){
 //
@@ -64,6 +116,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                     @Override
                     public void onExecption(Throwable throwable){
+                        LogUtils.d("onExecption:"+throwable.getMessage());
                     }
                 });
                 break;
@@ -106,21 +159,50 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void gateWay(){
-
-
+    private void gateWay() {
+        LogUtils.d("gateWay---------------------------");
+        USGate gateWay = new USGate();
+//        GateWay gateWay = new GateWay() ;
 //        getGateWay("123:imei:version", new IPCallback() {
-        getGateWay("23803560285:123456789012:1.0", new IPCallback() {
-            @Override
-            public void IPCallback(String s, int tPort, int uPort, String type, String result) {
-                LogUtils.d(s+tPort+uPort+type+result);
-            }
 
-            @Override
-            public void error(Object s) {
-                LogUtils.d("error ---------------------------------"+s);
-            }
-        }).subscribe(new Consumer<String>() {
+//        Disposable disposable =gateWay.setCommand("23803560285", "123456789012", "1.0")
+        Disposable disposable =gateWay.setCommand("23803560285")
+        .getGateWay(
+                new USGate.IPCallback() {
+                    @Override
+                    public void IPCallback(String ipCount) {
+                        LogUtils.d("IPCallback,ipCount:"+ipCount);
+                    }
+                    @Override
+//                        public void IPCallback(int  ipCount, String s) {
+//                                LogUtils.d("IPCallback,ipCount:"+ipCount+",msg:"+s);
+//                        public void IPCallback(int  ipCount) {
+//                            LogUtils.d("IPCallback,ipCount:"+ipCount);
+                        public void IPCallback(String ipCount, List<String[]> ipList) {
+                            LogUtils.d("IPCallback,ipCount:"+ipCount);
+                            for (String[] s: ipList){
+                                LogUtils.d("ipList"+ Arrays.toString(s));
+                            }
+                        }
+
+                        @Override
+                        public void error(int errorCode, Object s) {
+                            LogUtils.e("error"+errorCode+s);
+                        }
+                    }
+//                new GateWay.IPCallback() {
+//            @Override
+//            public void IPCallback(String s, int tPort, int uPort, String type, String result) {
+//                LogUtils.d(s+","+tPort+","+uPort+","+type+","+result);
+//            }
+//
+//            @Override
+//            public void error(int errorCode, Object s) {
+//                LogUtils.d("error ---------------------------------"+errorCode+","+s);
+//
+//            }
+//        }
+        ).subscribe(new Consumer<String>() {
             @Override
             public void accept(String s) throws Exception {
                 LogUtils.d(s);
@@ -131,95 +213,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 LogUtils.d(throwable.getMessage());
             }
         });
-
+//        if(!disposable.isDisposed()){
+//            disposable.dispose();
+//        }
     }
 
-    private Observable<String> getGateWay(final String msg, final IPCallback ipCallback){
-        return Observable.create(new ObservableOnSubscribe<String>() {
-            @Override
-            public void subscribe(ObservableEmitter<String> e) throws Exception {
-                try {
-                    e.onNext("----------------------"+msg);
-                    initSocket() ;
-                    e.onNext("initSocket");
-                    send(msg);
-                    e.onNext("send:"+msg);
-                    receive(ipCallback);
-                    e.onNext("receive");
-                    close();
-                    e.onNext("close");
-                    e.onComplete();
-                }catch (IOException ex){
-                    //  Unable to resolve host "poc.rayton.com.cn": No address associated with hostname
-                    ipCallback.error(ex.getMessage());
-                    ipCallback.error("网络错误");
-                }
-            }
-        }).subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread()) ;
-    }
-
-    String host = "poc.rayton.com.cn";
-    int port = 29992;
-    Socket socket ;
-    private Socket initSocket() throws IOException {
-        socket = new Socket(host, port) ;
-        return socket ;
-    }
-
-    private void send(String msg) throws IOException {
-        String reqStr = new String(MessageUtils.encryptAndDecrypt(msg.getBytes())) ;
-        reqStr +="\n" ;
-        socket.getOutputStream().write(reqStr.getBytes());
-    }
-
-    private void receive(IPCallback callback) throws IOException {
-        byte[] resp = new byte[256] ;
-        int read = socket.getInputStream().read(resp) ;
-        if (read<0){
-            callback.error("msg is null, read:"+read);
-            return ;
-        }
-        byte[] temp = new byte[read -1] ;
-        System.arraycopy(resp, 0, temp, 0, temp.length);
-        String respStr = new String(MessageUtils.encryptAndDecrypt(temp)) ;
-        String[] tempStr = null ;
-        System.out.println(respStr);
-        LogUtils.e(respStr);
-        tempStr = respStr.split(":") ;
-        if (callback != null){
-            if (tempStr.length >= 5) {
-                callback.IPCallback(tempStr[0], Integer.parseInt(tempStr[1]),
-                        Integer.parseInt(tempStr[2]), tempStr[3], tempStr[4]);
-            }else {
-                callback.error("return msg length is wrong, length:"+tempStr.length);
-            }
-        }else {
-            callback.error("callback == null");
-        }
-
-    }
-
-    private void close(){
-        if (socket != null){
-            try {
-                socket.shutdownInput();
-                socket.shutdownOutput();
-                InputStream inputStream = socket.getInputStream() ;
-                OutputStream outputStream = socket.getOutputStream() ;
-
-                inputStream.close();
-                outputStream.close();
-                socket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public interface IPCallback{
-        void IPCallback(String s, int tPort, int uPort, String type, String result) ;
-        void error(Object s) ;
+    private void testThrottleFirst(){
+        Flowable.intervalRange(0, 10, 0, 1, TimeUnit.SECONDS)
+                .throttleFirst(1, TimeUnit.SECONDS)//每1秒中只处理第一个元素
+                .subscribe(new Consumer<Long>() {
+                    @Override
+                    public void accept(Long aLong) throws Exception {
+                        LogUtils.i(String.valueOf(aLong)) ;
+                    }
+                });
     }
 
 }

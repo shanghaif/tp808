@@ -30,6 +30,7 @@ import android.view.TextureView;
 import com.library.common.WriteFileCallback;
 import com.library.live.file.WriteMp4;
 import com.library.live.stream.TcpSend;
+import com.library.live.stream.UdpSend;
 import com.library.live.vc.VoiceRecord;
 import com.library.live.vd.RecordEncoderVD;
 import com.library.live.vd.VDEncoder;
@@ -61,8 +62,8 @@ public class Publish implements TextureView.SurfaceTextureListener {
     //音频采集
     private VoiceRecord voiceRecord;
     //UDP发送类
-//    private UdpSend udpSend;
-    private TcpSend udpSend;
+    private TcpSend tcpSend;
+//    private TcpSend udpSend;
     private int rotateAngle = 90;//270 图片需要翻转角度
     private boolean isCameraBegin = false;
     private boolean useuvPicture = false;
@@ -104,7 +105,7 @@ public class Publish implements TextureView.SurfaceTextureListener {
         this.map = map;
         this.publishSize = map.getPublishSize();
         this.previewSize = map.getPreviewSize();
-        this.udpSend = map.getPushMode();
+        this.tcpSend = map.getPushMode();
 
         writeMp4 = new WriteMp4(map.getVideodirpath());
 
@@ -179,13 +180,13 @@ public class Publish implements TextureView.SurfaceTextureListener {
             Log.d("pictureSize", "预览分辨率  =  " + previewSize.getWidth() + " * " + previewSize.getHeight());
 
             //计算比例(需对调宽高)
-            udpSend.setWeight((double) publishSize.getHeight() / publishSize.getWidth());
+            tcpSend.setWeight((double) publishSize.getHeight() / publishSize.getWidth());
             if (map.isPreview()) {
                 map.getPublishView().setWeight((double) previewSize.getHeight() / previewSize.getWidth());
             }
 
             recordEncoderVD = new RecordEncoderVD(previewSize, map.getFrameRate(), map.getCollectionBitrate(), writeMp4, map.getCodetype());
-            vdEncoder = new VDEncoder(previewSize, publishSize, map.getFrameRate(), map.getPublishBitrate(), map.getCodetype(), udpSend);
+            vdEncoder = new VDEncoder(previewSize, publishSize, map.getFrameRate(), map.getPublishBitrate(), map.getCodetype(), tcpSend);
             //初始化音频编码
 //            voiceRecord = new VoiceRecord(udpSend, map.getCollectionbitrate_vc(), map.getPublishbitrate_vc(), writeMp4);
             vdEncoder.start();
@@ -532,12 +533,12 @@ public class Publish implements TextureView.SurfaceTextureListener {
     };
 
     public void start() {
-        udpSend.startsend();
+        tcpSend.startsend();
     }
 
     public void stop() {
-        udpSend.stopsend();
-        udpSend.closeTCPSocket() ;
+        tcpSend.stopsend();
+        tcpSend.closeTCPSocket() ;
     }
 
     public void destroy() {
@@ -545,7 +546,7 @@ public class Publish implements TextureView.SurfaceTextureListener {
         recordEncoderVD.destroy();
         vdEncoder.destroy();
 //        voiceRecord.destroy();
-        udpSend.destroy();
+        tcpSend.destroy();
         frameHandler.removeCallbacksAndMessages(null);
         controlFrameRateThread.quitSafely();
         camearHandler.removeCallbacksAndMessages(null);
@@ -555,7 +556,7 @@ public class Publish implements TextureView.SurfaceTextureListener {
     }
 
     public int getPublishStatus() {
-        return udpSend.getPublishStatus();
+        return tcpSend.getPublishStatus();
     }
 
     public int getRecodeStatus() {
@@ -670,6 +671,10 @@ public class Publish implements TextureView.SurfaceTextureListener {
             map.setPushMode(pushMode);
             return this;
         }
+        public Buider setPushMode(UdpSend pushMode) {
+            map.setPushMode(pushMode);
+            return this;
+        }
 
         public Buider setCenterScaleType(boolean isCenterScaleType) {
             if (!map.isPreview()) {
@@ -711,8 +716,8 @@ public class Publish implements TextureView.SurfaceTextureListener {
         private String videodirpath = null;
         //拍照地址
         private String picturedirpath = Environment.getExternalStorageDirectory().getPath() + File.separator + "VideoPicture";
-        private TcpSend pushMode;
-//        private UdpSend pushMode;
+        private TcpSend tPush;
+        private UdpSend uPush;
 
         private PublishView getPublishView() {
             return publishView;
@@ -822,14 +827,20 @@ public class Publish implements TextureView.SurfaceTextureListener {
 //            return pushMode;
 //        }
         private TcpSend getPushMode() {
-            return pushMode;
+            return tPush;
+        }
+        private UdpSend getUPushMode() {
+            return uPush;
         }
 
 //        private void setPushMode(UdpSend pushMode) {
 //            this.pushMode = pushMode;
 //        }
-        private void setPushMode(TcpSend pushMode) {
-            this.pushMode = pushMode;
+        private void setPushMode(TcpSend tPush) {
+            this.tPush = tPush;
+        }
+        private void setPushMode(UdpSend uPush) {
+            this.uPush = uPush;
         }
 
         private String getVideodirpath() {

@@ -255,7 +255,7 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
     }
 
     public boolean isConnected(){
-        return true ;
+        return !getIsNeedReconnect() ;
     }
 
     public boolean sendTcpMsg(PacketData packetData, boolean isAsyn){

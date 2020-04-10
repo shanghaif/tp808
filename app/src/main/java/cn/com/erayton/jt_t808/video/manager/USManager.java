@@ -5,6 +5,8 @@ import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.speedtalk.protocol.tscobjs.paramobjs.IP;
+
 import cn.com.erayton.jt_t808.constants.PublicConstants;
 import cn.com.erayton.jt_t808.video.eventBus.EventBusUtils;
 import cn.com.erayton.jt_t808.video.eventBus.event.BroadCastMainEvent;
@@ -59,7 +61,7 @@ public class USManager {
         Log.d(TAG, "IP:"+tHost+",TPORT:"+tPort+",UPORT:"+uPort+",PHONE:"+phone) ;
     }
 
-    public void setServer(String tHost, int tPort ,int uPort){
+    public void setServer(String tHost, int tPort , int uPort){
         this.tHost = tHost ;
         this.tPort = tPort ;
         this.uPort = uPort ;
@@ -110,6 +112,17 @@ public class USManager {
 
     //  登陆 即 socketClientSender register    成功之后自动发送心跳
     public void USLogin(){
+//        TerminalRegisterMsg.TerminalRegInfo regInfo = new TerminalRegisterMsg.TerminalRegInfo() ;
+//        regInfo.setProvinceId(0x00);
+//        regInfo.setCityId(0x00);
+//        regInfo.setManufacturerId("12345");
+//        regInfo.setTerminalType("12345678901234567890");
+//        regInfo.setTerminalId("ABCD123");
+//        regInfo.setLicensePlateColor(0x01);
+//        regInfo.setLicensePlate("测试03");        // 终端名称 - 别名
+//        Log.d(TAG, "SendRegister ---------------------------------"+regInfo) ;
+//        SocketClientSender.sendRegister(regInfo, false ,false) ;
+
         TerminalRegInfo regInfo = new TerminalRegInfo() ;
         regInfo.setProvinceId(0x00);
         regInfo.setCityId(0x00);
@@ -151,6 +164,18 @@ public class USManager {
 
     //  发送鉴权
     public void SendAuth() {
+//        TerminalAuthMsg.TerminalAuthInfo authInfo = new TerminalAuthMsg.TerminalAuthInfo();
+//        if (authCode == null){
+//            if (PublicConstants.ApiConstants.USAUTHCODE.equals("0")){
+//                USLogin() ;     //  重新登陆
+//            }else {
+//                authInfo.setAuth(PublicConstants.ApiConstants.USAUTHCODE);
+//            }
+//        }else {
+//            authInfo.setAuth(authCode);
+//        }
+//        Log.d(TAG, "SendAuth ---------------------------------"+authCode) ;
+//        SocketClientSender.sendAuth(authInfo, false, false) ;
         TerminalAuthInfo authInfo = new TerminalAuthInfo();
         if (authCode == null){
             if (PublicConstants.ApiConstants.USAUTHCODE.equals("0")){
@@ -166,14 +191,35 @@ public class USManager {
     }
 
     public void SendGeneralResp(int seNum ,int respId, int code){
+        Log.d("SocketClient", "SendGeneralResp ---------------------------------") ;
         TerminalGeneralInfo terminalGeneralInfo = new TerminalGeneralInfo() ;
         terminalGeneralInfo.setSeNum(seNum);
         terminalGeneralInfo.setRespId(respId);
         terminalGeneralInfo.setResult(code);
         SocketClientSender.sendGeneralReponse(terminalGeneralInfo, false, false) ;
+//        TerminalGeneralMsg.TerminalGeneralInfo terminalGeneralInfo = new TerminalGeneralMsg.TerminalGeneralInfo() ;
+//        terminalGeneralInfo.setSeNum(seNum);
+//        terminalGeneralInfo.setRespId(respId);
+//        terminalGeneralInfo.setResult(code);
+//        SocketClientSender.sendGeneralReponse(terminalGeneralInfo, false, false) ;
     }
 
     public void SendParamenter(int seNum){
+//        TerminalParametersMsg.TerminalParametersInfo parametersInfo = new TerminalParametersMsg.TerminalParametersInfo() ;
+//        parametersInfo.setSerialNumber(seNum);
+//        parametersInfo.setSerialNumber(10);
+//        parametersInfo.setInstructCount(8);
+//        parametersInfo.setItemParamenter("0208");
+//        parametersInfo.setGpsSleepInterval(40);
+//        parametersInfo.setGpsDefInterval(50);
+//        parametersInfo.setStrategy(0);
+//        parametersInfo.setPlan(1);
+//        parametersInfo.setLoggedOnInterval(10);
+//        parametersInfo.setAlarmInterval(20);
+//        parametersInfo.setAngelInflection(30);
+//        parametersInfo.setThreshold(60);
+//        SocketClientSender.sendParamenter(parametersInfo, false, false) ;
+
         TerminalParametersInfo parametersInfo = new TerminalParametersInfo() ;
         parametersInfo.setSerialNumber(seNum);
         parametersInfo.setSerialNumber(10);
@@ -293,7 +339,7 @@ public class USManager {
         @Override
         public void onTernimalAVTranslate(String s, int i, int i1, int i2, int i3, int i4, int i5) {
             int result = 1 ;
-            Log.d(TAG, "onTernimalAVTranslate:"+s+","+i1+","+i2+","+i3+","+i4+","+i5) ;
+            Log.d(TAG, "onTernimalAVTranslate:"+s+"，服务器 TCP 端口号:"+i+"，服务器 UDP 端口号:"+i1+"，逻辑通道号:"+i2+"，数据类型:"+i3+"，码流类型:"+i4+"，流水号:"+i5) ;
             if (!TextUtils.isEmpty(s)){ //  ip 不为空，返回通用回复成功
                 result = 0 ;
 //                serverAVTranslateMsg.getHost() ;
@@ -305,11 +351,17 @@ public class USManager {
             }
 
 
-            TerminalGeneralInfo info = new TerminalGeneralInfo() ;
-            info.setResult(result);
-            info.setRespId(Constants.SERVER_AVTRANSMISSION_REQUEST);
-            info.setSeNum(i5);
-            SocketClientSender.sendGeneralReponse(info, true , false) ;
+//            TerminalGeneralInfo info = new TerminalGeneralInfo() ;
+//            info.setResult(result);
+//            info.setRespId(Constants.SERVER_AVTRANSMISSION_REQUEST);
+//            info.setSeNum(i5);
+//            SocketClientSender.sendGeneralReponse(info, true , false) ;
+            SendGeneralResp(i5, Constants.SERVER_AVTRANSMISSION_REQUEST, result);
+//            TerminalGeneralMsg.TerminalGeneralInfo info = new TerminalGeneralMsg.TerminalGeneralInfo() ;
+//            info.setResult(result);
+//            info.setRespId(Constants.SERVER_AVTRANSMISSION_REQUEST);
+//            info.setSeNum(i5);
+//            SocketClientSender.sendGeneralReponse(info, true , false) ;
         }
 
         @Override

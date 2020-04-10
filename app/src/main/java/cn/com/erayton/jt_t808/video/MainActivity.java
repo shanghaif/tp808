@@ -11,6 +11,7 @@ import android.os.RemoteException;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -28,7 +29,6 @@ import cn.com.erayton.jt_t808.video.eventBus.event.BroadCastMainEvent;
 import cn.com.erayton.jt_t808.video.manager.USManager;
 import cn.com.erayton.jt_t808.video.video.Send;
 import cn.com.erayton.usagreement.VideoPushAIDL;
-import cn.com.erayton.usagreement.VideoPushCallback;
 import cn.com.erayton.usagreement.service.VideoPushService;
 import cn.com.erayton.usagreement.utils.LogUtils;
 import cn.erayton.voicelib.Mp3Lib;
@@ -36,6 +36,13 @@ import cn.erayton.voicelib.Mp3Lib;
 public class MainActivity extends AppCompatActivity {
     private final int REQUEST_CAMERA = 666;
     private Button push;
+    private Button changeIp;
+    private String host1 = "106.14.186.44" ;
+    private String host2 = "video.erayton.cn" ;
+    private String phone ;
+    private String host = host1 ;
+    private EditText editText ;
+
 //    private Button pull;
 //    private Button voice;
 
@@ -46,7 +53,8 @@ public class MainActivity extends AppCompatActivity {
         EventBusUtils.register(this);
         requestpermission();
 //        testVideoHex();
-        USManager.getSingleton().ServerLogin("23803641388", "106.14.186.44",
+//        USManager.getSingleton().ServerLogin("23803641388", "106.14.186.44",
+        USManager.getSingleton().ServerLogin(PublicConstants.ApiConstants.USER_NAME, host,
                 7000, 7000, false);
 
 
@@ -81,7 +89,11 @@ public class MainActivity extends AppCompatActivity {
     private void gostart() {
 //        String s = Mp3Lib.getHello()+Mp3Lib.getLameVersion() ;
         push = findViewById(R.id.push);
+        changeIp = findViewById(R.id.changeIp);
         push.setText(Mp3Lib.getLameVersion());
+        changeIp.setText(host);
+        editText = findViewById(R.id.loginId) ;
+        editText.setText(PublicConstants.ApiConstants.USER_NAME);
 //        push.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View view) {
@@ -108,32 +120,49 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.tackPhoto:
                 LogUtils.d("tackPhoto---------------------------------");
-                try {
-
-                    videoPushAIDL.tackPicture() ;
-//                    videoPushAIDL.tackPicture(new VideoPushCallback.Stub() {
-//                        @Override
-//                        public void setPicturePath(String s) throws RemoteException {
-//                            LogUtils.d("setPicturePath:"+s);
-//                        }
+//                try {
 //
-//                        @Override
-//                        public void Error(int i, String s) throws RemoteException {
-//
-//                        }
-//                    });
-                } catch (RemoteException e) {
-                    LogUtils.d("Exception ---------------------------------"+e.getMessage());
-                    e.printStackTrace();
-                }
+//                    videoPushAIDL.tackPicture() ;
+////                    videoPushAIDL.tackPicture(new VideoPushCallback.Stub() {
+////                        @Override
+////                        public void setPicturePath(String s) throws RemoteException {
+////                            LogUtils.d("setPicturePath:"+s);
+////                        }
+////
+////                        @Override
+////                        public void Error(int i, String s) throws RemoteException {
+////
+////                        }
+////                    });
+//                } catch (RemoteException e) {
+//                    LogUtils.d("Exception ---------------------------------"+e.getMessage());
+//                    e.printStackTrace();
+//                }
                 break;
             case R.id.recordVideo:
-                try {
-                    videoPushAIDL.recordVideo(isRecord);
-                    isRecord = !isRecord ;
-                } catch (RemoteException e) {
-                    e.printStackTrace();
+//                try {
+//                    videoPushAIDL.recordVideo(isRecord);
+//                    isRecord = !isRecord ;
+//                } catch (RemoteException e) {
+//                    e.printStackTrace();
+//                }
+                break;
+            case R.id.changeIp:
+                if (host.equals(host1)){
+                    host = host2 ;
+                }else host = host1 ;
+                String msg = editText.getText().toString() ;
+                if (msg.length() == 11) {
+                    phone = msg ;
+                    USManager.getSingleton().ServerLogin(msg, host,
+                            7000, 7000, false);
+                    changeIp.setText(host);
+                }else {
+                    Toast.makeText(this, "ID 格式不正确", Toast.LENGTH_SHORT).show();
                 }
+                break;
+            case R.id.sendGeneral:
+
                 break;
                 default:
                     break;
@@ -224,31 +253,33 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void register() {
-        try {
-            videoPushAIDL.registerCallback(new VideoPushCallback.Stub() {
-                @Override
-                public void setPicturePath(String s) throws RemoteException {
-                    LogUtils.d("setPicturePath:"+s);
-                }
-
-                @Override
-                public void Error(int i, String s) throws RemoteException {
-
-                }
-            });
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            videoPushAIDL.registerCallback(new VideoPushCallback.Stub() {
+//                @Override
+//                public void setPicturePath(String s) throws RemoteException {
+//                    LogUtils.d("setPicturePath:"+s);
+//                }
+//
+//                @Override
+//                public void Error(int i, String s) throws RemoteException {
+//
+//                }
+//            });
+//        } catch (RemoteException e) {
+//            e.printStackTrace();
+//        }
 
     }
 
 
     private void setService(String ip, int port, int channelNum){
-        Log.d("cjh", "setService --------------------------------"+ip+port) ;
         if (videoPushAIDL != null){
             try {
-                Log.d("cjh", "setService -----------------2---------------"+ip+port) ;
-                videoPushAIDL.setServerAddress(PublicConstants.ApiConstants.USER_NAME, ip, port, channelNum, true);
+                Log.d("cjh", "setService -----------------2---------------"+ip+","+port) ;
+//                phone != null ? phone :PublicConstants.ApiConstants.USER_NAME ;
+                videoPushAIDL.setServerAddress(phone != null ? phone :PublicConstants.ApiConstants.USER_NAME,
+                        ip, port, channelNum, true);
+//                videoPushAIDL.setServerAddress(PublicConstants.ApiConstants.USER_NAME, ip, port, channelNum);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
