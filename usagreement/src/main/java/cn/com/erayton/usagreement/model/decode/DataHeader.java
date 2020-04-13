@@ -6,6 +6,17 @@ import cn.com.erayton.usagreement.model.encode.HeaderMsg;
 import cn.com.erayton.usagreement.utils.BitOperator;
 import cn.com.erayton.usagreement.utils.HexStringUtils;
 
+/**
+ * JT808协议转义工具类
+ *
+ * <pre>
+ * 0x7d01 <====> 0x7d
+ * 0x7d02 <====> 0x7e
+ * </pre>
+ *
+ * @author hylexus
+ *
+ */
 public class DataHeader {
 
     private static final String FLAG_7D ="0X7D" ;

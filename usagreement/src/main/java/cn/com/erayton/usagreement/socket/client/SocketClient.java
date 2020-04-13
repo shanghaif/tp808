@@ -16,7 +16,6 @@ import cn.com.erayton.usagreement.socket.core.UDPClient;
 import cn.com.erayton.usagreement.utils.BitOperator;
 import cn.com.erayton.usagreement.utils.HexStringUtils;
 import cn.com.erayton.usagreement.utils.LogUtils;
-import cn.com.erayton.usagreement.utils.MsgTransformer;
 import cn.com.erayton.usagreement.utils.Utils;
 
 /**
@@ -496,6 +495,7 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
                     msgHeader.setTotalSubPackage(bitOperator.parseIntFromBytes(data, 12, 2));
                     msgHeader.setSubPackageSeq(bitOperator.parseIntFromBytes(data, 12, 2));
                 }
+                LogUtils.d("--------------------------- hex  --------------------------- \n"+HexStringUtils.toHexString(page)) ;
                 switch (msgHeader.getMsgId()){
                     case Constants.SERVER_COMMOM_RSP:           //  平台通用应答
                         packetData = new ServerGeneralMsg();

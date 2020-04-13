@@ -34,6 +34,30 @@ public class Constants {
     //  设置终端参数
     public static final int TERMINAL_PARAMETERS_SETTING = 0x8103 ;
     //  终端参数子参数
+
+        //  终端心跳发送间隔，单位为秒（s）
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0001 = 0x0001 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0002 = 0x0002 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0003 = 0x0003 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0004 = 0x0004 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0005 = 0x0005 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0006 = 0x0006 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0007 = 0x0007 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0010 = 0x0010 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0011 = 0x0011 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0012 = 0x0012 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0013 = 0x0013 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0014 = 0x0014 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0015 = 0x0015 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0016 = 0x0016 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0017 = 0x0017 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0018 = 0x0018 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0019 = 0x0019 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X001A = 0x001A ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X001B = 0x001B ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X001C = 0x001C ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X001D = 0x001D ;
+
         //  DWORD 位置汇报策略，0：定时汇报；1：定距汇报；2：定时和定距汇报
         public static final int TERMINAL_PARAMETERS_SETTING_0X0020 = 0x0020 ;
         //  位置汇报方案
@@ -58,6 +82,61 @@ public class Constants {
         public static final int TERMINAL_PARAMETERS_SETTING_0X0030 = 0x0030 ;
         //  电子围栏半径（非法位移阈值）
         public static final int TERMINAL_PARAMETERS_SETTING_0X0031 = 0x0031 ;
+
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0040 = 0x0040 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0041 = 0x0041 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0042 = 0x0042 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0043 = 0x0043 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0044 = 0x0044 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0045 = 0x0045 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0046 = 0x0046 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0047 = 0x0047 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0048 = 0x0048 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0049 = 0x0049 ;
+
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0050 = 0x0050 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0051 = 0x0051 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0052 = 0x0052 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0053 = 0x0053 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0054 = 0x0054 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0055 = 0x0055 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0056 = 0x0056 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0057 = 0x0057 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0058 = 0x0058 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0059 = 0x0059 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X005A = 0x005A ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X005B = 0x005B ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X005C = 0x005C ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X005D = 0x005D ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X005E = 0x005E ;
+
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0064 = 0x0064 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0065 = 0x0065 ;
+
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0070 = 0x0070 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0071 = 0x0071 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0072 = 0x0072 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0073 = 0x0073 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0074 = 0x0074 ;
+
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0080 = 0x0080 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0081 = 0x0081 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0082 = 0x0082 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0083 = 0x0083 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0084 = 0x0084 ;
+
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0090 = 0x0090 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0091 = 0x0091 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0092 = 0x0092 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0093 = 0x0093 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0094 = 0x0094 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0095 = 0x0095 ;
+
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0100 = 0x0100 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0101 = 0x0101 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0102 = 0x0102 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0103 = 0x0103 ;
+        public static final int TERMINAL_PARAMETERS_SETTING_0X0110 = 0x0110 ;
 
     //  查询终端参数
     public static final int TERMINAL_PARAMETERS_QUERY = 0x8104 ;

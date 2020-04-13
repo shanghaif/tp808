@@ -70,12 +70,12 @@ public class HexStringUtils {
 		return b;
 	}
 
-	public static void main(String[] args) {
-		String s = "abc你好";
-		String hex = toHexString(s.getBytes());
-		String decode = hexString2Bytes(hex);
-		System.out.println("原字符串:" + s);
-		System.out.println("十六进制字符串:" + hex);
-		System.out.println("还原:" + decode);
-	}
+//	public static void main(String[] args) {
+//		String s = "abc你好";
+//		String hex = toHexString(s.getBytes());
+//		String decode = hexString2Bytes(hex);
+//		System.out.println("原字符串:" + s);
+//		System.out.println("十六进制字符串:" + hex);
+//		System.out.println("还原:" + decode);
+//	}
 }

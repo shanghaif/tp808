@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import com.jakewharton.rxbinding2.view.RxView;
 import com.speedtalk.protocol.utils.MessageUtils;
 
 import java.io.IOException;
