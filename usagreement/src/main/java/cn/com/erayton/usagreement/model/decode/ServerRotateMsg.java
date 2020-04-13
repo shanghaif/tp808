@@ -60,8 +60,8 @@ public class ServerRotateMsg extends PacketData {
         }
         BitOperator bitOperator = BitOperator.getInstance();
         setChannelNum(bitOperator.parseIntFromBytes(tmp, 0, 1));
-        setDirection(bitOperator.parseIntFromBytes(tmp,1, 2));
-        setSpeech(bitOperator.parseIntFromBytes(tmp, 2, 3));
+        setDirection(bitOperator.parseIntFromBytes(tmp,1, 1));
+        setSpeech(bitOperator.parseIntFromBytes(tmp, 2, 1));
     }
 
     @Override
