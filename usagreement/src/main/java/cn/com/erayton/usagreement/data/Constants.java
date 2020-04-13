@@ -178,7 +178,19 @@ public class Constants {
     //  音视频实时传输控制
     public static final int SERVER_AVTRANSMISSION_CONTROL = 0x9102;
 
-
+    //  云台控制指令
+    //  云台旋转
+    public static final int SERVER_CLOUD_CONTROL_ROTATE = 0X9301;
+    //  云台调整焦距
+    public static final int SERVER_CLOUD_CONTROL_FOCALLENGTH = 0X9302;
+    //  云台调整光圈
+    public static final int SERVER_CLOUD_CONTROL_APERTURE = 0X9303;
+    //  云台雨刷
+    public static final int SERVER_CLOUD_CONTROL_WIPER = 0X9304;
+    //  红外补光
+    public static final int SERVER_CLOUD_CONTROL_INFRAREDLIGHT = 0X9305;
+    //  云台变倍
+    public static final int SERVER_CLOUD_CONTROL_ZOOM = 0X9306;
 
 
 

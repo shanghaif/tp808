@@ -11,6 +11,7 @@ import cn.com.erayton.usagreement.model.decode.ServerAVTranslateMsg;
 import cn.com.erayton.usagreement.model.decode.ServerGeneralMsg;
 import cn.com.erayton.usagreement.model.decode.ServerParametersMsg;
 import cn.com.erayton.usagreement.model.decode.ServerRegisterMsg;
+import cn.com.erayton.usagreement.model.decode.ServerRotateMsg;
 import cn.com.erayton.usagreement.socket.core.TCPClient;
 import cn.com.erayton.usagreement.socket.core.UDPClient;
 import cn.com.erayton.usagreement.utils.BitOperator;
@@ -573,6 +574,22 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
                                 ((ServerAVTranslateControlMsg) packetData).getCloseType(), ((ServerAVTranslateControlMsg) packetData).getSteamType());
                         LogUtils.d( "----------------------- 音视频实时传输控制 ---------------------------\n packetData -"+packetData) ;
                         break;
+                    case Constants.SERVER_CLOUD_CONTROL_ROTATE:
+                        packetData = new ServerRotateMsg() ;
+                        packetData.setMsgHeader(msgHeader);
+                        packetData.inflatePackageBody(page);
+                        LogUtils.d( "----------------------- 云台旋转 ---------------------------\n packetData -"+packetData) ;
+                        break;
+                    case Constants.SERVER_CLOUD_CONTROL_FOCALLENGTH:
+                        break;
+                    case Constants.SERVER_CLOUD_CONTROL_APERTURE:
+                        break;
+                    case Constants.SERVER_CLOUD_CONTROL_WIPER:
+                        break;
+                    case Constants.SERVER_CLOUD_CONTROL_INFRAREDLIGHT:
+                        break;
+                    case Constants.SERVER_CLOUD_CONTROL_ZOOM:
+                        break;
 
                     default:
                         packetData = new ServerRegisterMsg();
@@ -735,6 +752,20 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
             case Constants.TERMINAL_LOCATION_BATCH_UPLOAD:
                 return "定位数据批量上传" ;
 
+            //region 云台控制指令 --------------- start ---------------
+            case Constants.SERVER_CLOUD_CONTROL_ROTATE:
+                return "云台旋转";
+            case Constants.SERVER_CLOUD_CONTROL_FOCALLENGTH:
+                return "云台调整焦距";
+            case Constants.SERVER_CLOUD_CONTROL_APERTURE:
+                return "云台调整光圈";
+            case Constants.SERVER_CLOUD_CONTROL_WIPER:
+                return "云台雨刷";
+            case Constants.SERVER_CLOUD_CONTROL_INFRAREDLIGHT:
+                return "红外补光";
+            case Constants.SERVER_CLOUD_CONTROL_ZOOM:
+                return "云台变倍";
+            //endregion --------------- end ---------------
             default:
                 return "其它应答";
         }
