@@ -8,10 +8,21 @@ import cn.com.erayton.usagreement.data.ResponseReason;
 import cn.com.erayton.usagreement.model.decode.PacketData;
 import cn.com.erayton.usagreement.model.decode.ServerAVTranslateControlMsg;
 import cn.com.erayton.usagreement.model.decode.ServerAVTranslateMsg;
+import cn.com.erayton.usagreement.model.decode.ServerApertureMsg;
+import cn.com.erayton.usagreement.model.decode.ServerFileUploadControlMsg;
+import cn.com.erayton.usagreement.model.decode.ServerFileUploadMsg;
+import cn.com.erayton.usagreement.model.decode.ServerFocalLengthMsg;
 import cn.com.erayton.usagreement.model.decode.ServerGeneralMsg;
+import cn.com.erayton.usagreement.model.decode.ServerInfraredlightMsg;
 import cn.com.erayton.usagreement.model.decode.ServerParametersMsg;
 import cn.com.erayton.usagreement.model.decode.ServerRegisterMsg;
+import cn.com.erayton.usagreement.model.decode.ServerResourceQueryMsg;
 import cn.com.erayton.usagreement.model.decode.ServerRotateMsg;
+import cn.com.erayton.usagreement.model.decode.ServerTransferStatusMsg;
+import cn.com.erayton.usagreement.model.decode.ServerVideoReplayControlMsg;
+import cn.com.erayton.usagreement.model.decode.ServerVideoReplayMsg;
+import cn.com.erayton.usagreement.model.decode.ServerWiperMsg;
+import cn.com.erayton.usagreement.model.decode.ServerZoomMsg;
 import cn.com.erayton.usagreement.socket.core.TCPClient;
 import cn.com.erayton.usagreement.socket.core.UDPClient;
 import cn.com.erayton.usagreement.utils.BitOperator;
@@ -543,20 +554,23 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
                         break;
 
                     case Constants.TERMINAL_PARAMETERS_SETTING:
-                        LogUtils.d( "----------------------- 设置终端参数 ---------------------------\n packetData -"+packetData) ;
                         packetData = new ServerParametersMsg() ;
                         packetData.setMsgHeader(msgHeader);
                         packetData.inflatePackageBody(page);
-                        LogUtils.d( "--------------------------------------------------\n ((ServerParametersMsg) packetData)"+((ServerParametersMsg) packetData)) ;
+                        LogUtils.d( "----------------------- 设置终端参数 ---------------------------\n packetData -"+packetData) ;
                         listener.onTernimalParameterSetting(((ServerParametersMsg) packetData).getInstructCount(), ((ServerParametersMsg) packetData).getGpsSleepInterval(),
                                 ((ServerParametersMsg) packetData).getGpsDefInterval(), packetData.getMsgHeader().getFlowId());
                         break;
                     case Constants.TERMINAL_PARAMETERS_SPECIFY_QUERY:
-                        LogUtils.d( "----------------------- 查询指定终端参数 ---------------------------\n packetData -"+packetData) ;
                         listener.queryTernimalParameterSetting(msgHeader.getFlowId());
+                        LogUtils.d( "----------------------- 查询指定终端参数 ---------------------------\n packetData -"+packetData) ;
+                        break;
+
+
+                    case Constants.SERVER_AVPROPERTIES_QUERY:
+                        LogUtils.d( "----------------------- 查询终端音视频属性 0x9003 消息体为空---------------------------\n packetData -"+packetData) ;
                         break;
                     case Constants.SERVER_AVTRANSMISSION_REQUEST:
-                        LogUtils.d( "----------------------- 实时音视频传输请求 ---------------------------\n packetData -"+packetData) ;
                         packetData = new ServerAVTranslateMsg() ;
                         packetData.setMsgHeader(msgHeader);
                         packetData.inflatePackageBody(page);
@@ -565,6 +579,7 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
                                 ((ServerAVTranslateMsg) packetData).getUdpPort(), ((ServerAVTranslateMsg) packetData).getChannelNum(),
                                 ((ServerAVTranslateMsg) packetData).getDataType(), ((ServerAVTranslateMsg) packetData).getSteamType(),
                                 packetData.getMsgHeader().getFlowId());
+                        LogUtils.d( "----------------------- 实时音视频传输请求 0x9101 ---------------------------\n packetData -"+packetData) ;
                         break;
                     case Constants.SERVER_AVTRANSMISSION_CONTROL:
                         packetData = new ServerAVTranslateControlMsg() ;
@@ -572,23 +587,83 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
                         packetData.inflatePackageBody(page);
                         listener.onAVControl(((ServerAVTranslateControlMsg) packetData).getControlCode(), ((ServerAVTranslateControlMsg) packetData).getChannelNum(),
                                 ((ServerAVTranslateControlMsg) packetData).getCloseType(), ((ServerAVTranslateControlMsg) packetData).getSteamType());
-                        LogUtils.d( "----------------------- 音视频实时传输控制 ---------------------------\n packetData -"+packetData) ;
+                        LogUtils.d( "----------------------- 音视频实时传输控制 0x9102 ---------------------------\n packetData -"+packetData) ;
                         break;
+                    case Constants.SERVER_AVSTATUS_NOTIC:
+                        packetData = new ServerTransferStatusMsg() ;
+                        packetData.setMsgHeader(msgHeader);
+                        packetData.inflatePackageBody(page);
+                        LogUtils.d( "----------------------- 实时音视频传输状态通知 0x9105 ---------------------------\n packetData -"+packetData) ;
+                        break;
+                    case Constants.SERVER_RESOURCE_QUERY:
+                        packetData = new ServerResourceQueryMsg() ;
+                        packetData.setMsgHeader(msgHeader);
+                        packetData.inflatePackageBody(page);
+                        LogUtils.d( "----------------------- 查询资源列表 0x9205 ---------------------------\n packetData -"+packetData) ;
+                        SocketClientSender.sendAVResourceList(msgHeader.getFlowId()) ;
+                        break;
+
+                    case Constants.SERVER_AVREPLAY_REQUEST:
+                        packetData = new ServerVideoReplayMsg() ;
+                        packetData.setMsgHeader(msgHeader);
+                        packetData.inflatePackageBody(page);
+                        LogUtils.d( "----------------------- 平台下发远程录像回放请求 0x9201 ---------------------------\n packetData -"+packetData) ;
+                        break;
+                    case Constants.SERVER_AVREPLAY_CONTROL:
+                        packetData = new ServerVideoReplayControlMsg() ;
+                        packetData.setMsgHeader(msgHeader);
+                        packetData.inflatePackageBody(page);
+                        LogUtils.d( "----------------------- 平台下发远程录像回放控制 0x9202 ---------------------------\n packetData -"+packetData) ;
+                        break;
+                    case Constants.SERVER_FILEUPLOAD_REQUEST:
+                        packetData = new ServerFileUploadMsg() ;
+                        packetData.setMsgHeader(msgHeader);
+                        packetData.inflatePackageBody(page);
+                        LogUtils.d( "----------------------- 文件上传指令 0x9206 ---------------------------\n packetData -"+packetData) ;
+                        break;
+                    case Constants.SERVER_FILEUPLOAD_CONTROL:
+                        packetData = new ServerFileUploadControlMsg() ;
+                        packetData.setMsgHeader(msgHeader);
+                        packetData.inflatePackageBody(page);
+                        LogUtils.d( "----------------------- 文件上传控制 0x9207 ---------------------------\n packetData -"+packetData) ;
+                        break;
+
+
                     case Constants.SERVER_CLOUD_CONTROL_ROTATE:
                         packetData = new ServerRotateMsg() ;
                         packetData.setMsgHeader(msgHeader);
                         packetData.inflatePackageBody(page);
-                        LogUtils.d( "----------------------- 云台旋转 ---------------------------\n packetData -"+packetData) ;
+                        LogUtils.d( "----------------------- 云台旋转 0X9301 ---------------------------\n packetData -"+packetData) ;
                         break;
                     case Constants.SERVER_CLOUD_CONTROL_FOCALLENGTH:
+                        packetData = new ServerFocalLengthMsg() ;
+                        packetData.setMsgHeader(msgHeader);
+                        packetData.inflatePackageBody(page);
+                        LogUtils.d( "----------------------- 云台调整焦距 0X9302 ---------------------------\n packetData -"+packetData) ;
                         break;
                     case Constants.SERVER_CLOUD_CONTROL_APERTURE:
+                        packetData = new ServerApertureMsg() ;
+                        packetData.setMsgHeader(msgHeader);
+                        packetData.inflatePackageBody(page);
+                        LogUtils.d( "----------------------- 云台调整光圈 0X9303 ---------------------------\n packetData -"+packetData) ;
                         break;
                     case Constants.SERVER_CLOUD_CONTROL_WIPER:
+                        packetData = new ServerWiperMsg() ;
+                        packetData.setMsgHeader(msgHeader);
+                        packetData.inflatePackageBody(page);
+                        LogUtils.d( "----------------------- 云台控制雨刷 0X9304 ---------------------------\n packetData -"+packetData) ;
                         break;
                     case Constants.SERVER_CLOUD_CONTROL_INFRAREDLIGHT:
+                        packetData = new ServerInfraredlightMsg() ;
+                        packetData.setMsgHeader(msgHeader);
+                        packetData.inflatePackageBody(page);
+                        LogUtils.d( "----------------------- 红外补光 0X9305 ---------------------------\n packetData -"+packetData) ;
                         break;
                     case Constants.SERVER_CLOUD_CONTROL_ZOOM:
+                        packetData = new ServerZoomMsg() ;
+                        packetData.setMsgHeader(msgHeader);
+                        packetData.inflatePackageBody(page);
+                        LogUtils.d( "----------------------- 云台变倍 0X9306 ---------------------------\n packetData -"+packetData) ;
                         break;
 
                     default:

@@ -10,6 +10,7 @@ import cn.com.erayton.usagreement.model.encode.TerminalGPSMsg;
 import cn.com.erayton.usagreement.model.encode.TerminalGeneralMsg;
 import cn.com.erayton.usagreement.model.encode.TerminalParametersMsg;
 import cn.com.erayton.usagreement.model.encode.TerminalRegisterMsg;
+import cn.com.erayton.usagreement.model.encode.TerminalResourceMsg;
 import cn.com.erayton.usagreement.model.model.TerminalAuthInfo;
 import cn.com.erayton.usagreement.model.model.TerminalGPSInfo;
 import cn.com.erayton.usagreement.model.model.TerminalGeneralInfo;
@@ -172,6 +173,24 @@ public class SocketClientSender {
 
         return send(msg, isAsyn, isUdp) ;
     }
+
+    /**音视频资源列表上传
+     *
+     * @param serNum
+     * @return
+     */
+    public static boolean sendAVResourceList(int serNum){
+        if (socketClient == null) return false ;
+        TerminalResourceMsg msg = new TerminalResourceMsg(serNum) ;
+        //  header
+        PacketData.MsgHeader header = getHeader();
+        header.setMsgId(Constants.SERVER_PARAY_RSP);
+        header.setMsgBodyLength(msg.getBodyLength());
+        msg.setMsgHeader(header);
+
+        return send(msg, true, false) ;
+    }
+
 
     public static boolean send(byte[] msg, boolean isAsyn, boolean isUdp){
         if (!isUdp){

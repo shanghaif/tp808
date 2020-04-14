@@ -6,18 +6,15 @@ import cn.com.erayton.usagreement.utils.BitOperator;
 import cn.com.erayton.usagreement.utils.LogUtils;
 
 /**
- * 云台旋转
- * 平台请求旋转镜头
- *  方向: 0, 停止   1, 上    2, 下    3, 左    4, 右
- *  速度: 0 ~ 255
+ * 云台变倍
+ * 平台请求变倍控制
+ *  0, 调大   1, 调小
  * */
-public class ServerRotateMsg extends PacketData {
+public class ServerZoomMsg extends PacketData {
     //  逻辑通道号
     private int channelNum ;
-    //  方向
-    private int direction ;
-    //  速度
-    private int speech ;
+    //  变倍控制
+    private int zoom ;
 
     public int getChannelNum() {
         return channelNum;
@@ -27,20 +24,12 @@ public class ServerRotateMsg extends PacketData {
         this.channelNum = channelNum;
     }
 
-    public int getDirection() {
-        return direction;
+    public int getZoom() {
+        return zoom;
     }
 
-    public void setDirection(int direction) {
-        this.direction = direction;
-    }
-
-    public int getSpeech() {
-        return speech;
-    }
-
-    public void setSpeech(int speech) {
-        this.speech = speech;
+    public void setZoom(int zoom) {
+        this.zoom = zoom;
     }
 
     @Override
@@ -62,16 +51,14 @@ public class ServerRotateMsg extends PacketData {
         }
         BitOperator bitOperator = BitOperator.getInstance();
         setChannelNum(bitOperator.parseIntFromBytes(tmp, 0, 1));
-        setDirection(bitOperator.parseIntFromBytes(tmp,1, 1));
-        setSpeech(bitOperator.parseIntFromBytes(tmp, 2, 1));
+        setZoom(bitOperator.parseIntFromBytes(tmp,1, 1));
     }
 
     @Override
     public String toString() {
         return "ServerRotateMsg{" +
                 "channelNum=" + channelNum +
-                ", direction=" + direction +
-                ", speech=" + speech +
+                ", zoom=" + zoom +
                 '}';
     }
 }

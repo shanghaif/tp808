@@ -1,46 +1,34 @@
 package cn.com.erayton.usagreement.model.decode;
 
-
 import cn.com.erayton.usagreement.data.Constants;
 import cn.com.erayton.usagreement.utils.BitOperator;
 import cn.com.erayton.usagreement.utils.LogUtils;
 
 /**
- * 云台旋转
- * 平台请求旋转镜头
- *  方向: 0, 停止   1, 上    2, 下    3, 左    4, 右
- *  速度: 0 ~ 255
+ * 文件上传控制
  * */
-public class ServerRotateMsg extends PacketData {
-    //  逻辑通道号
-    private int channelNum ;
-    //  方向
-    private int direction ;
-    //  速度
-    private int speech ;
+public class ServerFileUploadControlMsg extends PacketData {
 
-    public int getChannelNum() {
-        return channelNum;
+    //  应答流水号
+    private int serNum ;
+    //  上传控制
+    private int uploadControl ;
+
+
+    public int getSerNum() {
+        return serNum;
     }
 
-    public void setChannelNum(int channelNum) {
-        this.channelNum = channelNum;
+    public void setSerNum(int serNum) {
+        this.serNum = serNum;
     }
 
-    public int getDirection() {
-        return direction;
+    public int getUploadControl() {
+        return uploadControl;
     }
 
-    public void setDirection(int direction) {
-        this.direction = direction;
-    }
-
-    public int getSpeech() {
-        return speech;
-    }
-
-    public void setSpeech(int speech) {
-        this.speech = speech;
+    public void setUploadControl(int uploadControl) {
+        this.uploadControl = uploadControl;
     }
 
     @Override
@@ -48,8 +36,10 @@ public class ServerRotateMsg extends PacketData {
         return new byte[0];
     }
 
+
     @Override
     public void inflatePackageBody(byte[] data) {
+
         int msgBodyLength = getMsgHeader().getMsgBodyLength();
         LogUtils.d("inflatePackageBody_msgBodyLength: " + msgBodyLength);
         byte[] tmp = new byte[msgHeader.getMsgBodyLength()];
@@ -61,17 +51,16 @@ public class ServerRotateMsg extends PacketData {
             System.arraycopy(data, Constants.MSGBODY_START_INDEX, tmp, 0, tmp.length);
         }
         BitOperator bitOperator = BitOperator.getInstance();
-        setChannelNum(bitOperator.parseIntFromBytes(tmp, 0, 1));
-        setDirection(bitOperator.parseIntFromBytes(tmp,1, 1));
-        setSpeech(bitOperator.parseIntFromBytes(tmp, 2, 1));
+        setSerNum(bitOperator.parseIntFromBytes(tmp, 0, 2));
+        setUploadControl(bitOperator.parseIntFromBytes(tmp, 2, 1));
+
     }
 
     @Override
     public String toString() {
-        return "ServerRotateMsg{" +
-                "channelNum=" + channelNum +
-                ", direction=" + direction +
-                ", speech=" + speech +
+        return "ServerFileUploadControlMsg{" +
+                "serNum=" + serNum +
+                ", uploadControl=" + uploadControl +
                 '}';
     }
 }

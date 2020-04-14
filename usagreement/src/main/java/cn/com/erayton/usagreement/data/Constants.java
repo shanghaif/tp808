@@ -173,10 +173,27 @@ public class Constants {
 
 //    p32
 
+    //  查询终端音视频属性
+    public static final int SERVER_AVPROPERTIES_QUERY = 0x9003;
     //  实时音视频传输请求
     public static final int SERVER_AVTRANSMISSION_REQUEST = 0x9101;
     //  音视频实时传输控制
     public static final int SERVER_AVTRANSMISSION_CONTROL = 0x9102;
+    //  实时音视频传输状态通知
+    public static final int SERVER_AVSTATUS_NOTIC = 0x9105;
+
+
+    //  平台下发远程录像回放请求
+    public static final int SERVER_AVREPLAY_REQUEST = 0x9201;
+    //  平台下发远程录像回放控制
+    public static final int SERVER_AVREPLAY_CONTROL = 0x9202;
+    //  查询资源列表
+    public static final int SERVER_RESOURCE_QUERY = 0x9205;
+    //  文件上传指令
+    public static final int SERVER_FILEUPLOAD_REQUEST = 0x9206;
+    //  文件上传控制
+    public static final int SERVER_FILEUPLOAD_CONTROL = 0x9207;
+
 
     //  云台控制指令
     //  云台旋转
@@ -185,7 +202,7 @@ public class Constants {
     public static final int SERVER_CLOUD_CONTROL_FOCALLENGTH = 0X9302;
     //  云台调整光圈
     public static final int SERVER_CLOUD_CONTROL_APERTURE = 0X9303;
-    //  云台雨刷
+    //  云台控制雨刷
     public static final int SERVER_CLOUD_CONTROL_WIPER = 0X9304;
     //  红外补光
     public static final int SERVER_CLOUD_CONTROL_INFRAREDLIGHT = 0X9305;
