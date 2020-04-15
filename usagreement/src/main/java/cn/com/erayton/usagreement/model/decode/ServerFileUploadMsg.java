@@ -1,12 +1,15 @@
 package cn.com.erayton.usagreement.model.decode;
 
 
+import java.util.Arrays;
+
 import cn.com.erayton.usagreement.data.Constants;
 import cn.com.erayton.usagreement.utils.BitOperator;
 import cn.com.erayton.usagreement.utils.LogUtils;
 
 /**
  * 文件上传指令
+ * 回复通用回复,回复后按照要求上传文件
  * */
 public class ServerFileUploadMsg extends PacketData {
     //  当前长度, 仅用于解析
@@ -43,8 +46,8 @@ public class ServerFileUploadMsg extends PacketData {
     private int steamType ;
     //  存储位置(存储器类型)
     private int memoryType ;
-    //  任务执行条件
-    private int TaskConditions ;
+    //  任务执行条件[1]   用 bit 位表示
+    private byte[] TaskConditions ;
 
 
     private int getNowLength() {
@@ -180,11 +183,11 @@ public class ServerFileUploadMsg extends PacketData {
         this.memoryType = memoryType;
     }
 
-    public int getTaskConditions() {
+    public byte[] getTaskConditions() {
         return TaskConditions;
     }
 
-    public void setTaskConditions(int taskConditions) {
+    public void setTaskConditions(byte[] taskConditions) {
         TaskConditions = taskConditions;
     }
 
@@ -236,14 +239,31 @@ public class ServerFileUploadMsg extends PacketData {
         setResourceType(bitOperator.parseIntFromBytes(tmp, 27+getNowLength(), 1));
         setSteamType(bitOperator.parseIntFromBytes(tmp, 28+getNowLength(), 1));
         setMemoryType(bitOperator.parseIntFromBytes(tmp, 29+getNowLength(), 1));
-        setTaskConditions(bitOperator.parseIntFromBytes(tmp, 30+getNowLength(), 1));
+        setTaskConditions(bitOperator.subByte(tmp, 30+getNowLength(), 1));
         LogUtils.d("inflatePackageBody_mowLength: " + getNowLength());
     }
 
     @Override
     public String toString() {
-        return "ServerRotateMsg{" +
-                "channelNum=" + channelNum +
+        return "ServerFileUploadMsg{" +
+                "nowLength=" + nowLength +
+                ", ipLength=" + ipLength +
+                ", host='" + host + '\'' +
+                ", port=" + port +
+                ", nameLength=" + nameLength +
+                ", userName='" + userName + '\'' +
+                ", passLength=" + passLength +
+                ", password='" + password + '\'' +
+                ", pathLength=" + pathLength +
+                ", uploadPath='" + uploadPath + '\'' +
+                ", channelNum=" + channelNum +
+                ", startTime='" + startTime + '\'' +
+                ", endTime='" + endTime + '\'' +
+                ", warningMark=" + Arrays.toString(warningMark) +
+                ", resourceType=" + resourceType +
+                ", steamType=" + steamType +
+                ", memoryType=" + memoryType +
+                ", TaskConditions=" + Arrays.toString(TaskConditions) +
                 '}';
     }
 }

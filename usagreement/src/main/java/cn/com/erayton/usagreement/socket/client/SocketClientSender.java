@@ -2,20 +2,29 @@ package cn.com.erayton.usagreement.socket.client;
 
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import cn.com.erayton.usagreement.data.Constants;
 import cn.com.erayton.usagreement.model.decode.EmptyPacketData;
 import cn.com.erayton.usagreement.model.decode.PacketData;
+import cn.com.erayton.usagreement.model.encode.TerminalAVPropertieMsg;
 import cn.com.erayton.usagreement.model.encode.TerminalAuthMsg;
 import cn.com.erayton.usagreement.model.encode.TerminalGPSMsg;
 import cn.com.erayton.usagreement.model.encode.TerminalGeneralMsg;
 import cn.com.erayton.usagreement.model.encode.TerminalParametersMsg;
 import cn.com.erayton.usagreement.model.encode.TerminalRegisterMsg;
 import cn.com.erayton.usagreement.model.encode.TerminalResourceMsg;
+import cn.com.erayton.usagreement.model.encode.TerminalResourceStatusMsg;
+import cn.com.erayton.usagreement.model.encode.TerminalRiderShipMsg;
+import cn.com.erayton.usagreement.model.model.TerminalAVPropertieInfo;
 import cn.com.erayton.usagreement.model.model.TerminalAuthInfo;
 import cn.com.erayton.usagreement.model.model.TerminalGPSInfo;
 import cn.com.erayton.usagreement.model.model.TerminalGeneralInfo;
 import cn.com.erayton.usagreement.model.model.TerminalParametersInfo;
 import cn.com.erayton.usagreement.model.model.TerminalRegInfo;
+import cn.com.erayton.usagreement.model.model.TerminalResourceInfo;
+import cn.com.erayton.usagreement.model.model.TerminalRiderShipInfo;
 import cn.com.erayton.usagreement.utils.BitOperator;
 import cn.com.erayton.usagreement.utils.LogUtils;
 
@@ -174,21 +183,90 @@ public class SocketClientSender {
         return send(msg, isAsyn, isUdp) ;
     }
 
+    /**终端上传音视频属性
+     *
+     * */
+    public static boolean sendAVPropertie(TerminalAVPropertieInfo info, boolean isAsyn, boolean isUdp){
+        if (socketClient == null)   return false ;
+
+        TerminalAVPropertieMsg msg = new TerminalAVPropertieMsg();
+        msg.setInfo(info);
+        //  header
+        PacketData.MsgHeader header = getHeader();
+        header.setMsgId(Constants.TERMINAL_AVPROPERTIE_UPLOAD);
+        header.setMsgBodyLength(msg.getBodyLength());
+        msg.setMsgHeader(header);
+
+        return send(msg, isAsyn, isUdp) ;
+    }
+
+    /**终端上传getoff乘客流量
+     *
+     * */
+    public static boolean sendRidership(TerminalRiderShipInfo info, boolean isAsyn, boolean isUdp){
+        if (socketClient == null)   return false ;
+
+        TerminalRiderShipMsg msg = new TerminalRiderShipMsg();
+        msg.setInfo(info);
+        //  header
+        PacketData.MsgHeader header = getHeader();
+        header.setMsgId(Constants.TERMINAL_RIDERSHIP_UPLOAD);
+        header.setMsgBodyLength(msg.getBodyLength());
+        msg.setMsgHeader(header);
+
+        return send(msg, isAsyn, isUdp) ;
+    }
+
     /**音视频资源列表上传
      *
      * @param serNum
      * @return
      */
-    public static boolean sendAVResourceList(int serNum){
-        if (socketClient == null) return false ;
-        TerminalResourceMsg msg = new TerminalResourceMsg(serNum) ;
-        //  header
+    public static boolean sendAVResourceList(int serNum, List<TerminalResourceInfo> infos, boolean isAsyn, boolean isUdp){
+        if (socketClient == null)
+            return false;
+//        List<TerminalResourceInfo> infos = new ArrayList<>() ;
+//        TerminalResourceInfo info = new TerminalResourceInfo();
+//        info.setChannelNum(1);
+//        info.setStartTime("200415000000");
+//        info.setEndTime("200415235959");
+//        // byte[] a = { 0, 0, 0, 0, 0, 0, 0, 0 };
+//        byte[] a = { 1, 1, 1, 1, 1, 1, 1, 1 };
+//        info.setWrang(a);
+//        info.setResourceType(0);
+//        info.setSteamType(1);
+//        info.setMemoryType(1);
+//
+//        info.setFileSize(1024);
+//        for (int i = 0; i < 5; i++) {
+//            infos.add(info);
+//        }
+        TerminalResourceMsg msg = new TerminalResourceMsg();
+        msg.setSerNum(serNum);
+        msg.setInfoList(infos);
+        // header
         PacketData.MsgHeader header = getHeader();
-        header.setMsgId(Constants.SERVER_PARAY_RSP);
+        header.setMsgId(Constants.TERMINAL_RESOURCE_LIST_UPLOAD);
         header.setMsgBodyLength(msg.getBodyLength());
         msg.setMsgHeader(header);
 
-        return send(msg, true, false) ;
+        return send(msg, isAsyn, isUdp);
+    }
+
+    /** 文件上传完成通知
+     *
+     * */
+    public static boolean sendUploadStatus(int serNum, int result, boolean isAsyn, boolean isUdp){
+        if (socketClient == null) return false ;
+        TerminalResourceStatusMsg msg = new TerminalResourceStatusMsg() ;
+        msg.setSerNum(serNum);
+        msg.setResult(result);
+        //  header
+        PacketData.MsgHeader header = getHeader();
+        header.setMsgId(Constants.TERMINAL_RESOURCE_STUTUS_UPLOAD);
+        header.setMsgBodyLength(msg.getBodyLength());
+        msg.setMsgHeader(header);
+        return send(msg, isAsyn, isUdp) ;
     }
 
 

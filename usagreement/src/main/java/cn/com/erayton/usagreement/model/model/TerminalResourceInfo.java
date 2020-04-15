@@ -17,8 +17,8 @@ public class TerminalResourceInfo {
     private int steamType ;
     //  存储类型    1, 主存储器 2, 灾备存储器
     private int memoryType ;
-    //  文件大小, 单位字节
-    private int fileSize ;
+    //  文件大小, 单位字节(BYTE)  // 1024 -> 1K
+    private long fileSize ;
 
     public int getChannelNum() {
         return channelNum;
@@ -76,11 +76,11 @@ public class TerminalResourceInfo {
         this.memoryType = memoryType;
     }
 
-    public int getFileSize() {
+    public long getFileSize() {
         return fileSize;
     }
 
-    public void setFileSize(int fileSize) {
+    public void setFileSize(long fileSize) {
         this.fileSize = fileSize;
     }
 

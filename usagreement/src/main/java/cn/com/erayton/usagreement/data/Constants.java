@@ -254,6 +254,17 @@ public class Constants {
     public static final int TERMINAL_VEHICLE_CONTROL_RESPONSE = 0x0500;
     //  定位数据批量上传
     public static final int TERMINAL_LOCATION_BATCH_UPLOAD = 0x0704;
+    //  终端上传音视频属性
+    public static final int TERMINAL_AVPROPERTIE_UPLOAD = 0x1003;
+    //  终端上传乘客流量
+    public static final int TERMINAL_RIDERSHIP_UPLOAD = 0x1005;
+    //  音视频资源列表上传
+    public static final int TERMINAL_RESOURCE_LIST_UPLOAD= 0x1205;
+    //  文件上传完成通知
+    public static final int TERMINAL_RESOURCE_STUTUS_UPLOAD= 0x1206;
+
+
+
 
     public static int TCP_CLIENT_IDLE_MINUTES = 30;
 

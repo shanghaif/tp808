@@ -3,11 +3,12 @@ package cn.com.erayton.usagreement.model.encode;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import cn.com.erayton.usagreement.model.decode.PacketData;
 import cn.com.erayton.usagreement.model.model.TerminalAVDataInfo;
 import cn.com.erayton.usagreement.utils.BitOperator;
 import cn.com.erayton.usagreement.utils.TimeUtils;
 
-public class TerminalAVDataMsg {
+public class TerminalAVDataMsg extends PacketData {
 
     private TerminalAVDataInfo terminalAVDataInfo ;
 
@@ -18,6 +19,11 @@ public class TerminalAVDataMsg {
 
     public void setTerminalAVDataInfo(TerminalAVDataInfo terminalAVDataInfo) {
         this.terminalAVDataInfo = terminalAVDataInfo;
+    }
+
+    @Override
+    public void inflatePackageBody(byte[] data) {
+
     }
 
     public byte[] packageDataBody2Byte() {

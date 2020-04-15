@@ -23,6 +23,7 @@ import cn.com.erayton.usagreement.model.decode.ServerVideoReplayControlMsg;
 import cn.com.erayton.usagreement.model.decode.ServerVideoReplayMsg;
 import cn.com.erayton.usagreement.model.decode.ServerWiperMsg;
 import cn.com.erayton.usagreement.model.decode.ServerZoomMsg;
+import cn.com.erayton.usagreement.model.model.TerminalAVPropertieInfo;
 import cn.com.erayton.usagreement.socket.core.TCPClient;
 import cn.com.erayton.usagreement.socket.core.UDPClient;
 import cn.com.erayton.usagreement.utils.BitOperator;
@@ -569,6 +570,20 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
 
                     case Constants.SERVER_AVPROPERTIES_QUERY:
                         LogUtils.d( "----------------------- 查询终端音视频属性 0x9003 消息体为空---------------------------\n packetData -"+packetData) ;
+
+                        TerminalAVPropertieInfo info = new TerminalAVPropertieInfo() ;
+                        info.setAudioEncoding(1);
+                        info.setAudioChannel(1);
+                        info.setAudioRate(0);
+                        info.setAudioNum(0);
+                        info.setAudioLength(1234);
+                        info.setAudioSupport(1);
+                        info.setVideoEncoding(98);
+                        info.setMaxAudioChannel(1);
+                        info.setMaxVideoChannel(1);
+
+                        SocketClientSender.sendAVPropertie(info, false, false) ;
+
                         break;
                     case Constants.SERVER_AVTRANSMISSION_REQUEST:
                         packetData = new ServerAVTranslateMsg() ;
@@ -600,7 +615,7 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
                         packetData.setMsgHeader(msgHeader);
                         packetData.inflatePackageBody(page);
                         LogUtils.d( "----------------------- 查询资源列表 0x9205 ---------------------------\n packetData -"+packetData) ;
-                        SocketClientSender.sendAVResourceList(msgHeader.getFlowId()) ;
+//                        SocketClientSender.sendAVResourceList(msgHeader.getFlowId()) ;
                         break;
 
                     case Constants.SERVER_AVREPLAY_REQUEST:
