@@ -56,7 +56,7 @@ public class TerminalGPSMsg extends PacketData {
             baos.write(BitOperator.getInstance().integerTo2Bytes(terminalGPSInfo.getSpeed()));
             baos.write(BitOperator.getInstance().integerTo2Bytes(terminalGPSInfo.getDirection()));
 //            baos.write(BCD8421Operator.getInstance().getBCDTime());
-            baos.write(BitOperator.getInstance().getBCDTime());
+            baos.write(terminalGPSInfo.getBCDTime());
             baos.write(BitOperator.getInstance().integerTo1Bytes(terminalGPSInfo.getAdditionalInformationId()));
             baos.write(BitOperator.getInstance().integerTo1Bytes(terminalGPSInfo.getAdditionalInformationLength()));
             baos.write(BitOperator.getInstance().integerTo4Bytes(terminalGPSInfo.getMileage()));

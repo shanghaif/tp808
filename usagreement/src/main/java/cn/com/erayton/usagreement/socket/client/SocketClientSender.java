@@ -200,7 +200,7 @@ public class SocketClientSender {
         return send(msg, isAsyn, isUdp) ;
     }
 
-    /**终端上传getoff乘客流量
+    /**终端上传乘客流量
      *
      * */
     public static boolean sendRidership(TerminalRiderShipInfo info, boolean isAsyn, boolean isUdp){

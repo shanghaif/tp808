@@ -6,7 +6,6 @@ import java.io.IOException;
 
 import cn.com.erayton.usagreement.model.decode.PacketData;
 import cn.com.erayton.usagreement.model.model.TerminalAVPropertieInfo;
-import cn.com.erayton.usagreement.model.model.TerminalResourceInfo;
 import cn.com.erayton.usagreement.utils.BitOperator;
 import cn.com.erayton.usagreement.utils.LogUtils;
 
