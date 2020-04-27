@@ -44,7 +44,7 @@ public class WriteMp4 {
     private WriteFileCallback writeFileCallback = new WriteFileCallback() {
         @Override
         public void success(String name) {
-
+            //  成功之后返回文件名
         }
 
         @Override
@@ -124,6 +124,7 @@ public class WriteMp4 {
 
     private void setPath() {
         OtherUtil.CreateDirFile(dirpath);
+        //  文件名规则， 开始时间(YYMMDDHHmmss)+结束时间(YYMMDDHHmmss)+通道号+资源类型(音视频,音频,视频,)+码流类型(主,子码流)
         path = dirpath + File.separator + System.currentTimeMillis() + ".mp4";
     }
 
