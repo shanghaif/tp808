@@ -61,11 +61,11 @@ public class Publish implements TextureView.SurfaceTextureListener {
     //视频录制
     private RecordEncoderVD recordEncoderVD = null;
     //音频采集
-//    private VoiceRecord voiceRecord;
+    private VoiceRecord voiceRecord;
     //UDP发送类
     private TcpSend tcpSend;
     private UdpSend udpSend;
-    private int rotateAngle = 90;//270 图片需要翻转角度
+    private int rotateAngle = 90;   //  270 图片需要翻转角度
     private boolean isCameraBegin = false;
     private boolean useuvPicture = false;
 
@@ -149,9 +149,10 @@ public class Publish implements TextureView.SurfaceTextureListener {
      */
     private void initCamera() {
         try {
-            //遍历所有摄像头,查找符合当前选择的摄像头
+            //  遍历所有摄像头,查找符合当前选择的摄像头
             for (String cameraId : manager.getCameraIdList()) {
                 CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
+                Log.e("cjh", "camera:"+manager.getCameraIdList().length+",characteristics.get(CameraCharacteristics.LENS_FACING)"+characteristics.get(CameraCharacteristics.LENS_FACING)) ;
                 if (characteristics.get(CameraCharacteristics.LENS_FACING) ==
                         (map.isRotate() ? CameraCharacteristics.LENS_FACING_FRONT : CameraCharacteristics.LENS_FACING_BACK)) {
                     //获取StreamConfigurationMap管理摄像头支持的所有输出格式和尺寸,根据TextureView的尺寸设置预览尺寸
@@ -191,9 +192,9 @@ public class Publish implements TextureView.SurfaceTextureListener {
             recordEncoderVD = new RecordEncoderVD(previewSize, map.getFrameRate(), map.getCollectionBitrate(), writeMp4, map.getCodetype());
             vdEncoder = new VDEncoder(previewSize, publishSize, map.getFrameRate(), map.getPublishBitrate(), map.getCodetype(), tcpSend);
             //初始化音频编码
-//            voiceRecord = new VoiceRecord(udpSend, map.getCollectionbitrate_vc(), map.getPublishbitrate_vc(), writeMp4);
+            voiceRecord = new VoiceRecord(udpSend, map.getCollectionbitrate_vc(), map.getPublishbitrate_vc(), writeMp4);
             vdEncoder.start();
-//            voiceRecord.start();
+            voiceRecord.start();
         }
     }
 
@@ -469,13 +470,13 @@ public class Publish implements TextureView.SurfaceTextureListener {
     }
 
     public void startRecode() {
-//        voiceRecord.startRecode();
+        voiceRecord.startRecode();
         recordEncoderVD.start();
         writeMp4.start();
     }
 
     public void stopRecode() {
-//        voiceRecord.stopRecode();
+        voiceRecord.stopRecode();
         recordEncoderVD.stop();
         writeMp4.stop();
     }
@@ -551,7 +552,7 @@ public class Publish implements TextureView.SurfaceTextureListener {
         releaseCamera();
         recordEncoderVD.destroy();
         vdEncoder.destroy();
-//        voiceRecord.destroy();
+        voiceRecord.destroy();
         tcpSend.destroy();
         frameHandler.removeCallbacksAndMessages(null);
         controlFrameRateThread.quitSafely();

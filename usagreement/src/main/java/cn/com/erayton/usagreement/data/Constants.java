@@ -371,8 +371,7 @@ public class Constants {
     public static int VIDEO_INIT_TIME = 2 ;
 
     //  kpbs 进制 ？
-    private static int SCALE = 1000 ;
-//    private static int SCALE = 1024 ;
+    private static int SCALE = 1024 ;
 
     //  帧率
     public static int FRAME_RATE = 30 ;
