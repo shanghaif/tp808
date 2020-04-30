@@ -115,13 +115,6 @@ public class OtherUtil {
         }
     }
 
-    public static void CreateDirFile(String dirpath) {
-        File dirfile = new File(dirpath);
-        if (!dirfile.exists()) {
-            dirfile.mkdirs();
-        }
-    }
-
 
     /**
      * 检测是否支持H265硬编码

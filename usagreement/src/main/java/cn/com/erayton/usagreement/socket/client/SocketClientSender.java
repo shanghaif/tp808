@@ -217,8 +217,8 @@ public class SocketClientSender {
         return send(msg, isAsyn, isUdp) ;
     }
 
-    /**音视频资源列表上传
-     *
+    /**
+     * 音视频资源列表上传
      * @param serNum
      * @return
      */
@@ -251,6 +251,18 @@ public class SocketClientSender {
         msg.setMsgHeader(header);
 
         return send(msg, isAsyn, isUdp);
+    }
+
+    /**
+     * 文件上传回复(通用回复)
+     * */
+    public static boolean sendUploadResp(int seNum, int code){
+        Log.d("SocketClient", "sendUploadResp ---------------------------------") ;
+        TerminalGeneralInfo terminalGeneralInfo = new TerminalGeneralInfo() ;
+        terminalGeneralInfo.setSeNum(seNum);
+        terminalGeneralInfo.setRespId(Constants.SERVER_FILEUPLOAD_REQUEST);
+        terminalGeneralInfo.setResult(code);
+        return sendGeneralReponse(terminalGeneralInfo, false, false) ;
     }
 
     /** 文件上传完成通知

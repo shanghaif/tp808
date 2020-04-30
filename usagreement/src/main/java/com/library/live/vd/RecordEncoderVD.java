@@ -116,7 +116,7 @@ public class RecordEncoderVD {
                             writeMp4.addTrack(mediaCodec.getOutputFormat(), WriteMp4.video);
                         }
                         while (outputBufferIndex >= 0) {
-                            //写文件
+                            //  写文件
                             writeMp4.write(WriteMp4.video, mediaCodec.getOutputBuffer(outputBufferIndex), bufferInfo);
 
                             mediaCodec.releaseOutputBuffer(outputBufferIndex, false);

@@ -82,6 +82,18 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
          * @param steamType 码流类型
          * */
         void onAVControl(int controlCode, int channelNum, int avCode, int steamType) ;
+
+        /**
+         * 查询资源列表
+         * */
+        void onQueryResourceReq(int serNum) ;
+
+        /** 文件上传指令
+         *
+         * @param seNum
+         * @param msg
+         */
+        void onFileUploadReq(int seNum, ServerFileUploadMsg msg) ;
     }
 
 
@@ -615,7 +627,8 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
                         packetData.setMsgHeader(msgHeader);
                         packetData.inflatePackageBody(page);
                         LogUtils.d( "----------------------- 查询资源列表 0x9205 ---------------------------\n packetData -"+packetData) ;
-//                        SocketClientSender.sendAVResourceList(msgHeader.getFlowId()) ;
+//                        SocketClientSender.sendAVResourceList(msgHeader.getFlowId(),false, false) ;
+                        listener.onQueryResourceReq(msgHeader.getFlowId());
                         break;
 
                     case Constants.SERVER_AVREPLAY_REQUEST:
@@ -635,6 +648,9 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
                         packetData.setMsgHeader(msgHeader);
                         packetData.inflatePackageBody(page);
                         LogUtils.d( "----------------------- 文件上传指令 0x9206 ---------------------------\n packetData -"+packetData) ;
+                        SocketClientSender.sendUploadResp(msgHeader.getFlowId(), 0) ;
+                        listener.onFileUploadReq(msgHeader.getFlowId(), (ServerFileUploadMsg)packetData);
+
                         break;
                     case Constants.SERVER_FILEUPLOAD_CONTROL:
                         packetData = new ServerFileUploadControlMsg() ;

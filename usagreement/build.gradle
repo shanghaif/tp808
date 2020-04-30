@@ -8,7 +8,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 26
         versionCode 9
-        versionName "0.9.0"
+        versionName "0.9.1"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 //        multiDexEnabled true
@@ -95,7 +95,11 @@ dependencies {
 
     //数据库框架
     annotationProcessor "com.github.Raizlabs.DBFlow:dbflow-processor:${dbFlow_version}"
-    compileOnly "com.github.Raizlabs.DBFlow:dbflow-core:${dbFlow_version}"
-    compileOnly "com.github.Raizlabs.DBFlow:dbflow:${dbFlow_version}"
+    api "com.github.Raizlabs.DBFlow:dbflow-core:${dbFlow_version}"
+//    compileOnly "com.github.Raizlabs.DBFlow:dbflow-core:${dbFlow_version}"
+    api "com.github.Raizlabs.DBFlow:dbflow:${dbFlow_version}"
+//    compileOnly "com.github.Raizlabs.DBFlow:dbflow:${dbFlow_version}"
+    api group: 'commons-net', name: 'commons-net', version: '3.6'
+//    compileOnly group: 'commons-net', name: 'commons-net', version: '3.6'
 
 }

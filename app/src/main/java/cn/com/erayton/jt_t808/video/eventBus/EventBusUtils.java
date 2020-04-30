@@ -34,6 +34,8 @@ public class EventBusUtils {
     public static final class EventCode {
         public static final int OPEN_VIDEO = 1;
         public static final int CLOSE_VIDEO = 2;
+        public static final int QUERY_RESOURCE = 3;
+        public static final int FILEUPLOAD_REQ = 4;
 
         // other more
     }

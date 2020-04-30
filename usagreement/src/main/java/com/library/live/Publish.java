@@ -35,6 +35,7 @@ import com.library.live.vc.VoiceRecord;
 import com.library.live.vd.RecordEncoderVD;
 import com.library.live.vd.VDEncoder;
 import com.library.live.view.PublishView;
+import com.library.util.FileUtils;
 import com.library.util.ImagUtil;
 import com.library.util.OtherUtil;
 import com.library.util.Rotate3dAnimation;
@@ -60,10 +61,10 @@ public class Publish implements TextureView.SurfaceTextureListener {
     //视频录制
     private RecordEncoderVD recordEncoderVD = null;
     //音频采集
-    private VoiceRecord voiceRecord;
+//    private VoiceRecord voiceRecord;
     //UDP发送类
     private TcpSend tcpSend;
-//    private TcpSend udpSend;
+    private UdpSend udpSend;
     private int rotateAngle = 90;//270 图片需要翻转角度
     private boolean isCameraBegin = false;
     private boolean useuvPicture = false;
@@ -162,6 +163,7 @@ public class Publish implements TextureView.SurfaceTextureListener {
                         manager.setTorchMode(cameraId, false);
                     }
                     rotateAngle = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
+
                     initCode(map.getOutputSizes(SurfaceTexture.class));
                     break;
                 }
@@ -182,7 +184,8 @@ public class Publish implements TextureView.SurfaceTextureListener {
             //计算比例(需对调宽高)
             tcpSend.setWeight((double) publishSize.getHeight() / publishSize.getWidth());
             if (map.isPreview()) {
-                map.getPublishView().setWeight((double) previewSize.getHeight() / previewSize.getWidth());
+                //  设置预览界面的大小
+//                map.getPublishView().setWeight((double) previewSize.getHeight() / previewSize.getWidth());
             }
 
             recordEncoderVD = new RecordEncoderVD(previewSize, map.getFrameRate(), map.getCollectionBitrate(), writeMp4, map.getCodetype());
@@ -190,7 +193,6 @@ public class Publish implements TextureView.SurfaceTextureListener {
             //初始化音频编码
 //            voiceRecord = new VoiceRecord(udpSend, map.getCollectionbitrate_vc(), map.getPublishbitrate_vc(), writeMp4);
             vdEncoder.start();
-            //  TODO 线程未关闭
 //            voiceRecord.start();
         }
     }
@@ -254,6 +256,9 @@ public class Publish implements TextureView.SurfaceTextureListener {
             List<Surface> surfaces = new ArrayList<>();
             //预览数据输出
             final CaptureRequest.Builder previewRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+            previewRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON);
+            previewRequestBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_SINGLE);
+            previewRequestBuilder.set(CaptureRequest.CONTROL_AE_EXPOSURE_COMPENSATION,6);
             previewRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
             previewRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
             Surface previewSurface = getPreviewImageReaderSurface();
@@ -278,6 +283,7 @@ public class Publish implements TextureView.SurfaceTextureListener {
                 surfaces.add(pictureSurface);
                 captureRequest = captureRequestBuilder.build();
             }
+
 
             //创建相机捕获会话，第一个参数是捕获数据的输出Surface列表(同时输出屏幕，输出预览，拍照)，
             // 第二个参数是CameraCaptureSession的状态回调接口，当它创建好后会回调onConfigured方法，
@@ -396,7 +402,7 @@ public class Publish implements TextureView.SurfaceTextureListener {
     }
 
     private void saveImage(byte[] bytes) {
-        OtherUtil.CreateDirFile(map.getPicturedirpath());
+        FileUtils.createDirFile(map.getPicturedirpath());
         BufferedOutputStream output;
         String path = map.getPicturedirpath() + File.separator + System.currentTimeMillis() + ".jpg";
         try {

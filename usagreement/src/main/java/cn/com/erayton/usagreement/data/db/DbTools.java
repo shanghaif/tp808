@@ -1,6 +1,13 @@
 package cn.com.erayton.usagreement.data.db;
 
 
+import com.raizlabs.android.dbflow.sql.language.Delete;
+import com.raizlabs.android.dbflow.sql.language.SQLite;
+
+import java.util.List;
+
+import cn.com.erayton.usagreement.data.db.table.VideoRecord;
+import cn.com.erayton.usagreement.data.db.table.VideoRecord_Table;
 
 /**
  * 数据库操作工具
@@ -9,9 +16,83 @@ package cn.com.erayton.usagreement.data.db;
 
 public class DbTools {
 
-    public static void insertVideoRecord(){
+    /**
+     * 添加视频记录
+     * @param fileName  文件名
+     * @param startTime 开始时间
+     * @param endTime   结束时间
+     * @param channel   通道号
+     * @param fileSize  文件大小
+     */
+    public static void insertVideoRecord(String fileName, long startTime,
+         long endTime, int channel, long fileSize){
+        VideoRecord videoRecord = new VideoRecord() ;
+        videoRecord.setName(fileName);
+        videoRecord.setStartTime(startTime);
+        videoRecord.setEndTime(endTime);
+        videoRecord.setChannel(channel);
+        videoRecord.setSourceType(0);
+        videoRecord.setStreamType(1);
+        videoRecord.setMemoryType(1);
+        videoRecord.setSize(fileSize);
+        //  报警类型暂时不使用此字段
+        videoRecord.setWarning("");
+        videoRecord.save() ;
+    }
+
+    /** 查找指定时间内的数据
+     *
+     * @param startTime 开始时间
+     * @param endTime   结束时间
+     * @return  数据列表 VideoRecord
+     */
+    public static List<VideoRecord> queryVideoRecord(long startTime, long endTime){
+        return SQLite.select()
+                .from(VideoRecord.class)
+                .where(VideoRecord_Table.startTime.greaterThanOrEq(startTime),
+                        VideoRecord_Table.endTime.lessThanOrEq(endTime))
+                .queryList() ;
+    }
+    public static VideoRecord queryVideoRecord(long startTime){
+        return SQLite.select()
+                .from(VideoRecord.class)
+                .where(VideoRecord_Table.startTime.greaterThanOrEq(startTime))
+                .querySingle() ;
+    }
+    public static List<VideoRecord> queryVideoRecord(){
+        return SQLite.select()
+                .from(VideoRecord.class)
+                .queryList() ;
+    }
+
+    /** 删除指定时间内的数据
+     * 同时需要清除对应文件夹里面的记录
+     * @param startTime 开始时间
+     * @param endTime   结束时间
+     */
+    public static void delQueryVideoRecord(long startTime, long endTime){
+        for (VideoRecord v:queryVideoRecord(startTime, endTime)){
+            //  TODO 删除文件
+            SQLite.delete(VideoRecord.class)
+                    .where(VideoRecord_Table.name.eq(v.getName()))
+                    .execute();
+        }
+//        SQLite.delete(VideoRecord.class)
+//                .where(VideoRecord_Table.startTime.greaterThanOrEq(startTime),
+//                        VideoRecord_Table.endTime.lessThanOrEq(endTime))
+//                .execute();
 
     }
+
+    /** 删除表内的所有记录
+     * 如果是图片或者音视频，同时需要清除对应文件夹里面的记录
+     * @param cls   表名
+     * @param <T>   Java 类
+     */
+    public static <T> void deleteAllData(Class<T> cls){
+        Delete.table(cls);
+    }
+
 
 //    /**
 //     * 对于向数据库插入数据的操作，对于已经继承了 BaseModel 的 bean，

@@ -12,7 +12,7 @@ import cn.com.erayton.usagreement.data.db.config.MyDatabase;
  * Created by Administrator on 2019/1/28.
  */
 @Table(database = MyDatabase.class)
-public class VideoRecord extends BaseModel {
+public class VoiceRecord extends BaseModel {
     @PrimaryKey(autoincrement = true)
     private long id;
     @Column
@@ -112,22 +112,5 @@ public class VideoRecord extends BaseModel {
 
     public void setWarning(String warning) {
         this.warning = warning;
-    }
-
-
-    @Override
-    public String toString() {
-        return "VideoRecord{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", startTime=" + startTime +
-                ", endTime=" + endTime +
-                ", channel=" + channel +
-                ", sourceType=" + sourceType +
-                ", streamType=" + streamType +
-                ", memoryType=" + memoryType +
-                ", size=" + size +
-                ", warning='" + warning + '\'' +
-                '}';
     }
 }

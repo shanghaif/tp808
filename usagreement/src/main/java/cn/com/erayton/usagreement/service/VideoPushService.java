@@ -13,6 +13,7 @@ import android.os.Environment;
 import android.os.IBinder;
 import android.os.RemoteCallbackList;
 import android.os.RemoteException;
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
@@ -150,7 +151,7 @@ public class VideoPushService extends Service {
 
 
     private void initPushVideo(String ip, int port, int channelNum){
-        publish = new Publish.Buider(this, publishView)
+        publish = new Publish.Buider(this, null)
 //                .setPushMode(new UdpSend(phone, ip, port, channelNum))
                 .setPushMode(new TcpSend(phone, ip, port, channelNum))
                 //  帧率
@@ -192,7 +193,6 @@ public class VideoPushService extends Service {
                         //  倒计时完毕，处理方式
 //                        tuistar.performClick() ;
                         startVideo() ;
-
                     }
                 })
                 .subscribe() ;
@@ -202,6 +202,7 @@ public class VideoPushService extends Service {
         setNotificationMessage(getString(R.string.tip_video_recording), false) ;
         try {
             publish.start();
+//            alertPromission();
             return true ;
         }catch (Exception e) {
             return false;
@@ -212,6 +213,7 @@ public class VideoPushService extends Service {
         setNotificationMessage(getString(R.string.tip_video_record_pause), true) ;
         try {
             publish.stop();
+//            destoryFloatWindow() ;
             return true ;
         }catch (Exception e) {
             return false;
@@ -425,5 +427,21 @@ public class VideoPushService extends Service {
             windowManager.removeView(floatingLayout);
             floatingLayout = null;
         }
+    }
+
+    private void alertPromission(){
+        //  6.0以后版本
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            //  如果没有覆盖权限
+            if (!Settings.canDrawOverlays(this)) {
+                //  引导用户去开启权限
+                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
+                startActivity(intent);
+                return;
+            } else {
+                //6.0之前不用管
+            }
+        }
+        initWindow();
     }
 }

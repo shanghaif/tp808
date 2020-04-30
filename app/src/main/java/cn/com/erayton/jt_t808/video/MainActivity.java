@@ -6,8 +6,11 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.provider.MediaStore;
+import android.provider.UserDictionary;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -19,8 +22,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 
+import com.library.live.Publish;
+import com.library.live.stream.TcpSend;
+import com.library.live.view.PublishView;
+import com.library.util.FTPUtils;
+
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import cn.com.erayton.jt_t808.R;
 import cn.com.erayton.jt_t808.constants.PublicConstants;
@@ -29,22 +41,26 @@ import cn.com.erayton.jt_t808.video.eventBus.event.BroadCastMainEvent;
 import cn.com.erayton.jt_t808.video.manager.USManager;
 import cn.com.erayton.jt_t808.video.video.Send;
 import cn.com.erayton.usagreement.VideoPushAIDL;
+import cn.com.erayton.usagreement.data.Constants;
+import cn.com.erayton.usagreement.data.db.DbTools;
+import cn.com.erayton.usagreement.data.db.table.VideoRecord;
+import cn.com.erayton.usagreement.model.decode.ServerFileUploadMsg;
+import cn.com.erayton.usagreement.model.model.TerminalResourceInfo;
 import cn.com.erayton.usagreement.service.VideoPushService;
+import cn.com.erayton.usagreement.socket.client.SocketClient;
+import cn.com.erayton.usagreement.socket.client.SocketClientSender;
 import cn.com.erayton.usagreement.utils.LogUtils;
 import cn.erayton.voicelib.Mp3Lib;
 
 public class MainActivity extends AppCompatActivity {
     private final int REQUEST_CAMERA = 666;
-    private Button push;
-    private Button changeIp;
     private String host1 = "106.14.186.44" ;
+    private String host = "" ;
     private String host2 = "video.erayton.cn" ;
-    private String phone ;
-    private String host = host1 ;
-    private EditText editText ;
-
-//    private Button pull;
-//    private Button voice;
+    private String phone ="23803560285" ;
+    PublishView publishView ;
+    Publish publish ;
+    Button button , ipButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,14 +68,23 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main_video);
         EventBusUtils.register(this);
         requestpermission();
-//        testVideoHex();
-//        USManager.getSingleton().ServerLogin("23803641388", "106.14.186.44",
-        USManager.getSingleton().ServerLogin(PublicConstants.ApiConstants.USER_NAME, host,
-                7000, 7000, false);
+        host = host2 ;
+        initView();
+    }
 
-
-        bindServiceAidl() ;
-//        OtherUtil.executeCmd(PublicConstants.ApiConstants.HOST, false) ;
+    public void buttonClick(View view){
+        switch (view.getId()){
+            case R.id.changeIp:
+                if (host.equalsIgnoreCase(host1)){
+                    host = host2 ;
+                }else {
+                    host = host1 ;
+                }
+                ipButton.setText(host);
+                USManager.getSingleton().ServerLogin(phone, host,
+                        7000, 7000, false);
+            break;
+        }
     }
 
 
@@ -68,12 +93,12 @@ public class MainActivity extends AppCompatActivity {
         //  SD卡读写权限
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
             //权限已授权，功能操作
-            gostart();
+//            gostart();
         } else {
             //未授权，提起权限申请
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
                 Toast.makeText(this, "没有权限", Toast.LENGTH_SHORT).show();
-                gostart();
+//                gostart();
             } else {
                 //申请权限
                 ActivityCompat.requestPermissions(this, new String[]{
@@ -86,89 +111,46 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void gostart() {
-//        String s = Mp3Lib.getHello()+Mp3Lib.getLameVersion() ;
-        push = findViewById(R.id.push);
-        changeIp = findViewById(R.id.changeIp);
-        push.setText(Mp3Lib.getLameVersion());
-        changeIp.setText(host);
-        editText = findViewById(R.id.loginId) ;
-        editText.setText(PublicConstants.ApiConstants.USER_NAME);
-//        push.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                try {
-//                    videoPushAIDL.distoryVideo();
-//                } catch (RemoteException e) {
-//                    e.printStackTrace();
-//                }
-////                startActivity(new Intent(MainActivity.this, Send.class));
-//            }
-//        });
-    }
-
-    boolean isRecord = true ;
-
-    public void buttonClick(View view){
-        switch (view.getId()){
-            case R.id.push:
-                try {
-                    videoPushAIDL.distoryVideo();
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
-                break;
-            case R.id.tackPhoto:
-                LogUtils.d("tackPhoto---------------------------------");
-//                try {
-//
-//                    videoPushAIDL.tackPicture() ;
-////                    videoPushAIDL.tackPicture(new VideoPushCallback.Stub() {
-////                        @Override
-////                        public void setPicturePath(String s) throws RemoteException {
-////                            LogUtils.d("setPicturePath:"+s);
-////                        }
-////
-////                        @Override
-////                        public void Error(int i, String s) throws RemoteException {
-////
-////                        }
-////                    });
-//                } catch (RemoteException e) {
-//                    LogUtils.d("Exception ---------------------------------"+e.getMessage());
-//                    e.printStackTrace();
-//                }
-                break;
-            case R.id.recordVideo:
-//                try {
-//                    videoPushAIDL.recordVideo(isRecord);
-//                    isRecord = !isRecord ;
-//                } catch (RemoteException e) {
-//                    e.printStackTrace();
-//                }
-                break;
-            case R.id.changeIp:
-                if (host.equals(host1)){
-                    host = host2 ;
-                }else host = host1 ;
-                String msg = editText.getText().toString() ;
-                if (msg.length() == 11) {
-                    phone = msg ;
-                    USManager.getSingleton().ServerLogin(msg, host,
-                            7000, 7000, false);
-                    changeIp.setText(host);
+    private boolean isRecord = false ;
+    private void initView() {
+        publishView = findViewById(R.id.publishView) ;
+        button = findViewById(R.id.record_btn) ;
+        ipButton = findViewById(R.id.changeIp) ;
+        ipButton.setText(host);
+        ipButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                ipButton.setVisibility(View.GONE);
+                return false;
+            }
+        });
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isRecord){
+                    publish.stopRecode();
+                    button.setText("start Record");
+                    isRecord = false ;
                 }else {
-                    Toast.makeText(this, "ID 格式不正确", Toast.LENGTH_SHORT).show();
+                    publish.startRecode();
+                    button.setText("stop Record");
+                    isRecord = true ;
                 }
-                break;
-            case R.id.sendGeneral:
-
-                break;
-                default:
-                    break;
-        }
-
+            }
+        });
+        button.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if (ipButton.getVisibility() == View.GONE){
+                    ipButton.setVisibility(View.VISIBLE);
+                }
+                return false;
+            }
+        });
+        USManager.getSingleton().ServerLogin(phone, host,
+                7000, 7000, false);
     }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -177,17 +159,23 @@ public class MainActivity extends AppCompatActivity {
             //判断权限是否申请通过
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 //授权成功
-                gostart();
+//                gostart();
+                Toast.makeText(this, "授权成功", Toast.LENGTH_SHORT).show();
             } else {
                 //授权失败
                 Toast.makeText(this, "没有权限", Toast.LENGTH_SHORT).show();
-                gostart();
+//                gostart();
             }
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        EventBusUtils.unregister(this);
+        super.onDestroy();
+    }
 
     /**
      * 主页事件
@@ -198,91 +186,124 @@ public class MainActivity extends AppCompatActivity {
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(BroadCastMainEvent event) {
-        LogUtils.e("onEventMainThread ----------------");
+        LogUtils.e("onEventMainThread ----------------"+event);
         switch (event.getCode()){
             case EventBusUtils.EventCode.OPEN_VIDEO:
 //                ServerAVTranslateMsg msg = (ServerAVTranslateMsg) event.getData();
-                setService(event.getHost(), event.getTcpPort(), event.getChannelNum());
+//                setService(event.getHost(), event.getTcpPort(), event.getChannelNum());
+                initVideo(event.getHost(), event.getTcpPort(), event.getChannelNum());
+
                 break;
             case EventBusUtils.EventCode.CLOSE_VIDEO:
-                try {
-                    videoPushAIDL.distoryVideo() ;
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
+//                    videoPushAIDL.distoryVideo() ;
+//                    publish.stop();
+//                stopVideo();
+
                 break;
-                default:
-                    break;
+            case EventBusUtils.EventCode.QUERY_RESOURCE:
+//                    videoPushAIDL.distoryVideo() ;
+//                    publish.stop();
+                Log.e("cjh", "FILEUPLOAD_REQ------------") ;
+                stopVideo((Integer) event.getData());
+
+                break;
+            case EventBusUtils.EventCode.FILEUPLOAD_REQ:
+//                    videoPushAIDL.distoryVideo() ;
+//                    publish.stop();
+                fileUpload(event.getFlowId(), (ServerFileUploadMsg)event.getData());
+                break;
+            default:
+                break;
         }
 
     }
 
 
-    private void toOtherPage(Bundle bundle){
-        Intent intent = new Intent(this, Send.class) ;
-        intent.putExtras(bundle) ;
-        startActivity(intent);
-        finish();
+    private void initVideo(String ip, int port, int channelNum){
+        publishView.setVisibility(View.VISIBLE);
+        button.setVisibility(View.VISIBLE);
+        publish = new Publish.Buider(this, publishView)
+//                .setPushMode(new UdpSend(phone, ip, port, channelNum))
+                .setPushMode(new TcpSend(phone, ip, port, channelNum))
+                //  帧率
+                .setFrameRate(Constants.FRAME_RATE)
+                //  编码方式
+                .setVideoCode(Constants.VIDEO_ENCODING)
+                //  是否预览
+                .setIsPreview(Constants.PREVIEW)
+                //  推流码率
+                .setPublishBitrate(Constants.VIDEO_PUSH_RATE)
+                //  采集码率
+                .setCollectionBitrate(Constants.VIDEO_SAMPLING_RATE)
+                //  音频采集码率
+                .setCollectionBitrateVC(Constants.VOICE_SAMPLING_RATE)
+                //  音频推流码率
+                .setPublishBitrateVC(Constants.VOICE_PUSH_RATE)
+                //  推流分辨率
+                .setPublishSize(Constants.PUSHER_RESOLUTION_W, Constants.PUSHER_RESOLUTION_H)
+                //  预览分辨率
+                .setPreviewSize(Constants.PREVIEW_RESOLUTION_W, Constants.PREVIEW_RESOLUTION_H)
+                //  摄像头选择
+                .setRotate(Constants.CAMERA)
+                .setVideoDirPath(Environment.getExternalStorageDirectory().getPath() + File.separator + "erayTonLive")
+                .setPictureDirPath(Environment.getExternalStorageDirectory().getPath() + File.separator + "erayTonPicture")
+                .setCenterScaleType(true)
+                .setScreenshotsMode(Publish.TAKEPHOTO)
+                .build();
+        publish.start();
     }
 
-    @Override
-    protected void onDestroy() {
-        EventBusUtils.unregister(this);
-        super.onDestroy();
-    }
-
-
-    private VideoPushAIDL videoPushAIDL ;
-    private void bindServiceAidl(){
-        Intent intent = new Intent(this, VideoPushService.class) ;
-        bindService(intent, new ServiceConnection() {
-            @Override
-            public void onServiceConnected(ComponentName name, IBinder service) {
-                videoPushAIDL = VideoPushAIDL.Stub.asInterface(service) ;
-//                register() ;
-            }
-
-
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-
-            }
-        },BIND_AUTO_CREATE) ;
-
-//        stopService(intent) ;
-    }
-
-    private void register() {
-//        try {
-//            videoPushAIDL.registerCallback(new VideoPushCallback.Stub() {
-//                @Override
-//                public void setPicturePath(String s) throws RemoteException {
-//                    LogUtils.d("setPicturePath:"+s);
-//                }
-//
-//                @Override
-//                public void Error(int i, String s) throws RemoteException {
-//
-//                }
-//            });
-//        } catch (RemoteException e) {
-//            e.printStackTrace();
-//        }
-
-    }
-
-
-    private void setService(String ip, int port, int channelNum){
-        if (videoPushAIDL != null){
-            try {
-                Log.d("cjh", "setService -----------------2---------------"+ip+","+port) ;
-//                phone != null ? phone :PublicConstants.ApiConstants.USER_NAME ;
-                videoPushAIDL.setServerAddress(phone != null ? phone :PublicConstants.ApiConstants.USER_NAME,
-                        ip, port, channelNum, true);
-//                videoPushAIDL.setServerAddress(PublicConstants.ApiConstants.USER_NAME, ip, port, channelNum);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
+    public void stopVideo(int seNum){
+        List<TerminalResourceInfo> infos = new ArrayList<>() ;
+        byte[] a = { 1, 1, 1, 1, 1, 1, 1, 1 };
+        for (VideoRecord v:DbTools.queryVideoRecord()){
+            TerminalResourceInfo info = new TerminalResourceInfo() ;
+            Log.e("cjh", "list:"+v) ;
+            info.setChannelNum(v.getChannel());
+            info.setStartTime(String.valueOf(v.getStartTime()));
+            info.setEndTime(String.valueOf(v.getEndTime()));
+            // byte[] a = { 0, 0, 0, 0, 0, 0, 0, 0 };
+            info.setWrang(a);
+            info.setResourceType(v.getSourceType());
+            info.setSteamType(v.getStreamType());
+            info.setMemoryType(v.getMemoryType());
+            info.setFileSize(v.getSize());
+            infos.add(info) ;
         }
+
+        USManager.getSingleton().SendAVResourceList(seNum, infos) ;
+    }
+
+    private void fileUpload(final int seNum, final ServerFileUploadMsg msg){
+        //  文件上传，通过开始时间和结束时间，找到文件路径
+        final String uri =DbTools.queryVideoRecord(Long.parseLong(msg.getStartTime())).getName() ;    //  文件路径
+        FTPUtils.getInstance().initFtpClient(msg.getHost(), msg.getPort(),
+                msg.getUserName(), msg.getPassword());
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+//                        FTPUtils.getInstance().connectFtp() ;
+
+                FTPUtils.getInstance().uploadFile(msg.getUploadPath(),
+                        msg.getStartTime() + ".mp4", uri, new FTPUtils.FTPListener() {
+                            @Override
+                            public void Success() {
+                                SocketClientSender.sendUploadStatus(seNum, 0, false, false) ;
+                            }
+
+                            @Override
+                            public void Status(int code, String msg) {
+
+                            }
+
+                            @Override
+                            public void Failer(String errorMsg) {
+                                SocketClientSender.sendUploadStatus(seNum, 1, false, false) ;
+                            }
+                        });
+            }
+        }).start();
+
+//        SocketClientSender.sendUploadStatus(seNum, 0, false, false) ;
     }
 }

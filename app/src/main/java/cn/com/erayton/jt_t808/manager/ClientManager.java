@@ -3,6 +3,7 @@ package cn.com.erayton.jt_t808.manager;
 import java.util.Arrays;
 
 import cn.com.erayton.jt_t808.constants.PublicConstants;
+import cn.com.erayton.usagreement.model.decode.ServerFileUploadMsg;
 import cn.com.erayton.usagreement.socket.client.SocketClient;
 import cn.com.erayton.usagreement.socket.client.SocketClientSender;
 import cn.com.erayton.usagreement.utils.LogUtils;
@@ -98,6 +99,17 @@ public class ClientManager {
         public void onAVControl(int i, int i1, int i2, int i3) {
 
         }
+
+        @Override
+        public void onQueryResourceReq(int serNum) {
+
+        }
+
+        @Override
+        public void onFileUploadReq(int seNum, ServerFileUploadMsg msg) {
+
+        }
+
 
     } ;
 }

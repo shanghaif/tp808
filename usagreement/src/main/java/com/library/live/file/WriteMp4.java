@@ -8,17 +8,31 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.library.common.WriteFileCallback;
+import com.library.util.FileUtils;
 import com.library.util.OtherUtil;
+import com.library.util.RegularUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+
+import cn.com.erayton.usagreement.data.db.DbTools;
+import cn.com.erayton.usagreement.utils.BitOperator;
 
 /**
  * 视频录制与保存
  */
 
 public class WriteMp4 {
+    //  录制开始时间
+    private static String startTime ;
+    //  录制结束时间
+    private static String endTime ;
+
+    private final String format="%s_%s_%d_%d_%d" ;
+    private int channel = 0;
+
+
     public static final int RECODE_STATUS_START = 0;
     public static final int RECODE_STATUS_STOP = 1;
     public static final int RECODE_STATUS_READY = 2;
@@ -44,12 +58,18 @@ public class WriteMp4 {
     private WriteFileCallback writeFileCallback = new WriteFileCallback() {
         @Override
         public void success(String name) {
+            Log.e("cjh", "fileName"+name) ;
             //  成功之后返回文件名
+            String fileName = RegularUtils.getOneResult(name, RegularUtils.videoRex);
+            //  处理文件名
+            String[] names = fileName.split("_") ;
+            DbTools.insertVideoRecord(name, Long.parseLong(names[0]),  Long.parseLong(names[1]),
+                    Integer.parseInt(names[2]), FileUtils.getFileSize(name));
         }
 
         @Override
         public void failure(String err) {
-
+            Log.e("cjh", "failure"+err) ;
         }
     };
 
@@ -74,6 +94,7 @@ public class WriteMp4 {
 
 
     public void start() {
+        startTime = BitOperator.getInstance().getNowBCDTimeString() ;
         RECODE_STATUS = RECODE_STATUS_READY;
         synchronized (lock) {
             if (voiceFormat != null && videoFormat != null && mMediaMuxer == null) {
@@ -123,18 +144,26 @@ public class WriteMp4 {
     }
 
     private void setPath() {
-        OtherUtil.CreateDirFile(dirpath);
-        //  文件名规则， 开始时间(YYMMDDHHmmss)+结束时间(YYMMDDHHmmss)+通道号+资源类型(音视频,音频,视频,)+码流类型(主,子码流)
-        path = dirpath + File.separator + System.currentTimeMillis() + ".mp4";
+        FileUtils.createDirFile(dirpath);
+//        //  文件名规则， 开始时间(YYMMDDHHmmss)_通道号_资源类型(音视频,音频,视频,)_码流类型(主,子码流)
+//        String format="%s_%d_%d_%d" ;
+        //  文件名规则， 开始时间(YYMMDDHHmmss)_结束时间(YYMMDDHHmmss)_通道号_资源类型(音视频,音频,视频,)_码流类型(主,子码流)
+//        String format="%s_%s_%d_%d_%d" ;
+//        int channel = 0;
+//        path = dirpath + File.separator + String.format(format, startTime, channel, 0, 0) + ".mp4";
+//        path = dirpath + File.separator + String.format(format, startTime, "%s", channel, 0, 0) + ".mp4";
+        path = dirpath + File.separator + startTime+".mp4";
     }
 
     public void stop() {
         synchronized (lock) {
             if (RECODE_STATUS == RECODE_STATUS_START) {
+                endTime = BitOperator.getInstance().getNowBCDTimeString() ;
                 boolean iscatch = false;
                 try {
                     mMediaMuxer.release();
                     if (frameNum >= 20) {
+                        path = FileUtils.FixFileName(path, String.format(format, startTime, endTime, channel, 0, 0)) ;
                         writeFileCallback.success(path);
                     }
                     Log.d("app_WriteMp4", "文件录制关闭");

@@ -598,6 +598,12 @@ public class BitOperator {
         return string2Bcd(f.format(date));
     }
 
+
+    public String getNowBCDTimeString() {
+        Date date = new Date() ;
+        return getBCDTime(date);
+    }
+
     public String getBCDTime(Date date) {
         // SimpleDateFormat f = new SimpleDateFormat("今天是"+"yyyy年MM月dd日 E kk点mm分");
         // SimpleDateFormat f = new SimpleDateFormat("yy-MM-dd-hh-mm-ss");
@@ -605,6 +611,7 @@ public class BitOperator {
         LogUtils.i("getBCDTime- " + f.format(date));
         return f.format(date);
     }
+
 
     //  ===================================================================
 

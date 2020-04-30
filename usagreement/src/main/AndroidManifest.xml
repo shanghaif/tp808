@@ -20,6 +20,7 @@
         tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.UPDATE_DEVICE_STATS"
         tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permissionmission.SYSTEM_OVERLAY_WINDOW" />
 
     <application>
         <service android:name="cn.com.erayton.usagreement.service.VideoPushService"

@@ -17,6 +17,10 @@ public class BroadCastMainEvent extends EventBusEvent {
     public BroadCastMainEvent(int code, Object data) {
         super(code, data);
     }
+    public BroadCastMainEvent(int code, int flowId, Object data) {
+        super(code, data);
+        setFlowId(flowId);
+    }
 
 
     /**

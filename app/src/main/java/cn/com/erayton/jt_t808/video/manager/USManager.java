@@ -7,14 +7,18 @@ import android.util.Log;
 
 import com.speedtalk.protocol.tscobjs.paramobjs.IP;
 
+import java.util.List;
+
 import cn.com.erayton.jt_t808.constants.PublicConstants;
 import cn.com.erayton.jt_t808.video.eventBus.EventBusUtils;
 import cn.com.erayton.jt_t808.video.eventBus.event.BroadCastMainEvent;
 import cn.com.erayton.usagreement.data.Constants;
+import cn.com.erayton.usagreement.model.decode.ServerFileUploadMsg;
 import cn.com.erayton.usagreement.model.model.TerminalAuthInfo;
 import cn.com.erayton.usagreement.model.model.TerminalGeneralInfo;
 import cn.com.erayton.usagreement.model.model.TerminalParametersInfo;
 import cn.com.erayton.usagreement.model.model.TerminalRegInfo;
+import cn.com.erayton.usagreement.model.model.TerminalResourceInfo;
 import cn.com.erayton.usagreement.socket.client.SocketClient;
 import cn.com.erayton.usagreement.socket.client.SocketClientSender;
 
@@ -236,6 +240,11 @@ public class USManager {
         SocketClientSender.sendParamenter(parametersInfo, false, false) ;
     }
 
+    public void SendAVResourceList(int seNum, List<TerminalResourceInfo> infos){
+        SocketClientSender.sendAVResourceList(seNum,infos, false, false ) ;
+    }
+
+
     public static void SendBytes(byte[] bytes){
         SocketClientSender.send(bytes, false, false) ;
     }
@@ -372,6 +381,15 @@ public class USManager {
             }
         }
 
+        @Override
+        public void onQueryResourceReq(int serNum) {
+            EventBusUtils.sendEvent(new BroadCastMainEvent(EventBusUtils.EventCode.QUERY_RESOURCE, serNum));
+        }
+
+        @Override
+        public void onFileUploadReq(int seNum, ServerFileUploadMsg msg) {
+            EventBusUtils.sendEvent(new BroadCastMainEvent(EventBusUtils.EventCode.FILEUPLOAD_REQ, seNum, msg));
+        }
 
 
     } ;

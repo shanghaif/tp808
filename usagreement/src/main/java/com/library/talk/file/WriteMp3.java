@@ -8,6 +8,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.library.common.WriteFileCallback;
+import com.library.util.FileUtils;
 import com.library.util.OtherUtil;
 
 import java.io.File;
@@ -96,7 +97,7 @@ public class WriteMp3 {
     }
 
     private void setPath() {
-        OtherUtil.CreateDirFile(dirpath);
+        FileUtils.createDirFile(dirpath);
         path = dirpath + File.separator + System.currentTimeMillis() + ".mp3";
     }
 
