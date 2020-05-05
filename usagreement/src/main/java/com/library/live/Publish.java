@@ -51,6 +51,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 
+import cn.com.erayton.usagreement.utils.LogUtils;
+
 public class Publish implements TextureView.SurfaceTextureListener {
     private Context context;
     private final int frameMax = 4;
@@ -100,6 +102,11 @@ public class Publish implements TextureView.SurfaceTextureListener {
 
     private CameraManager manager;
     private String cameraId;
+    private CameraCharacteristics characteristics ;
+
+
+    //  此摄像头最大放大倍数
+    protected float maximumZoomLevel;
 
     private Publish(Context context, ParameterMap map) {
         this.context = context;
@@ -151,7 +158,8 @@ public class Publish implements TextureView.SurfaceTextureListener {
         try {
             //  遍历所有摄像头,查找符合当前选择的摄像头
             for (String cameraId : manager.getCameraIdList()) {
-                CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
+                characteristics = manager.getCameraCharacteristics(cameraId);
+//                CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
                 Log.e("cjh", "camera:"+manager.getCameraIdList().length+",characteristics.get(CameraCharacteristics.LENS_FACING)"+characteristics.get(CameraCharacteristics.LENS_FACING)) ;
                 if (characteristics.get(CameraCharacteristics.LENS_FACING) ==
                         (map.isRotate() ? CameraCharacteristics.LENS_FACING_FRONT : CameraCharacteristics.LENS_FACING_BACK)) {
@@ -236,6 +244,8 @@ public class Publish implements TextureView.SurfaceTextureListener {
                     cameraDevice = device;
                     //开启预览
                     startPreview();
+                    //  初始化画面大小调节
+                    initCharacteristics() ;
                 }
 
                 @Override
@@ -561,6 +571,113 @@ public class Publish implements TextureView.SurfaceTextureListener {
         writeMp4.destroy();
         pictureCallback = null;
     }
+
+ -----------------------------------------------------------------------------------
+
+    private void initCharacteristics() {
+        CameraManager manager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
+        assert manager != null;
+//            characteristics = manager.getCameraCharacteristics(cameraDevice.getId());
+        maximumZoomLevel = characteristics.get(CameraCharacteristics.SCALER_AVAILABLE_MAX_DIGITAL_ZOOM);
+    }
+
+
+
+    //  Zooming 当前数值
+    protected float fingerSpacing = 0;
+    //  每次放大的等级
+    protected float zoomLevel = 1f;
+    //  缩放点
+    protected Rect zoom;
+    /** 放大缩小
+     * @param currentFingerSpacing  控制放大缩小的数值,随意大小,只需要保证放大时数值比缩小数值大
+     */
+    private void updateZoom(float currentFingerSpacing){
+        Rect rect = characteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE);
+        if (rect == null) return ;
+        CaptureRequest.Builder builder = getPreviewBuilder();
+        float delta = 0.05f; // Control this value to control the zooming sensibility
+        if (fingerSpacing != 0) {
+            if (currentFingerSpacing > fingerSpacing) { //  Don't over zoom-in
+                if ((maximumZoomLevel - zoomLevel) <= delta) {
+                    delta = maximumZoomLevel - zoomLevel;
+                }
+                zoomLevel = zoomLevel + delta;
+            } else if (currentFingerSpacing < fingerSpacing) { //   Don't over zoom-out
+                if ((zoomLevel - delta) < 1f) {
+                    delta = zoomLevel - 1f;
+                }
+                zoomLevel = zoomLevel - delta;
+            }
+            float ratio = (float) 1 / zoomLevel; // This ratio is the ratio of cropped Rect to Camera's original(Maximum) Rect
+            //  croppedWidth and croppedHeight are the pixels cropped away, not pixels after cropped
+            int croppedWidth = rect.width() - Math.round((float) rect.width() * ratio);
+            int croppedHeight = rect.height() - Math.round((float) rect.height() * ratio);
+            //  Finally, zoom represents the zoomed visible area
+            zoom = new Rect(croppedWidth / 2, croppedHeight / 2,
+                    rect.width() - croppedWidth / 2, rect.height() - croppedHeight / 2);
+            builder.set(CaptureRequest.SCALER_CROP_REGION, zoom);
+
+            Log.d("cjh", "zoom:"+zoom+",currentFingerSpacing:"+currentFingerSpacing+",max:"+maximumZoomLevel) ;
+        }
+        fingerSpacing = currentFingerSpacing;
+//        sendRepeatingRequest(builder.build(), mPreviewCallback, mMainHandler);
+        try {
+            session.setRepeatingRequest(builder.build(), null, camearHandler);
+        } catch (CameraAccessException e) {
+            LogUtils.d("CameraAccessException ------------------"+e.getMessage());
+            e.printStackTrace();
+        }
+//        }
+    }
+
+    private CaptureRequest.Builder getPreviewBuilder() {
+        return createBuilder(CameraDevice.TEMPLATE_PREVIEW, getTextureSurface());
+    }
+
+
+
+    CaptureRequest.Builder createBuilder(int type, Surface surface) {
+        try {
+            CaptureRequest.Builder builder = cameraDevice.createCaptureRequest(type);
+            builder.addTarget(surface);
+            return builder;
+        } catch (CameraAccessException | IllegalStateException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     public int getPublishStatus() {
         return tcpSend.getPublishStatus();
