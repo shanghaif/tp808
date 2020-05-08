@@ -1,34 +1,34 @@
 package cn.com.erayton.usagreement.model.decode;
 
+
 import cn.com.erayton.usagreement.data.Constants;
 import cn.com.erayton.usagreement.utils.BitOperator;
 import cn.com.erayton.usagreement.utils.LogUtils;
 
 /**
- * 文件上传控制
+ * 平台控制请求
+ *  0, 调大   1, 调小
  * */
-public class ServerFileUploadControlMsg extends PacketData {
+public class ServerCouldControlMsg extends PacketData {
+    //  逻辑通道号
+    private int channelNum ;
+    //  控制
+    private int num ;
 
-    //  应答流水号
-    private int serNum ;
-    //  上传控制    0,暂停  1,继续    2,取消
-    private int uploadControl ;
-
-
-    public int getSerNum() {
-        return serNum;
+    public int getChannelNum() {
+        return channelNum;
     }
 
-    public void setSerNum(int serNum) {
-        this.serNum = serNum;
+    public void setChannelNum(int channelNum) {
+        this.channelNum = channelNum;
     }
 
-    public int getUploadControl() {
-        return uploadControl;
+    public int getNum() {
+        return num;
     }
 
-    public void setUploadControl(int uploadControl) {
-        this.uploadControl = uploadControl;
+    public void setNum(int num) {
+        this.num = num;
     }
 
     @Override
@@ -36,10 +36,8 @@ public class ServerFileUploadControlMsg extends PacketData {
         return new byte[0];
     }
 
-
     @Override
     public void inflatePackageBody(byte[] data) {
-
         int msgBodyLength = getMsgHeader().getMsgBodyLength();
         LogUtils.d("inflatePackageBody_msgBodyLength: " + msgBodyLength);
         byte[] tmp = new byte[msgHeader.getMsgBodyLength()];
@@ -51,16 +49,15 @@ public class ServerFileUploadControlMsg extends PacketData {
             System.arraycopy(data, Constants.MSGBODY_START_INDEX, tmp, 0, tmp.length);
         }
         BitOperator bitOperator = BitOperator.getInstance();
-        setSerNum(bitOperator.parseIntFromBytes(tmp, 0, 2));
-        setUploadControl(bitOperator.parseIntFromBytes(tmp, 2, 1));
-
+        setChannelNum(bitOperator.parseIntFromBytes(tmp, 0, 1));
+        setNum(bitOperator.parseIntFromBytes(tmp,1, 1));
     }
 
     @Override
     public String toString() {
-        return "ServerFileUploadControlMsg{" +
-                "serNum=" + serNum +
-                ", uploadControl=" + uploadControl +
+        return "ServerRotateMsg{" +
+                "channelNum=" + channelNum +
+                ", num=" + num +
                 '}';
     }
 }

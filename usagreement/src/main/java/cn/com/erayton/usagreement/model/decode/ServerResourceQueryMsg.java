@@ -11,19 +11,19 @@ import cn.com.erayton.usagreement.utils.LogUtils;
  * 查询资源列表
  * */
 public class ServerResourceQueryMsg extends PacketData {
-    //  逻辑通道号
+    //  逻辑通道号 [1]
     private int channelNum ;
     //  开始时间    BCD[6]
     private String startTime ;
-    //  结束时间
+    //  结束时间    BCD[6]
     private String endTime ;
-    //  报警标志
+    //  报警标志    [8]
     private byte[] warningMark ;
-    //  音视频资源类型
+    //  音视频资源类型 [1]
     private int resourceType ;
-    //  码流类型
+    //  码流类型    [1]
     private int steamType ;
-    //  存储器类型
+    //  存储器类型   [1]
     private int memoryType ;
 
     public int getChannelNum() {

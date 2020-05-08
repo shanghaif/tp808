@@ -4,6 +4,9 @@ import java.io.File;
 import java.nio.channels.FileChannel;
 
 public class FileUtils {
+    private static final String JPEG = "image/jpeg";
+    private static final String VIDEO = "video/mpeg";
+    private static final String YUV = "image/yuv";
 
     public static boolean isPath(String path){
         String matches = "[A-Za-z]:\\\\[^:?\"><*]*";
@@ -108,6 +111,19 @@ public class FileUtils {
             return file.length() ;
         }
         return 0 ;
+    }
+
+    /**
+     * 文件类型
+     * */
+    public static String getMimeType(int type) {
+        if (type == MediaFunc.MEDIA_TYPE_IMAGE) {
+            return JPEG;
+        } else if (type == MediaFunc.MEDIA_TYPE_VIDEO) {
+            return VIDEO;
+        } else {
+            return YUV;
+        }
     }
 
 }

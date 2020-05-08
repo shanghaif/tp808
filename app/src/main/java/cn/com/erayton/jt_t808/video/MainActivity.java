@@ -15,10 +15,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.SeekBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatSeekBar;
 import androidx.core.app.ActivityCompat;
 
 
@@ -61,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
     PublishView publishView ;
     Publish publish ;
     Button button , ipButton;
+    AppCompatSeekBar seekBar ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,6 +120,23 @@ public class MainActivity extends AppCompatActivity {
         button = findViewById(R.id.record_btn) ;
         ipButton = findViewById(R.id.changeIp) ;
         ipButton.setText(host);
+        seekBar = findViewById(R.id.camera_zoom) ;
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                publish.updateZoom(progress);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
         ipButton.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -174,6 +194,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         EventBusUtils.unregister(this);
+        publish.destroy();
         super.onDestroy();
     }
 
@@ -196,7 +217,8 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case EventBusUtils.EventCode.CLOSE_VIDEO:
 //                    videoPushAIDL.distoryVideo() ;
-//                    publish.stop();
+                    publish.stop();
+                publish.destroy();
 //                stopVideo();
 
                 break;
@@ -204,7 +226,7 @@ public class MainActivity extends AppCompatActivity {
 //                    videoPushAIDL.distoryVideo() ;
 //                    publish.stop();
                 Log.e("cjh", "FILEUPLOAD_REQ------------") ;
-                stopVideo((Integer) event.getData());
+                queryVideo((Integer) event.getData());
 
                 break;
             case EventBusUtils.EventCode.FILEUPLOAD_REQ:
@@ -253,7 +275,7 @@ public class MainActivity extends AppCompatActivity {
         publish.start();
     }
 
-    public void stopVideo(int seNum){
+    public void queryVideo(int seNum){
         List<TerminalResourceInfo> infos = new ArrayList<>() ;
         byte[] a = { 1, 1, 1, 1, 1, 1, 1, 1 };
         for (VideoRecord v:DbTools.queryVideoRecord()){

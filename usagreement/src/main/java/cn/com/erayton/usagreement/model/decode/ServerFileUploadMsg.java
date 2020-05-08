@@ -47,7 +47,7 @@ public class ServerFileUploadMsg extends PacketData {
     //  存储位置(存储器类型)
     private int memoryType ;
     //  任务执行条件[1]   用 bit 位表示
-    private byte[] TaskConditions ;
+    private byte[] taskConditions ;
 
 
     private int getNowLength() {
@@ -184,11 +184,11 @@ public class ServerFileUploadMsg extends PacketData {
     }
 
     public byte[] getTaskConditions() {
-        return TaskConditions;
+        return taskConditions;
     }
 
     public void setTaskConditions(byte[] taskConditions) {
-        TaskConditions = taskConditions;
+        taskConditions = taskConditions;
     }
 
     @Override
@@ -263,7 +263,7 @@ public class ServerFileUploadMsg extends PacketData {
                 ", resourceType=" + resourceType +
                 ", steamType=" + steamType +
                 ", memoryType=" + memoryType +
-                ", TaskConditions=" + Arrays.toString(TaskConditions) +
+                ", TaskConditions=" + Arrays.toString(taskConditions) +
                 '}';
     }
 }

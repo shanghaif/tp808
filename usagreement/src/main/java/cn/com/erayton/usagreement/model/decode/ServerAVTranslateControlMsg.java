@@ -13,11 +13,11 @@ public class ServerAVTranslateControlMsg extends PacketData {
     String TAG = ServerAVTranslateControlMsg.class.getName() ;
 
     private int channelNum ;
-
+    //  控制指令    [1] 0,关闭音视频传输   1,切换码流  2,暂停该通道所有流的发送   3,回复暂停前流的发送与暂停前的流类型一致   4,关闭双向对讲
     private int controlCode ;
-
+    //  关闭音视频类型 [1] 0,关闭该通道有关的音视频数据 1,只关闭该通道有关的音频保留视频   2,只关闭该通道有关的视频频保留音频
     private int closeType ;
-
+    //  切换码流类型  [1] 0,主码流   1,子码流
     private int steamType ;
 
 

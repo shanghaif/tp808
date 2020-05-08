@@ -254,8 +254,28 @@ public class SocketClientSender {
     }
 
     /**
-     * 文件上传回复(通用回复)
-     * */
+     * 视频请求回复
+     * @param seNum 流水号
+     * @param code  状态
+     * @return
+     */
+    public boolean SendAVTranslate(int seNum, int code){
+        Log.d("SocketClient", "sendUploadResp ---------------------------------") ;
+        TerminalGeneralInfo terminalGeneralInfo = new TerminalGeneralInfo() ;
+        terminalGeneralInfo.setSeNum(seNum);
+        terminalGeneralInfo.setRespId(Constants.SERVER_AVTRANSMISSION_REQUEST);
+        terminalGeneralInfo.setResult(code);
+        return sendGeneralReponse(terminalGeneralInfo, false, false) ;
+
+    }
+
+    /** 文件上传回复(通用回复)
+     *
+     * @param seNum 流水号
+     * @param code  状态
+     * @return
+     */
+
     public static boolean sendUploadResp(int seNum, int code){
         Log.d("SocketClient", "sendUploadResp ---------------------------------") ;
         TerminalGeneralInfo terminalGeneralInfo = new TerminalGeneralInfo() ;

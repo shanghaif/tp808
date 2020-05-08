@@ -62,34 +62,82 @@ public class LogUtils {
         if (!isDebuggable())
             return;
         getMethodNames(new Throwable().getStackTrace());
-        Log.e(className, createLog(message));
+        e(className, createLog(message));
     }
+    public static void e(String tag, String message){
+        Log.e(tag, createLog(message));
+    }
+//    public static void e(String message){
+//        if (!isDebuggable())
+//            return;
+//        getMethodNames(new Throwable().getStackTrace());
+//        Log.e(className, createLog(message));
+//    }
 
     public static void i(String message){
         if (!isDebuggable())
             return;
         getMethodNames(new Throwable().getStackTrace());
-        Log.i(className, createLog(message));
+        i(className, createLog(message));
     }
+    public static void i(String tag, String message){
+        Log.i(tag, createLog(message));
+    }
+//    public static void i(String message){
+//        if (!isDebuggable())
+//            return;
+//        getMethodNames(new Throwable().getStackTrace());
+//        Log.i(className, createLog(message));
+//    }
+
 
     public static void d(String message){
         if (!isDebuggable())
             return;
         getMethodNames(new Throwable().getStackTrace());
-        Log.d(className, createLog(message, 0));
+        d(className, message);
     }
+    public static void d(String tag, String message){
+        Log.d(tag, createLog(message, 0));
+    }
+//    public static void d(String message){
+//        if (!isDebuggable())
+//            return;
+//        getMethodNames(new Throwable().getStackTrace());
+//        Log.d(className, createLog(message, 0));
+//    }
 
     public static void v(String message){
         if (!isDebuggable())
             return;
         getMethodNames(new Throwable().getStackTrace());
-        Log.v(className, createLog(message));
+        v(className, createLog(message, 0));
     }
+    public static void v(String tag, String message){
+        Log.v(tag, createLog(message, 0));
+    }
+//    public static void v(String message){
+//        if (!isDebuggable())
+//            return;
+//        getMethodNames(new Throwable().getStackTrace());
+//        Log.v(className, createLog(message, 0));
+//    }
 
     public static void w(String message){
         if (!isDebuggable())
             return;
         getMethodNames(new Throwable().getStackTrace());
-        Log.w(className, createLog(message));
+        w(className, createLog(message, 0));
     }
+    public static void w(String tag, String message){
+        Log.w(tag, createLog(message, 0));
+    }
+//    public static void w(String message){
+//        if (!isDebuggable())
+//            return;
+//        getMethodNames(new Throwable().getStackTrace());
+//        Log.w(className, createLog(message, 0));
+//    }
+
+
 }

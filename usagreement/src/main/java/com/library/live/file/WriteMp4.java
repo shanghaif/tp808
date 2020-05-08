@@ -1,5 +1,6 @@
 package com.library.live.file;
 
+import android.graphics.Bitmap;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.media.MediaMuxer;
@@ -8,14 +9,18 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.library.common.WriteFileCallback;
+import com.library.util.BitmapUtils;
 import com.library.util.FileUtils;
+import com.library.util.MediaFunc;
 import com.library.util.OtherUtil;
 import com.library.util.RegularUtils;
+import com.library.util.Storage;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import cn.com.erayton.usagreement.ApplicationProvider;
 import cn.com.erayton.usagreement.data.db.DbTools;
 import cn.com.erayton.usagreement.utils.BitOperator;
 
@@ -63,8 +68,15 @@ public class WriteMp4 {
             String fileName = RegularUtils.getOneResult(name, RegularUtils.videoRex);
             //  处理文件名
             String[] names = fileName.split("_") ;
+            File file = new File(name) ;
+
+            BitmapUtils.getVideoThumbnail(name) ;
+
             DbTools.insertVideoRecord(name, Long.parseLong(names[0]),  Long.parseLong(names[1]),
-                    Integer.parseInt(names[2]), FileUtils.getFileSize(name));
+                    Integer.parseInt(names[2]), file.length());
+            Storage.addVideoToDB(ApplicationProvider.context.getContentResolver(), file.getName(),
+                    System.currentTimeMillis(), null, file.length(), name,
+                    200, 200, FileUtils.getMimeType(MediaFunc.MEDIA_TYPE_VIDEO));
         }
 
         @Override

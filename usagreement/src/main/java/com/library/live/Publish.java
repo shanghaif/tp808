@@ -160,7 +160,7 @@ public class Publish implements TextureView.SurfaceTextureListener {
             for (String cameraId : manager.getCameraIdList()) {
                 characteristics = manager.getCameraCharacteristics(cameraId);
 //                CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
-                Log.e("cjh", "camera:"+manager.getCameraIdList().length+",characteristics.get(CameraCharacteristics.LENS_FACING)"+characteristics.get(CameraCharacteristics.LENS_FACING)) ;
+                Log.e("cjh", "camera num:"+manager.getCameraIdList().length+",cameraId:"+cameraId) ;
                 if (characteristics.get(CameraCharacteristics.LENS_FACING) ==
                         (map.isRotate() ? CameraCharacteristics.LENS_FACING_FRONT : CameraCharacteristics.LENS_FACING_BACK)) {
                     //获取StreamConfigurationMap管理摄像头支持的所有输出格式和尺寸,根据TextureView的尺寸设置预览尺寸
@@ -266,7 +266,8 @@ public class Publish implements TextureView.SurfaceTextureListener {
         try {
             List<Surface> surfaces = new ArrayList<>();
             //预览数据输出
-            final CaptureRequest.Builder previewRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+            final CaptureRequest.Builder previewRequestBuilder = getPreviewBuilder();
+//            final CaptureRequest.Builder previewRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
             previewRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON);
             previewRequestBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_SINGLE);
             previewRequestBuilder.set(CaptureRequest.CONTROL_AE_EXPOSURE_COMPENSATION,6);
@@ -572,7 +573,7 @@ public class Publish implements TextureView.SurfaceTextureListener {
         pictureCallback = null;
     }
 
- -----------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------
 
     private void initCharacteristics() {
         CameraManager manager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
@@ -592,7 +593,9 @@ public class Publish implements TextureView.SurfaceTextureListener {
     /** 放大缩小
      * @param currentFingerSpacing  控制放大缩小的数值,随意大小,只需要保证放大时数值比缩小数值大
      */
-    private void updateZoom(float currentFingerSpacing){
+    public void updateZoom(float currentFingerSpacing){
+        assert  session != null;
+
         Rect rect = characteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE);
         if (rect == null) return ;
         CaptureRequest.Builder builder = getPreviewBuilder();
@@ -618,7 +621,7 @@ public class Publish implements TextureView.SurfaceTextureListener {
                     rect.width() - croppedWidth / 2, rect.height() - croppedHeight / 2);
             builder.set(CaptureRequest.SCALER_CROP_REGION, zoom);
 
-            Log.d("cjh", "zoom:"+zoom+",currentFingerSpacing:"+currentFingerSpacing+",max:"+maximumZoomLevel) ;
+            LogUtils.d( "zoom:"+zoom+",currentFingerSpacing:"+currentFingerSpacing+",max:"+maximumZoomLevel) ;
         }
         fingerSpacing = currentFingerSpacing;
 //        sendRepeatingRequest(builder.build(), mPreviewCallback, mMainHandler);
@@ -631,8 +634,12 @@ public class Publish implements TextureView.SurfaceTextureListener {
 //        }
     }
 
+    private CaptureRequest.Builder previewBuilder ;
     private CaptureRequest.Builder getPreviewBuilder() {
-        return createBuilder(CameraDevice.TEMPLATE_PREVIEW, getTextureSurface());
+        if (previewBuilder ==null){
+            previewBuilder = createBuilder(CameraDevice.TEMPLATE_PREVIEW, getTextureSurface()) ;
+        }
+        return previewBuilder;
     }
 
 

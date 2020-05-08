@@ -205,7 +205,7 @@ public class TCPClient implements Runnable {
                 byte[] buffer = new byte[socket.getReceiveBufferSize()];
 //                byte[] buffer = new byte[256];
                 int count = inputStream.read(buffer);
-                Log.i("cjh", "count"+count) ;
+                Log.i("cjh", "count:"+count) ;
                 if (count > 0) {
                     receiveBytes = new byte[count];
 //                    receiveBytes = new byte[256];

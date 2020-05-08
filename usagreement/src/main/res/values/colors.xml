@@ -2,4 +2,10 @@
 <resources>
     <color name="black">#000000</color>
     <color name="white">#ffffff</color>
+    <color name="colorAccent">#209f55</color>
+
+
+    <color name="outer_circle_color">@color/colorAccent</color>
+    <color name="inner_circle_color">#ffffff</color>
+    <color name="color_record">#ef5d5d</color>
 </resources>

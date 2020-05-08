@@ -9,6 +9,7 @@ import cn.com.erayton.usagreement.model.decode.PacketData;
 import cn.com.erayton.usagreement.model.decode.ServerAVTranslateControlMsg;
 import cn.com.erayton.usagreement.model.decode.ServerAVTranslateMsg;
 import cn.com.erayton.usagreement.model.decode.ServerApertureMsg;
+import cn.com.erayton.usagreement.model.decode.ServerCouldControlMsg;
 import cn.com.erayton.usagreement.model.decode.ServerFileUploadControlMsg;
 import cn.com.erayton.usagreement.model.decode.ServerFileUploadMsg;
 import cn.com.erayton.usagreement.model.decode.ServerFocalLengthMsg;
@@ -64,6 +65,11 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
          * */
         void onTernimalParameterSetting(int instructCount, int GpsSleepInterval, int GpsDefInterval, int flowId) ;
         void queryTernimalParameterSetting(int serNum) ;
+
+        /** 查询终端音视频属性
+         */
+        void onAVPropertiesQuery() ;
+
         /**     实时视频传输请求
          * @param  host 服务器 IP 地址
          * @param tcpPort 服务器 TCP 端口号
@@ -85,8 +91,32 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
 
         /**
          * 查询资源列表
-         * */
-        void onQueryResourceReq(int serNum) ;
+         * @param serNum    流水号
+         * @param channelNum    逻辑通道号
+         * @param startTime     开始时间
+         * @param endTime       结束时间
+         * @param warningMark   报警标志
+         * @param resourceType  音视频资源类型
+         * @param steamType     码流类型
+         * @param memoryType    存储器类型
+         */
+        void onQueryResourceReq(int serNum, int channelNum, String startTime, String endTime, String warningMark,
+                                int resourceType, int steamType, int memoryType
+                                ) ;
+
+        /** 平台下发远程录像回放请求
+         *
+         * @param msg
+         */
+        void onAVReplayReq(ServerVideoReplayMsg msg) ;
+        /** 平台下发远程录像回放控制
+         *
+         * @param channelNum        逻辑通道号
+         * @param playbackControl   回放控制
+         * @param multiple          快进或快退倍数
+         * @param dragTo            拖动回放位置
+         */
+        void onAVReplayControl(int channelNum, int playbackControl, int multiple, String dragTo) ;
 
         /** 文件上传指令
          *
@@ -94,6 +124,30 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
          * @param msg
          */
         void onFileUploadReq(int seNum, ServerFileUploadMsg msg) ;
+
+        /** 文件上传控制
+         *
+         * @param seNum
+         * @param uploadControl 上传控制, 0,暂停  1,继续    2,取消
+         */
+        void onFileUploadControl(int seNum, int uploadControl) ;
+
+
+        /** 云台旋转
+         *
+         * @param channelNum    逻辑通道号
+         * @param direction 0 停止, 1上, 2下, 3左, 4右
+         * @param speech    0 ~ 255
+         */
+        void onRotateCloudControl(int channelNum, int direction, int speech) ;
+
+        /**
+         * 云台控制
+         * @param controlType 控制类型, 消息id
+         * @param channelNum    逻辑通道号
+         * @param num 0 调大/停止      1 调小/启动
+         */
+        void onCloudControl(int controlType, int channelNum, int num) ;
     }
 
 
@@ -467,6 +521,7 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
                 catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+                continue;
             } else{
                 if ((tcpLastHbDt + getHBInterval() * 1000) <= curDt) {
                     //  有信息发送的情况下不再发送心跳
@@ -583,18 +638,18 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
                     case Constants.SERVER_AVPROPERTIES_QUERY:
                         LogUtils.d( "----------------------- 查询终端音视频属性 0x9003 消息体为空---------------------------\n packetData -"+packetData) ;
 
-                        TerminalAVPropertieInfo info = new TerminalAVPropertieInfo() ;
-                        info.setAudioEncoding(1);
-                        info.setAudioChannel(1);
-                        info.setAudioRate(0);
-                        info.setAudioNum(0);
-                        info.setAudioLength(1234);
-                        info.setAudioSupport(1);
-                        info.setVideoEncoding(98);
-                        info.setMaxAudioChannel(1);
-                        info.setMaxVideoChannel(1);
-
-                        SocketClientSender.sendAVPropertie(info, false, false) ;
+//                        TerminalAVPropertieInfo info = new TerminalAVPropertieInfo() ;
+//                        info.setAudioEncoding(1);
+//                        info.setAudioChannel(1);
+//                        info.setAudioRate(0);
+//                        info.setAudioNum(0);
+//                        info.setAudioLength(1234);
+//                        info.setAudioSupport(1);
+//                        info.setVideoEncoding(98);
+//                        info.setMaxAudioChannel(1);
+//                        info.setMaxVideoChannel(1);
+//                        SocketClientSender.sendAVPropertie(info, false, false) ;
+                        listener.onAVPropertiesQuery();
 
                         break;
                     case Constants.SERVER_AVTRANSMISSION_REQUEST:
@@ -628,19 +683,27 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
                         packetData.inflatePackageBody(page);
                         LogUtils.d( "----------------------- 查询资源列表 0x9205 ---------------------------\n packetData -"+packetData) ;
 //                        SocketClientSender.sendAVResourceList(msgHeader.getFlowId(),false, false) ;
-                        listener.onQueryResourceReq(msgHeader.getFlowId());
+                        listener.onQueryResourceReq(msgHeader.getFlowId(), ((ServerResourceQueryMsg) packetData).getChannelNum(),
+                        ((ServerResourceQueryMsg) packetData).getStartTime(), ((ServerResourceQueryMsg) packetData).getEndTime(),
+                        String.valueOf(((ServerResourceQueryMsg) packetData).getWarningMark()), ((ServerResourceQueryMsg) packetData).getResourceType(),
+                        ((ServerResourceQueryMsg) packetData).getSteamType(), ((ServerResourceQueryMsg) packetData).getMemoryType()
+                        );
                         break;
 
                     case Constants.SERVER_AVREPLAY_REQUEST:
                         packetData = new ServerVideoReplayMsg() ;
                         packetData.setMsgHeader(msgHeader);
                         packetData.inflatePackageBody(page);
+                        listener.onAVReplayReq((ServerVideoReplayMsg)packetData);
                         LogUtils.d( "----------------------- 平台下发远程录像回放请求 0x9201 ---------------------------\n packetData -"+packetData) ;
                         break;
                     case Constants.SERVER_AVREPLAY_CONTROL:
                         packetData = new ServerVideoReplayControlMsg() ;
                         packetData.setMsgHeader(msgHeader);
                         packetData.inflatePackageBody(page);
+                        listener.onAVReplayControl(((ServerVideoReplayControlMsg) packetData).getChannelNum(), ((ServerVideoReplayControlMsg) packetData).getPlaybackControl(),
+                                ((ServerVideoReplayControlMsg) packetData).getMultiple(), ((ServerVideoReplayControlMsg) packetData).getDragTo()
+                                ) ;
                         LogUtils.d( "----------------------- 平台下发远程录像回放控制 0x9202 ---------------------------\n packetData -"+packetData) ;
                         break;
                     case Constants.SERVER_FILEUPLOAD_REQUEST:
@@ -648,7 +711,7 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
                         packetData.setMsgHeader(msgHeader);
                         packetData.inflatePackageBody(page);
                         LogUtils.d( "----------------------- 文件上传指令 0x9206 ---------------------------\n packetData -"+packetData) ;
-                        SocketClientSender.sendUploadResp(msgHeader.getFlowId(), 0) ;
+//                        SocketClientSender.sendUploadResp(msgHeader.getFlowId(), 0) ;
                         listener.onFileUploadReq(msgHeader.getFlowId(), (ServerFileUploadMsg)packetData);
 
                         break;
@@ -656,6 +719,7 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
                         packetData = new ServerFileUploadControlMsg() ;
                         packetData.setMsgHeader(msgHeader);
                         packetData.inflatePackageBody(page);
+                        listener.onFileUploadControl(((ServerFileUploadControlMsg) packetData).getSerNum(), ((ServerFileUploadControlMsg) packetData).getUploadControl());
                         LogUtils.d( "----------------------- 文件上传控制 0x9207 ---------------------------\n packetData -"+packetData) ;
                         break;
 
@@ -664,38 +728,50 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
                         packetData = new ServerRotateMsg() ;
                         packetData.setMsgHeader(msgHeader);
                         packetData.inflatePackageBody(page);
+                        listener.onRotateCloudControl(((ServerRotateMsg) packetData).getChannelNum(), ((ServerRotateMsg) packetData).getDirection(), ((ServerRotateMsg) packetData).getSpeech()) ;
                         LogUtils.d( "----------------------- 云台旋转 0X9301 ---------------------------\n packetData -"+packetData) ;
                         break;
                     case Constants.SERVER_CLOUD_CONTROL_FOCALLENGTH:
-                        packetData = new ServerFocalLengthMsg() ;
-                        packetData.setMsgHeader(msgHeader);
-                        packetData.inflatePackageBody(page);
-                        LogUtils.d( "----------------------- 云台调整焦距 0X9302 ---------------------------\n packetData -"+packetData) ;
-                        break;
                     case Constants.SERVER_CLOUD_CONTROL_APERTURE:
-                        packetData = new ServerApertureMsg() ;
-                        packetData.setMsgHeader(msgHeader);
-                        packetData.inflatePackageBody(page);
-                        LogUtils.d( "----------------------- 云台调整光圈 0X9303 ---------------------------\n packetData -"+packetData) ;
-                        break;
                     case Constants.SERVER_CLOUD_CONTROL_WIPER:
-                        packetData = new ServerWiperMsg() ;
-                        packetData.setMsgHeader(msgHeader);
-                        packetData.inflatePackageBody(page);
-                        LogUtils.d( "----------------------- 云台控制雨刷 0X9304 ---------------------------\n packetData -"+packetData) ;
-                        break;
                     case Constants.SERVER_CLOUD_CONTROL_INFRAREDLIGHT:
-                        packetData = new ServerInfraredlightMsg() ;
-                        packetData.setMsgHeader(msgHeader);
-                        packetData.inflatePackageBody(page);
-                        LogUtils.d( "----------------------- 红外补光 0X9305 ---------------------------\n packetData -"+packetData) ;
-                        break;
                     case Constants.SERVER_CLOUD_CONTROL_ZOOM:
-                        packetData = new ServerZoomMsg() ;
+                        packetData = new ServerCouldControlMsg();
                         packetData.setMsgHeader(msgHeader);
                         packetData.inflatePackageBody(page);
-                        LogUtils.d( "----------------------- 云台变倍 0X9306 ---------------------------\n packetData -"+packetData) ;
+                        LogUtils.d( "----------------------- 云台控制 0X9302 0X9303 0X9304 0X9305 0X9306 ---------------------------\n packetData -"+packetData) ;
+                        listener.onCloudControl(msgHeader.getMsgId(), ((ServerCouldControlMsg) packetData).getChannelNum(), ((ServerCouldControlMsg) packetData).getNum());
                         break;
+//                    case Constants.SERVER_CLOUD_CONTROL_FOCALLENGTH:
+//                        packetData = new ServerFocalLengthMsg() ;
+//                        packetData.setMsgHeader(msgHeader);
+//                        packetData.inflatePackageBody(page);
+//                        LogUtils.d( "----------------------- 云台调整焦距 0X9302 ---------------------------\n packetData -"+packetData) ;
+//                        break;
+//                    case Constants.SERVER_CLOUD_CONTROL_APERTURE:
+//                        packetData = new ServerApertureMsg() ;
+//                        packetData.setMsgHeader(msgHeader);
+//                        packetData.inflatePackageBody(page);
+//                        LogUtils.d( "----------------------- 云台调整光圈 0X9303 ---------------------------\n packetData -"+packetData) ;
+//                        break;
+//                    case Constants.SERVER_CLOUD_CONTROL_WIPER:
+//                        packetData = new ServerWiperMsg() ;
+//                        packetData.setMsgHeader(msgHeader);
+//                        packetData.inflatePackageBody(page);
+//                        LogUtils.d( "----------------------- 云台控制雨刷 0X9304 ---------------------------\n packetData -"+packetData) ;
+//                        break;
+//                    case Constants.SERVER_CLOUD_CONTROL_INFRAREDLIGHT:
+//                        packetData = new ServerInfraredlightMsg() ;
+//                        packetData.setMsgHeader(msgHeader);
+//                        packetData.inflatePackageBody(page);
+//                        LogUtils.d( "----------------------- 红外补光 0X9305 ---------------------------\n packetData -"+packetData) ;
+//                        break;
+//                    case Constants.SERVER_CLOUD_CONTROL_ZOOM:
+//                        packetData = new ServerZoomMsg() ;
+//                        packetData.setMsgHeader(msgHeader);
+//                        packetData.inflatePackageBody(page);
+//                        LogUtils.d( "----------------------- 云台变倍 0X9306 ---------------------------\n packetData -"+packetData) ;
+//                        break;
 
                     default:
                         packetData = new ServerRegisterMsg();

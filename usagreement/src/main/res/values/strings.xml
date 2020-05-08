@@ -5,4 +5,6 @@
     <string name="tip_video_recording">视频录制中&#8230;&#8230;&#8230;</string>
     <string name="tip_video_record_pause">视频录制暂停</string>
     <string name="tip_video_record_finish">视频录制结束</string>
+
+    <string name="open_file_error">Can not found app to open image/video</string>
 </resources>

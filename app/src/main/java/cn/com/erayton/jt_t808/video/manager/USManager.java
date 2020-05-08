@@ -14,6 +14,7 @@ import cn.com.erayton.jt_t808.video.eventBus.EventBusUtils;
 import cn.com.erayton.jt_t808.video.eventBus.event.BroadCastMainEvent;
 import cn.com.erayton.usagreement.data.Constants;
 import cn.com.erayton.usagreement.model.decode.ServerFileUploadMsg;
+import cn.com.erayton.usagreement.model.decode.ServerVideoReplayMsg;
 import cn.com.erayton.usagreement.model.model.TerminalAuthInfo;
 import cn.com.erayton.usagreement.model.model.TerminalGeneralInfo;
 import cn.com.erayton.usagreement.model.model.TerminalParametersInfo;
@@ -241,7 +242,7 @@ public class USManager {
     }
 
     public void SendAVResourceList(int seNum, List<TerminalResourceInfo> infos){
-        SocketClientSender.sendAVResourceList(seNum,infos, false, false ) ;
+        SocketClientSender.sendAVResourceList(seNum, infos, false, false ) ;
     }
 
 
@@ -346,6 +347,11 @@ public class USManager {
         }
 
         @Override
+        public void onAVPropertiesQuery() {
+
+        }
+
+        @Override
         public void onTernimalAVTranslate(String s, int i, int i1, int i2, int i3, int i4, int i5) {
             int result = 1 ;
             Log.d(TAG, "onTernimalAVTranslate:"+s+"，服务器 TCP 端口号:"+i+"，服务器 UDP 端口号:"+i1+"，逻辑通道号:"+i2+"，数据类型:"+i3+"，码流类型:"+i4+"，流水号:"+i5) ;
@@ -382,13 +388,38 @@ public class USManager {
         }
 
         @Override
-        public void onQueryResourceReq(int serNum) {
+        public void onQueryResourceReq(int serNum, int channelNum, String startTime, String endTime, String warningMark, int resourceType, int steamType, int memoryType) {
             EventBusUtils.sendEvent(new BroadCastMainEvent(EventBusUtils.EventCode.QUERY_RESOURCE, serNum));
+        }
+
+        @Override
+        public void onAVReplayReq(ServerVideoReplayMsg msg) {
+
+        }
+
+        @Override
+        public void onAVReplayControl(int channelNum, int playbackControl, int multiple, String dragTo) {
+
         }
 
         @Override
         public void onFileUploadReq(int seNum, ServerFileUploadMsg msg) {
             EventBusUtils.sendEvent(new BroadCastMainEvent(EventBusUtils.EventCode.FILEUPLOAD_REQ, seNum, msg));
+        }
+
+        @Override
+        public void onFileUploadControl(int seNum, int uploadControl) {
+
+        }
+
+        @Override
+        public void onRotateCloudControl(int channelNum, int direction, int speech) {
+
+        }
+
+        @Override
+        public void onCloudControl(int controlType, int channelNum, int num) {
+
         }
 
 

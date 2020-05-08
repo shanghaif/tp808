@@ -1,7 +1,10 @@
 package cn.com.erayton.usagreement.data;
 
+import android.os.Environment;
+
 import com.library.live.vd.VDEncoder;
 
+import java.io.File;
 import java.nio.charset.Charset;
 
 import cn.com.erayton.usagreement.service.VideoPushService;
@@ -403,6 +406,11 @@ public class Constants {
     public static int VOICE_PUSH_RATE = 24 * SCALE ;
     //  音频采集码率
     public static int VOICE_SAMPLING_RATE = 64 * SCALE ;
+
+//    public static String VIDEOSAVEPATH = Environment.getExternalStorageDirectory().getPath() + File.separator + "rayTonLive" ;
+    public static String VIDEOSAVEPATH = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getPath() + File.separator + "Camera2" ;
+    public static String PICTURESAVEPATH = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getPath() + File.separator + "Camera2" ;
+//    public static String PICTURESAVEPATH = Environment.getExternalStorageDirectory().getPath() + File.separator + "rayTonPicture" ;
 
 
 
