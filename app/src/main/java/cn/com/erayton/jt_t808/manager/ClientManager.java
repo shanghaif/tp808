@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import cn.com.erayton.jt_t808.constants.PublicConstants;
 import cn.com.erayton.usagreement.model.decode.ServerFileUploadMsg;
+import cn.com.erayton.usagreement.model.decode.ServerVideoReplayMsg;
 import cn.com.erayton.usagreement.socket.client.SocketClient;
 import cn.com.erayton.usagreement.socket.client.SocketClientSender;
 import cn.com.erayton.usagreement.utils.LogUtils;
@@ -91,6 +92,11 @@ public class ClientManager {
         }
 
         @Override
+        public void onAVPropertiesQuery() {
+
+        }
+
+        @Override
         public void onTernimalAVTranslate(String s, int i, int i1, int i2, int i3, int i4, int i5) {
 
         }
@@ -101,12 +107,42 @@ public class ClientManager {
         }
 
         @Override
-        public void onQueryResourceReq(int serNum) {
+        public void onQueryResourceReq(int serNum, int channelNum, String startTime, String endTime, String warningMark, int resourceType, int steamType, int memoryType) {
 
         }
 
         @Override
+        public void onAVReplayReq(ServerVideoReplayMsg msg) {
+
+        }
+
+        @Override
+        public void onAVReplayControl(int channelNum, int playbackControl, int multiple, String dragTo) {
+
+        }
+
+//        @Override
+//        public void onQueryResourceReq(int serNum) {
+//
+//        }
+
+        @Override
         public void onFileUploadReq(int seNum, ServerFileUploadMsg msg) {
+
+        }
+
+        @Override
+        public void onFileUploadControl(int seNum, int uploadControl) {
+
+        }
+
+        @Override
+        public void onRotateCloudControl(int channelNum, int direction, int speech) {
+
+        }
+
+        @Override
+        public void onCloudControl(int controlType, int channelNum, int num) {
 
         }
 

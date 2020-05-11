@@ -59,7 +59,8 @@ public class MainActivity extends AppCompatActivity {
     private String host1 = "106.14.186.44" ;
     private String host = "" ;
     private String host2 = "video.erayton.cn" ;
-    private String phone ="23803560285" ;
+    private String phone ="23803560303" ;
+//    private String phone ="23803560285" ;
     PublishView publishView ;
     Publish publish ;
     Button button , ipButton;
@@ -169,6 +170,38 @@ public class MainActivity extends AppCompatActivity {
         });
         USManager.getSingleton().ServerLogin(phone, host,
                 7000, 7000, false);
+
+
+        publishView.setVisibility(View.VISIBLE);
+        publish = new Publish.Buider(this, publishView)
+//                .setPushMode(new UdpSend(phone, ip, port, channelNum))
+//                .setPushMode(new TcpSend(phone, ip, port, channelNum))
+                //  帧率
+                .setFrameRate(Constants.FRAME_RATE)
+                //  编码方式
+                .setVideoCode(Constants.VIDEO_ENCODING)
+                //  是否预览
+                .setIsPreview(Constants.PREVIEW)
+                //  推流码率
+                .setPublishBitrate(Constants.VIDEO_PUSH_RATE)
+                //  采集码率
+                .setCollectionBitrate(Constants.VIDEO_SAMPLING_RATE)
+                //  音频采集码率
+                .setCollectionBitrateVC(Constants.VOICE_SAMPLING_RATE)
+                //  音频推流码率
+                .setPublishBitrateVC(Constants.VOICE_PUSH_RATE)
+                //  推流分辨率
+//                .setPublishSize(Constants.PUSHER_RESOLUTION_W, Constants.PUSHER_RESOLUTION_H)
+                .setPublishSize(Constants.PREVIEW_RESOLUTION_W, Constants.PREVIEW_RESOLUTION_H)
+                //  预览分辨率
+                .setPreviewSize(Constants.PREVIEW_RESOLUTION_W, Constants.PREVIEW_RESOLUTION_H)
+                //  摄像头选择
+                .setRotate(Constants.CAMERA)
+                .setVideoDirPath(Environment.getExternalStorageDirectory().getPath() + File.separator + "erayTonLive")
+                .setPictureDirPath(Environment.getExternalStorageDirectory().getPath() + File.separator + "erayTonPicture")
+                .setCenterScaleType(true)
+                .setScreenshotsMode(Publish.TAKEPHOTO)
+                .build();
     }
 
 
@@ -242,36 +275,37 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void initVideo(String ip, int port, int channelNum){
-        publishView.setVisibility(View.VISIBLE);
+//        publishView.setVisibility(View.VISIBLE);
         button.setVisibility(View.VISIBLE);
-        publish = new Publish.Buider(this, publishView)
-//                .setPushMode(new UdpSend(phone, ip, port, channelNum))
-                .setPushMode(new TcpSend(phone, ip, port, channelNum))
-                //  帧率
-                .setFrameRate(Constants.FRAME_RATE)
-                //  编码方式
-                .setVideoCode(Constants.VIDEO_ENCODING)
-                //  是否预览
-                .setIsPreview(Constants.PREVIEW)
-                //  推流码率
-                .setPublishBitrate(Constants.VIDEO_PUSH_RATE)
-                //  采集码率
-                .setCollectionBitrate(Constants.VIDEO_SAMPLING_RATE)
-                //  音频采集码率
-                .setCollectionBitrateVC(Constants.VOICE_SAMPLING_RATE)
-                //  音频推流码率
-                .setPublishBitrateVC(Constants.VOICE_PUSH_RATE)
-                //  推流分辨率
-                .setPublishSize(Constants.PUSHER_RESOLUTION_W, Constants.PUSHER_RESOLUTION_H)
-                //  预览分辨率
-                .setPreviewSize(Constants.PREVIEW_RESOLUTION_W, Constants.PREVIEW_RESOLUTION_H)
-                //  摄像头选择
-                .setRotate(Constants.CAMERA)
-                .setVideoDirPath(Environment.getExternalStorageDirectory().getPath() + File.separator + "erayTonLive")
-                .setPictureDirPath(Environment.getExternalStorageDirectory().getPath() + File.separator + "erayTonPicture")
-                .setCenterScaleType(true)
-                .setScreenshotsMode(Publish.TAKEPHOTO)
-                .build();
+//        publish = new Publish.Buider(this, publishView)
+////                .setPushMode(new UdpSend(phone, ip, port, channelNum))
+////                .setPushMode(new TcpSend(phone, ip, port, channelNum))
+//                //  帧率
+//                .setFrameRate(Constants.FRAME_RATE)
+//                //  编码方式
+//                .setVideoCode(Constants.VIDEO_ENCODING)
+//                //  是否预览
+//                .setIsPreview(Constants.PREVIEW)
+//                //  推流码率
+//                .setPublishBitrate(Constants.VIDEO_PUSH_RATE)
+//                //  采集码率
+//                .setCollectionBitrate(Constants.VIDEO_SAMPLING_RATE)
+//                //  音频采集码率
+//                .setCollectionBitrateVC(Constants.VOICE_SAMPLING_RATE)
+//                //  音频推流码率
+//                .setPublishBitrateVC(Constants.VOICE_PUSH_RATE)
+//                //  推流分辨率
+//                .setPublishSize(Constants.PUSHER_RESOLUTION_W, Constants.PUSHER_RESOLUTION_H)
+//                //  预览分辨率
+//                .setPreviewSize(Constants.PREVIEW_RESOLUTION_W, Constants.PREVIEW_RESOLUTION_H)
+//                //  摄像头选择
+//                .setRotate(Constants.CAMERA)
+//                .setVideoDirPath(Environment.getExternalStorageDirectory().getPath() + File.separator + "erayTonLive")
+//                .setPictureDirPath(Environment.getExternalStorageDirectory().getPath() + File.separator + "erayTonPicture")
+//                .setCenterScaleType(true)
+//                .setScreenshotsMode(Publish.TAKEPHOTO)
+//                .build();
+        publish.initTcp(phone, host, port, channelNum);
         publish.start();
     }
 

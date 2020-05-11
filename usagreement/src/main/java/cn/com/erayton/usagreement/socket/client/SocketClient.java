@@ -82,10 +82,10 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
         void onTernimalAVTranslate(String host, int tcpPort, int udpPort,
                                    int channelNum, int dataType, int steamType, int flowId) ;
         /**     音视频传输控制
-         * @param controlCode 控制指令
+         * @param controlCode 控制指令  0,关闭音视频传输指令 1,切换码流  2,暂停该通道所有流的发送   3,恢复暂停前流的发送,与暂停前的流类型一致  4,关闭双向对讲
          * @param channelNum 逻辑通道号
          * @param avCode 音频类型
-         * @param steamType 码流类型
+         * @param steamType 码流类型    0,主码流   1,子码流
          * */
         void onAVControl(int controlCode, int channelNum, int avCode, int steamType) ;
 

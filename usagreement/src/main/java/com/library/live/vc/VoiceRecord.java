@@ -24,7 +24,7 @@ public class VoiceRecord {
 
     private SingleThreadExecutor singleThreadExecutor;
 
-    public VoiceRecord(UdpSend udpSend, int collectionbitrate_vc, int publishbitrate_vc, WriteMp4 writeMp4) {
+    public VoiceRecord(int collectionbitrate_vc, int publishbitrate_vc, WriteMp4 writeMp4, UdpSend udpSend) {
 //    public VoiceRecord(TcpSend udpSend, int collectionbitrate_vc, int publishbitrate_vc, WriteMp4 writeMp4) {
         recBufSize = AudioRecord.getMinBufferSize(
                 OtherUtil.samplerate,

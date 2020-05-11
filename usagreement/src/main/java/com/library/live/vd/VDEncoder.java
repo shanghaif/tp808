@@ -87,6 +87,7 @@ public class VDEncoder {
         startEncoderThread();
     }
 
+
     private void startEncoderThread() {
         singleThreadExecutor.execute(new Runnable() {
             @Override
@@ -129,9 +130,10 @@ public class VDEncoder {
 
                         outputBufferIndex = mediaCodec.dequeueOutputBuffer(bufferInfo, OtherUtil.waitTime);
                         while (outputBufferIndex >= 0) {
+
                             //  源流
                             outputBuffer = mediaCodec.getOutputBuffer(outputBufferIndex);
-                            LogUtils.d("outputBuffer----------------------------------------");
+                            LogUtils.d("outputBuffer----------------------------------------"+outputBufferIndex+",flags:"+bufferInfo.flags);
                             if (bufferInfo.flags == MediaCodec.BUFFER_FLAG_CODEC_CONFIG) {
                                 //  sps pps 信息
                                 outData = new byte[bufferInfo.size];

@@ -44,6 +44,9 @@ public class TcpSend implements Runnable{
         this.channelNum = channelNum ;
         this.ip = ip ;
         this.port = port ;
+        if (port == 0){
+            return;
+        }
         initSocket(ip, port);
     }
 

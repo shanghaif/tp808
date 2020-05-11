@@ -24,6 +24,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
+import android.util.Range;
 import android.util.Size;
 import android.view.Surface;
 import android.view.TextureView;
@@ -191,20 +192,44 @@ public class Publish implements TextureView.SurfaceTextureListener {
             Log.d("pictureSize", "预览分辨率  =  " + previewSize.getWidth() + " * " + previewSize.getHeight());
 
             //计算比例(需对调宽高)
-            tcpSend.setWeight((double) publishSize.getHeight() / publishSize.getWidth());
+//            tcpSend.setWeight((double) publishSize.getHeight() / publishSize.getWidth());
             if (map.isPreview()) {
                 //  设置预览界面的大小
 //                map.getPublishView().setWeight((double) previewSize.getHeight() / previewSize.getWidth());
             }
 
-            recordEncoderVD = new RecordEncoderVD(previewSize, map.getFrameRate(), map.getCollectionBitrate(), writeMp4, map.getCodetype());
-            vdEncoder = new VDEncoder(previewSize, publishSize, map.getFrameRate(), map.getPublishBitrate(), map.getCodetype(), tcpSend);
-            //初始化音频编码
-            voiceRecord = new VoiceRecord(udpSend, map.getCollectionbitrate_vc(), map.getPublishbitrate_vc(), writeMp4);
-            vdEncoder.start();
-            voiceRecord.start();
+//            recordEncoderVD = new RecordEncoderVD(previewSize, map.getFrameRate(), map.getCollectionBitrate(), writeMp4, map.getCodetype());
+//            vdEncoder = new VDEncoder(previewSize, publishSize, map.getFrameRate(), map.getPublishBitrate(), map.getCodetype(), tcpSend);
+//            //初始化音频编码
+//            voiceRecord = new VoiceRecord(map.getCollectionbitrate_vc(), map.getPublishbitrate_vc(), writeMp4, udpSend);
+//            vdEncoder.start();
+//            voiceRecord.start();
         }
     }
+
+//    private void initCode(Size[] outputSizes) {
+//        if (vdEncoder == null) {
+//            publishSize = initSize(publishSize, outputSizes);
+//            previewSize = initSize(previewSize, outputSizes);
+//
+//            Log.d("pictureSize", "推流分辨率  =  " + publishSize.getWidth() + " * " + publishSize.getHeight());
+//            Log.d("pictureSize", "预览分辨率  =  " + previewSize.getWidth() + " * " + previewSize.getHeight());
+//
+//            //计算比例(需对调宽高)
+////            tcpSend.setWeight((double) publishSize.getHeight() / publishSize.getWidth());
+//            if (map.isPreview()) {
+//                //  设置预览界面的大小
+////                map.getPublishView().setWeight((double) previewSize.getHeight() / previewSize.getWidth());
+//            }
+//
+//            recordEncoderVD = new RecordEncoderVD(previewSize, map.getFrameRate(), map.getCollectionBitrate(), writeMp4, map.getCodetype());
+//            vdEncoder = new VDEncoder(previewSize, publishSize, map.getFrameRate(), map.getPublishBitrate(), map.getCodetype(), tcpSend);
+//            //初始化音频编码
+//            voiceRecord = new VoiceRecord(map.getCollectionbitrate_vc(), map.getPublishbitrate_vc(), writeMp4, udpSend);
+//            vdEncoder.start();
+//            voiceRecord.start();
+//        }
+//    }
 
     private Size initSize(Size publishSize, Size[] outputSizes) {
         int numw = 10000;
@@ -271,7 +296,12 @@ public class Publish implements TextureView.SurfaceTextureListener {
             previewRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON);
             previewRequestBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_SINGLE);
             previewRequestBuilder.set(CaptureRequest.CONTROL_AE_EXPOSURE_COMPENSATION,6);
+            //  设置自动曝光帧率范围
+            previewBuilder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, getRange());
+            //  自动对焦
             previewRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
+//            //  对焦触发器设置为空闲状态
+            previewBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER,CaptureRequest.CONTROL_AF_TRIGGER_IDLE);
             previewRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
             Surface previewSurface = getPreviewImageReaderSurface();
             previewRequestBuilder.addTarget(previewSurface);
@@ -286,7 +316,8 @@ public class Publish implements TextureView.SurfaceTextureListener {
 
             //拍照数据输出
             if (map.getScreenshotsMode() == TAKEPHOTO) {
-                final CaptureRequest.Builder captureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
+//                final CaptureRequest.Builder captureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
+                final CaptureRequest.Builder captureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
                 captureRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
                 captureRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
                 captureRequestBuilder.set(CaptureRequest.JPEG_ORIENTATION, rotateAngle);
@@ -367,7 +398,7 @@ public class Publish implements TextureView.SurfaceTextureListener {
                 frameHandler.postDelayed(this, 1000 / map.getFrameRate());
                 if (!frameRateControlQueue.isEmpty()) {
                     //耗时检测
-//                    long time = System.currentTimeMillis();
+                    long time = System.currentTimeMillis();
                     Image image = frameRateControlQueue.poll();
                     //YUV_420_888先转成I420
                     byte[] i420 = ImagUtil.YUV420888toI420(image);
@@ -380,13 +411,25 @@ public class Publish implements TextureView.SurfaceTextureListener {
                         yuvPicture = Arrays.copyOf(input, input.length);
                         camearHandler.post(pictureRunnable);
                     }
+
+                    if (recordEncoderVD !=null)
                     //录制编码器
                     recordEncoderVD.addFrame(input);
+                    if (vdEncoder != null )
                     //推流编码器
                     vdEncoder.addFrame(input);
-//                    if ((System.currentTimeMillis() - time) > (1000 / frameRate)) {
+
+
+//                    //录制编码器
+//                    recordEncoderVD.addFrame(input);
+//                    //推流编码器
+//                    vdEncoder.addFrame(input);
+
+
+                    if ((System.currentTimeMillis() - time) > (1000 / map.getFrameRate())) {
+                        Log.e("Frame_loss", "图像处理速度过慢");
 //                        Log.d("Frame_slow", "图像处理速度过慢");
-//                    }
+                    }
                 } else {
                     Log.d("Frame_loss", "图像采集速率不够");
                 }
@@ -550,6 +593,16 @@ public class Publish implements TextureView.SurfaceTextureListener {
         }
     };
 
+    public void initTcp(String phone, String ip, int port, int channelNum){
+        this.tcpSend = new TcpSend(phone, ip, port, channelNum) ;
+        recordEncoderVD = new RecordEncoderVD(previewSize, map.getFrameRate(), map.getCollectionBitrate(), writeMp4, map.getCodetype());
+        vdEncoder = new VDEncoder(previewSize, publishSize, map.getFrameRate(), map.getPublishBitrate(), map.getCodetype(), tcpSend);
+        //初始化音频编码
+        voiceRecord = new VoiceRecord(map.getCollectionbitrate_vc(), map.getPublishbitrate_vc(), writeMp4, udpSend);
+        vdEncoder.start();
+        voiceRecord.start();
+    }
+
     public void start() {
         tcpSend.startsend();
     }
@@ -561,24 +614,34 @@ public class Publish implements TextureView.SurfaceTextureListener {
 
     public void destroy() {
         releaseCamera();
-        recordEncoderVD.destroy();
-        vdEncoder.destroy();
-        voiceRecord.destroy();
-        tcpSend.destroy();
-        frameHandler.removeCallbacksAndMessages(null);
-        controlFrameRateThread.quitSafely();
-        camearHandler.removeCallbacksAndMessages(null);
-        handlerCamearThread.quitSafely();
-        writeMp4.destroy();
+        if (recordEncoderVD != null)
+            recordEncoderVD.destroy();
+        if (vdEncoder != null)
+            vdEncoder.destroy();
+        if (voiceRecord != null)
+            voiceRecord.destroy();
+        if (tcpSend != null)
+            tcpSend.destroy();
+        if (frameHandler != null)
+            frameHandler.removeCallbacksAndMessages(null);
+        if (controlFrameRateThread != null)
+            controlFrameRateThread.quitSafely();
+        if (camearHandler != null)
+            camearHandler.removeCallbacksAndMessages(null);
+        if (handlerCamearThread != null)
+            handlerCamearThread.quitSafely();
+        if (writeMp4 != null)
+            writeMp4.destroy();
         pictureCallback = null;
     }
 
 // -----------------------------------------------------------------------------------
 
     private void initCharacteristics() {
-        CameraManager manager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
-        assert manager != null;
+//        CameraManager manager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
+//        assert manager != null;
 //            characteristics = manager.getCameraCharacteristics(cameraDevice.getId());
+        assert characteristics != null ;
         maximumZoomLevel = characteristics.get(CameraCharacteristics.SCALER_AVAILABLE_MAX_DIGITAL_ZOOM);
     }
 
@@ -637,7 +700,8 @@ public class Publish implements TextureView.SurfaceTextureListener {
     private CaptureRequest.Builder previewBuilder ;
     private CaptureRequest.Builder getPreviewBuilder() {
         if (previewBuilder ==null){
-            previewBuilder = createBuilder(CameraDevice.TEMPLATE_PREVIEW, getTextureSurface()) ;
+//            previewBuilder = createBuilder(CameraDevice.TEMPLATE_PREVIEW, getTextureSurface()) ;
+            previewBuilder = createBuilder(CameraDevice.TEMPLATE_RECORD, getTextureSurface()) ;
         }
         return previewBuilder;
     }
@@ -656,7 +720,30 @@ public class Publish implements TextureView.SurfaceTextureListener {
     }
 
 
+    private Range<Integer> getRange() {
+////        CameraManager mCameraManager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
+//        CameraCharacteristics chars = null;
+//        try {
+//            chars = manager.getCameraCharacteristics(cameraId);
+//        } catch (CameraAccessException e) {
+//            e.printStackTrace();
+//        }
+        Range<Integer>[] ranges = characteristics.get(CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES);
 
+        Range<Integer> result = null;
+
+        for (Range<Integer> range : ranges) {
+            //帧率不能太低，大于10
+            if (range.getLower()<10)
+                continue;
+            if (result==null)
+                result = range;
+                //FPS下限小于15，弱光时能保证足够曝光时间，提高亮度。range范围跨度越大越好，光源足够时FPS较高，预览更流畅，光源不够时FPS较低，亮度更好。
+            else if (range.getLower()<=15 && (range.getUpper()-range.getLower())>(result.getUpper()-result.getLower()))
+                result = range;
+        }
+        return result;
+    }
 
 
 
