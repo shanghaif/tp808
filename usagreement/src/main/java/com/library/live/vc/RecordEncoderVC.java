@@ -109,4 +109,8 @@ public class RecordEncoderVC {
             mediaCodec = null;
         }
     }
+
+    public boolean isCanEncoder() {
+        return isCanEncoder;
+    }
 }

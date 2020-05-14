@@ -68,6 +68,10 @@ public class RecordEncoderVD {
     }
 
     public void start() {
+        if (isRuning){
+            //  正在录制,不开启动
+            return;
+        }
         YUVQueue.clear();
         mediaCodec.configure(mediaFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
         mediaCodec.start();

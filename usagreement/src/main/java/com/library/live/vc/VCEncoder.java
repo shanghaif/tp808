@@ -22,6 +22,7 @@ public class VCEncoder {
 //    private TcpSend udpSend;
     private UdpSend udpSend;
 
+//    public VCEncoder(int bitrate, int recBufSize) {
     public VCEncoder(int bitrate, int recBufSize, UdpSend udpSend) {
 //    public VCEncoder(int bitrate, int recBufSize, TcpSend udpSend) {
         this.udpSend = udpSend;
@@ -40,6 +41,14 @@ public class VCEncoder {
 
         mediaCodec.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
         mediaCodec.start();
+    }
+
+    public UdpSend getUdpSend() {
+        return udpSend;
+    }
+
+    public void setUdpSend(UdpSend udpSend) {
+        this.udpSend = udpSend;
     }
 
     private MediaCodec.BufferInfo bufferInfo = new MediaCodec.BufferInfo();

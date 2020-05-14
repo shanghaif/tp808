@@ -55,7 +55,6 @@
     <Button
         android:id="@+id/record_btn"
         android:text="start Record"
-        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

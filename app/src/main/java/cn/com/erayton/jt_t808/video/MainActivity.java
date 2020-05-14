@@ -59,8 +59,9 @@ public class MainActivity extends AppCompatActivity {
     private String host1 = "106.14.186.44" ;
     private String host = "" ;
     private String host2 = "video.erayton.cn" ;
-    private String phone ="23803560303" ;
-//    private String phone ="23803560285" ;
+//    private String phone ="23803560303" ;
+    private String phone ="23803560285" ;
+//    private String phone ="23803641388" ;
     PublishView publishView ;
     Publish publish ;
     Button button , ipButton;
@@ -191,8 +192,8 @@ public class MainActivity extends AppCompatActivity {
                 //  音频推流码率
                 .setPublishBitrateVC(Constants.VOICE_PUSH_RATE)
                 //  推流分辨率
-//                .setPublishSize(Constants.PUSHER_RESOLUTION_W, Constants.PUSHER_RESOLUTION_H)
-                .setPublishSize(Constants.PREVIEW_RESOLUTION_W, Constants.PREVIEW_RESOLUTION_H)
+                .setPublishSize(Constants.PUSHER_RESOLUTION_W, Constants.PUSHER_RESOLUTION_H)
+//                .setPublishSize(Constants.PREVIEW_RESOLUTION_W, Constants.PREVIEW_RESOLUTION_H)
                 //  预览分辨率
                 .setPreviewSize(Constants.PREVIEW_RESOLUTION_W, Constants.PREVIEW_RESOLUTION_H)
                 //  摄像头选择
@@ -276,7 +277,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void initVideo(String ip, int port, int channelNum){
 //        publishView.setVisibility(View.VISIBLE);
-        button.setVisibility(View.VISIBLE);
+//        button.setVisibility(View.VISIBLE);
 //        publish = new Publish.Buider(this, publishView)
 ////                .setPushMode(new UdpSend(phone, ip, port, channelNum))
 ////                .setPushMode(new TcpSend(phone, ip, port, channelNum))
@@ -305,7 +306,7 @@ public class MainActivity extends AppCompatActivity {
 //                .setCenterScaleType(true)
 //                .setScreenshotsMode(Publish.TAKEPHOTO)
 //                .build();
-        publish.initTcp(phone, host, port, channelNum);
+        publish.initTcp(phone, host, port, channelNum, false);
         publish.start();
     }
 

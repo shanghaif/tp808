@@ -7,6 +7,7 @@ import android.util.Log;
 import android.util.Size;
 
 import com.library.live.stream.TcpSend;
+import com.library.live.stream.UdpSend;
 import com.library.util.ByteUtil;
 import com.library.util.ImagUtil;
 import com.library.util.OtherUtil;
@@ -37,10 +38,11 @@ public class VDEncoder {
     private int COLOR_FORMAT;
     private SingleThreadExecutor singleThreadExecutor;
 
-    public VDEncoder(Size csize, Size psize, int framerate, int publishBitrate, String codetype, TcpSend udpSend) {
+//    public VDEncoder(Size csize, Size psize, int framerate, int publishBitrate, String codetype, TcpSend udpSend) {
+    public VDEncoder(Size csize, Size psize, int framerate, int publishBitrate, String codetype) {
 //    public VDEncoder(Size csize, Size psize, int framerate, int publishBitrate, String codetype, UdpSend udpSend) {
-        //UPD实例
-        this.udpSend = udpSend;
+//        //UPD实例
+//        this.udpSend = udpSend;
         //由于图片旋转过，所以高度宽度需要对调
         cWidth = csize.getHeight();
         cHeight = csize.getWidth();
@@ -87,6 +89,9 @@ public class VDEncoder {
         startEncoderThread();
     }
 
+    public void setTcpSend(TcpSend udpSend) {
+        this.udpSend = udpSend;
+    }
 
     private void startEncoderThread() {
         singleThreadExecutor.execute(new Runnable() {

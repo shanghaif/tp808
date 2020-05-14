@@ -161,14 +161,14 @@ public class Publish implements TextureView.SurfaceTextureListener {
             for (String cameraId : manager.getCameraIdList()) {
                 characteristics = manager.getCameraCharacteristics(cameraId);
 //                CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
-                Log.e("cjh", "camera num:"+manager.getCameraIdList().length+",cameraId:"+cameraId) ;
+                Log.e("cjh", "camera num:" + manager.getCameraIdList().length + ",cameraId:" + cameraId+"\nLENS_FACING:"+characteristics.get(CameraCharacteristics.LENS_FACING));
                 if (characteristics.get(CameraCharacteristics.LENS_FACING) ==
                         (map.isRotate() ? CameraCharacteristics.LENS_FACING_FRONT : CameraCharacteristics.LENS_FACING_BACK)) {
                     //获取StreamConfigurationMap管理摄像头支持的所有输出格式和尺寸,根据TextureView的尺寸设置预览尺寸
                     StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
                     //选取最佳分辨率初始化编码器（未必和设置的匹配，由于摄像头不支持设置的分辨率）
                     this.cameraId = cameraId;
-
+                    Log.e("cjh", "this.cameraId:" + this.cameraId);
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         manager.setTorchMode(cameraId, false);
                     }
@@ -193,14 +193,16 @@ public class Publish implements TextureView.SurfaceTextureListener {
 
             //计算比例(需对调宽高)
 //            tcpSend.setWeight((double) publishSize.getHeight() / publishSize.getWidth());
-            if (map.isPreview()) {
-                //  设置预览界面的大小
+//            if (map.isPreview()) {
+            //  设置预览界面的大小
 //                map.getPublishView().setWeight((double) previewSize.getHeight() / previewSize.getWidth());
-            }
+//            }
 
-//            recordEncoderVD = new RecordEncoderVD(previewSize, map.getFrameRate(), map.getCollectionBitrate(), writeMp4, map.getCodetype());
-//            vdEncoder = new VDEncoder(previewSize, publishSize, map.getFrameRate(), map.getPublishBitrate(), map.getCodetype(), tcpSend);
-//            //初始化音频编码
+            recordEncoderVD = new RecordEncoderVD(previewSize, map.getFrameRate(), map.getCollectionBitrate(), writeMp4, map.getCodetype());
+//            vdEncoder = new VDEncoder(previewSize, publishSize, map.getFrameRate(), map.getPublishBitrate(), map.getCodetype());
+            vdEncoder = new VDEncoder(previewSize, publishSize, map.getFrameRate(), map.getPublishBitrate(), map.getCodetype());
+            //  初始化音频编码
+//            voiceRecord = new VoiceRecord(map.getCollectionbitrate_vc(), map.getPublishbitrate_vc(), writeMp4);
 //            voiceRecord = new VoiceRecord(map.getCollectionbitrate_vc(), map.getPublishbitrate_vc(), writeMp4, udpSend);
 //            vdEncoder.start();
 //            voiceRecord.start();
@@ -263,6 +265,7 @@ public class Publish implements TextureView.SurfaceTextureListener {
         }
         try {
             //  打开相机
+            Log.e("cjh", "cameraId-*------------:" + cameraId);
             manager.openCamera(cameraId, new CameraDevice.StateCallback() {
                 @Override
                 public void onOpened( CameraDevice device) {
@@ -413,11 +416,11 @@ public class Publish implements TextureView.SurfaceTextureListener {
                     }
 
                     if (recordEncoderVD !=null)
-                    //录制编码器
-                    recordEncoderVD.addFrame(input);
+                        //  录制编码器
+                        recordEncoderVD.addFrame(input);
                     if (vdEncoder != null )
-                    //推流编码器
-                    vdEncoder.addFrame(input);
+                        //  推流编码器
+                        vdEncoder.addFrame(input);
 
 
 //                    //录制编码器
@@ -426,10 +429,10 @@ public class Publish implements TextureView.SurfaceTextureListener {
 //                    vdEncoder.addFrame(input);
 
 
-                    if ((System.currentTimeMillis() - time) > (1000 / map.getFrameRate())) {
-                        Log.e("Frame_loss", "图像处理速度过慢");
-//                        Log.d("Frame_slow", "图像处理速度过慢");
-                    }
+//                    if ((System.currentTimeMillis() - time) > (1000 / map.getFrameRate())) {
+//                        Log.e("Frame_loss", "图像处理速度过慢");
+////                        Log.d("Frame_slow", "图像处理速度过慢");
+//                    }
                 } else {
                     Log.d("Frame_loss", "图像采集速率不够");
                 }
@@ -524,6 +527,13 @@ public class Publish implements TextureView.SurfaceTextureListener {
     }
 
     public void startRecode() {
+        LogUtils.d("startRecode------------------------");
+        if (voiceRecord == null){
+            LogUtils.d("startRecode--------------------voiceRecord == null----");
+            voiceRecord = new VoiceRecord(map.getCollectionbitrate_vc(), map.getPublishbitrate_vc(), writeMp4, udpSend);
+
+        }
+        voiceRecord.start();
         voiceRecord.startRecode();
         recordEncoderVD.start();
         writeMp4.start();
@@ -535,7 +545,7 @@ public class Publish implements TextureView.SurfaceTextureListener {
         writeMp4.stop();
     }
 
-    //旋转
+    //  旋转
     public void rotate() {
         if (isCameraBegin) {
             releaseCamera();
@@ -593,14 +603,22 @@ public class Publish implements TextureView.SurfaceTextureListener {
         }
     };
 
-    public void initTcp(String phone, String ip, int port, int channelNum){
+    public void initTcp(String phone, String ip, int port, int channelNum, boolean isVoice){
         this.tcpSend = new TcpSend(phone, ip, port, channelNum) ;
-        recordEncoderVD = new RecordEncoderVD(previewSize, map.getFrameRate(), map.getCollectionBitrate(), writeMp4, map.getCodetype());
-        vdEncoder = new VDEncoder(previewSize, publishSize, map.getFrameRate(), map.getPublishBitrate(), map.getCodetype(), tcpSend);
-        //初始化音频编码
-        voiceRecord = new VoiceRecord(map.getCollectionbitrate_vc(), map.getPublishbitrate_vc(), writeMp4, udpSend);
+        vdEncoder.setTcpSend(tcpSend);
+//        recordEncoderVD = new RecordEncoderVD(previewSize, map.getFrameRate(), map.getCollectionBitrate(), writeMp4, map.getCodetype());
+//        vdEncoder = new VDEncoder(previewSize, publishSize, map.getFrameRate(), map.getPublishBitrate(), map.getCodetype(), tcpSend);
+//        //初始化音频编码
+//        voiceRecord = new VoiceRecord(map.getCollectionbitrate_vc(), map.getPublishbitrate_vc(), writeMp4, udpSend);
         vdEncoder.start();
-        voiceRecord.start();
+        if (isVoice){
+            if (voiceRecord == null){
+                voiceRecord = new VoiceRecord(map.getCollectionbitrate_vc(), map.getPublishbitrate_vc(), writeMp4, udpSend);
+            }
+            voiceRecord.start();
+        }
+
+
     }
 
     public void start() {
@@ -608,8 +626,12 @@ public class Publish implements TextureView.SurfaceTextureListener {
     }
 
     public void stop() {
-        tcpSend.stopsend();
-        tcpSend.closeTCPSocket() ;
+        try {
+            tcpSend.stopsend();
+            tcpSend.closeTCPSocket();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public void destroy() {
@@ -658,33 +680,37 @@ public class Publish implements TextureView.SurfaceTextureListener {
      */
     public void updateZoom(float currentFingerSpacing){
         assert  session != null;
-
         Rect rect = characteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE);
         if (rect == null) return ;
-        CaptureRequest.Builder builder = getPreviewBuilder();
-        float delta = 0.05f; // Control this value to control the zooming sensibility
-        if (fingerSpacing != 0) {
-            if (currentFingerSpacing > fingerSpacing) { //  Don't over zoom-in
-                if ((maximumZoomLevel - zoomLevel) <= delta) {
-                    delta = maximumZoomLevel - zoomLevel;
+        CaptureRequest.Builder builder = null;
+        try {
+            builder = getPreviewBuilder();
+            float delta = 0.05f; // Control this value to control the zooming sensibility
+            if (fingerSpacing != 0) {
+                if (currentFingerSpacing > fingerSpacing) { //  Don't over zoom-in
+                    if ((maximumZoomLevel - zoomLevel) <= delta) {
+                        delta = maximumZoomLevel - zoomLevel;
+                    }
+                    zoomLevel = zoomLevel + delta;
+                } else if (currentFingerSpacing < fingerSpacing) { //   Don't over zoom-out
+                    if ((zoomLevel - delta) < 1f) {
+                        delta = zoomLevel - 1f;
+                    }
+                    zoomLevel = zoomLevel - delta;
                 }
-                zoomLevel = zoomLevel + delta;
-            } else if (currentFingerSpacing < fingerSpacing) { //   Don't over zoom-out
-                if ((zoomLevel - delta) < 1f) {
-                    delta = zoomLevel - 1f;
-                }
-                zoomLevel = zoomLevel - delta;
-            }
-            float ratio = (float) 1 / zoomLevel; // This ratio is the ratio of cropped Rect to Camera's original(Maximum) Rect
-            //  croppedWidth and croppedHeight are the pixels cropped away, not pixels after cropped
-            int croppedWidth = rect.width() - Math.round((float) rect.width() * ratio);
-            int croppedHeight = rect.height() - Math.round((float) rect.height() * ratio);
-            //  Finally, zoom represents the zoomed visible area
-            zoom = new Rect(croppedWidth / 2, croppedHeight / 2,
-                    rect.width() - croppedWidth / 2, rect.height() - croppedHeight / 2);
-            builder.set(CaptureRequest.SCALER_CROP_REGION, zoom);
+                float ratio = (float) 1 / zoomLevel; // This ratio is the ratio of cropped Rect to Camera's original(Maximum) Rect
+                //  croppedWidth and croppedHeight are the pixels cropped away, not pixels after cropped
+                int croppedWidth = rect.width() - Math.round((float) rect.width() * ratio);
+                int croppedHeight = rect.height() - Math.round((float) rect.height() * ratio);
+                //  Finally, zoom represents the zoomed visible area
+                zoom = new Rect(croppedWidth / 2, croppedHeight / 2,
+                        rect.width() - croppedWidth / 2, rect.height() - croppedHeight / 2);
+                builder.set(CaptureRequest.SCALER_CROP_REGION, zoom);
 
-            LogUtils.d( "zoom:"+zoom+",currentFingerSpacing:"+currentFingerSpacing+",max:"+maximumZoomLevel) ;
+                LogUtils.d( "zoom:"+zoom+",currentFingerSpacing:"+currentFingerSpacing+",max:"+maximumZoomLevel) ;
+            }
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
         }
         fingerSpacing = currentFingerSpacing;
 //        sendRepeatingRequest(builder.build(), mPreviewCallback, mMainHandler);
@@ -698,10 +724,12 @@ public class Publish implements TextureView.SurfaceTextureListener {
     }
 
     private CaptureRequest.Builder previewBuilder ;
-    private CaptureRequest.Builder getPreviewBuilder() {
-        if (previewBuilder ==null){
+    private CaptureRequest.Builder getPreviewBuilder() throws CameraAccessException {
+        if (previewBuilder ==null && map.isPreview()){
 //            previewBuilder = createBuilder(CameraDevice.TEMPLATE_PREVIEW, getTextureSurface()) ;
             previewBuilder = createBuilder(CameraDevice.TEMPLATE_RECORD, getTextureSurface()) ;
+        }else {
+            previewBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);;
         }
         return previewBuilder;
     }
@@ -856,7 +884,7 @@ public class Publish implements TextureView.SurfaceTextureListener {
             return this;
         }
 
-//        public Buider setScreenshotsMode(@ScreenshotsMode int screenshotsMode) {
+        //        public Buider setScreenshotsMode(@ScreenshotsMode int screenshotsMode) {
 //            map.setScreenshotsMode(screenshotsMode);
 //            return this;
 //        }
@@ -881,7 +909,7 @@ public class Publish implements TextureView.SurfaceTextureListener {
             return this;
         }
 
-//        public Buider setPushMode(UdpSend pushMode) {
+        //        public Buider setPushMode(UdpSend pushMode) {
 //            map.setPushMode(pushMode);
 //            return this;
 //        }
@@ -1041,7 +1069,7 @@ public class Publish implements TextureView.SurfaceTextureListener {
             this.picturedirpath = picturedirpath;
         }
 
-//        private UdpSend getPushMode() {
+        //        private UdpSend getPushMode() {
 //            return pushMode;
 //        }
         private TcpSend getPushMode() {
@@ -1051,7 +1079,7 @@ public class Publish implements TextureView.SurfaceTextureListener {
             return uPush;
         }
 
-//        private void setPushMode(UdpSend pushMode) {
+        //        private void setPushMode(UdpSend pushMode) {
 //            this.pushMode = pushMode;
 //        }
         private void setPushMode(TcpSend tPush) {

@@ -43,6 +43,8 @@ import io.reactivex.functions.Action;
 public class VideoPushService extends Service {
     private String TAG = VideoPushService.class.getName() ;
     private Publish publish ;
+    private String host ;
+    private int tPort ;
     private String phone ;
 
     private NotificationManager notificationManager ;
@@ -63,9 +65,38 @@ public class VideoPushService extends Service {
 //        init() ;
         initNotification() ;
 //        initWindow();
+        initVideo() ;
     }
 
-    private void init() {
+    private void initVideo() {
+        publish = new Publish.Buider(this, null)
+//                .setPushMode(new UdpSend(phone, ip, port, channelNum))
+//                .setPushMode(new TcpSend(phone, ip, port, channelNum))
+                //  帧率
+                .setFrameRate(Constants.FRAME_RATE)
+                //  编码方式
+                .setVideoCode(Constants.VIDEO_ENCODING)
+                //  是否预览
+                .setIsPreview(false)
+                //  推流码率
+                .setPublishBitrate(Constants.VIDEO_PUSH_RATE)
+                //  采集码率
+                .setCollectionBitrate(Constants.VIDEO_SAMPLING_RATE)
+                //  音频采集码率
+                .setCollectionBitrateVC(Constants.VOICE_SAMPLING_RATE)
+                //  音频推流码率
+                .setPublishBitrateVC(Constants.VOICE_PUSH_RATE)
+                //  推流分辨率
+                .setPublishSize(Constants.PUSHER_RESOLUTION_W, Constants.PUSHER_RESOLUTION_H)
+                //  预览分辨率
+                .setPreviewSize(Constants.PREVIEW_RESOLUTION_W, Constants.PREVIEW_RESOLUTION_H)
+                //  摄像头选择
+                .setRotate(Constants.CAMERA)
+                .setVideoDirPath(Constants.VIDEOSAVEPATH)
+                .setPictureDirPath(Constants.PICTURESAVEPATH)
+                .setCenterScaleType(true)
+                .setScreenshotsMode(Publish.TAKEPHOTO)
+                .build();
     }
 
     @Override
@@ -81,7 +112,7 @@ public class VideoPushService extends Service {
     public void onDestroy() {
         super.onDestroy();
         destoryVideo() ;
-        destoryFloatWindow();
+//        destoryFloatWindow();
     }
 
 
@@ -92,11 +123,13 @@ public class VideoPushService extends Service {
 //            IP = ip ;
 //            Port = port ;
             phone = userName ;
+            host = ip ;
+            tPort = port ;
             if (TextUtils.isEmpty(ip) || port == 0){
                 LogUtils.d("setServerAddress -------------------- null ") ;
             }else {
-                initPushVideo(ip, port, channelNum);
-                if (needPublish) timeDisposable();
+                if (needPublish)
+                    initPushVideo(ip, port, channelNum);
             }
         }
 
@@ -150,41 +183,8 @@ public class VideoPushService extends Service {
     } ;
 
 
-    private void initPushVideo(String ip, int port, int channelNum){
-        publish = new Publish.Buider(this, null)
-//                .setPushMode(new UdpSend(phone, ip, port, channelNum))
-                .setPushMode(new TcpSend(phone, ip, port, channelNum))
-                //  帧率
-                .setFrameRate(Constants.FRAME_RATE)
-                //  编码方式
-                .setVideoCode(Constants.VIDEO_ENCODING)
-                //  是否预览
-                .setIsPreview(Constants.PREVIEW)
-                //  推流码率
-                .setPublishBitrate(Constants.VIDEO_PUSH_RATE)
-                //  采集码率
-                .setCollectionBitrate(Constants.VIDEO_SAMPLING_RATE)
-                //  音频采集码率
-                .setCollectionBitrateVC(Constants.VOICE_SAMPLING_RATE)
-                //  音频推流码率
-                .setPublishBitrateVC(Constants.VOICE_PUSH_RATE)
-                //  推流分辨率
-                .setPublishSize(Constants.PUSHER_RESOLUTION_W, Constants.PUSHER_RESOLUTION_H)
-                //  预览分辨率
-                .setPreviewSize(Constants.PREVIEW_RESOLUTION_W, Constants.PREVIEW_RESOLUTION_H)
-                //  摄像头选择
-                .setRotate(Constants.CAMERA)
-                .setVideoDirPath(Environment.getExternalStorageDirectory().getPath() + File.separator + "erayTonLive")
-                .setPictureDirPath(Environment.getExternalStorageDirectory().getPath() + File.separator + "erayTonPicture")
-                .setCenterScaleType(true)
-                .setScreenshotsMode(Publish.TAKEPHOTO)
-                .build();
-    }
-
-
     Disposable disposable ;
-    private void timeDisposable(){
-
+    private void initPushVideo(final String ip, final int port, final int channelNum){
         disposable = Flowable.intervalRange(0, Constants.VIDEO_INIT_TIME, 0, 1, TimeUnit.SECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnComplete(new Action() {
@@ -192,13 +192,22 @@ public class VideoPushService extends Service {
                     public void run() throws Exception {
                         //  倒计时完毕，处理方式
 //                        tuistar.performClick() ;
+//                        startVideo() ;
+                        publish.initTcp(phone, ip, port, channelNum, false);
                         startVideo() ;
                     }
-                })
-                .subscribe() ;
+                }).subscribe() ;
+
+
+
+
+//        publish.initTcp(phone, ip, port, channelNum, false);
+//        startVideo() ;
     }
 
+
     private boolean startVideo(){
+        LogUtils.d("startVideo----------------------------------");
         setNotificationMessage(getString(R.string.tip_video_recording), false) ;
         try {
             publish.start();
@@ -420,14 +429,14 @@ public class VideoPushService extends Service {
 
     }
 
-    private void destoryFloatWindow(){
-
-        if (floatingLayout != null) {
-            // 移除悬浮窗口
-            windowManager.removeView(floatingLayout);
-            floatingLayout = null;
-        }
-    }
+//    private void destoryFloatWindow(){
+//
+//        if (floatingLayout != null) {
+//            // 移除悬浮窗口
+//            windowManager.removeView(floatingLayout);
+//            floatingLayout = null;
+//        }
+//    }
 
     private void alertPromission(){
         //  6.0以后版本
@@ -439,7 +448,7 @@ public class VideoPushService extends Service {
                 startActivity(intent);
                 return;
             } else {
-                //6.0之前不用管
+                //  6.0之前不用管
             }
         }
         initWindow();

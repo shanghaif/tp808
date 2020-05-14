@@ -10,6 +10,8 @@ import com.library.live.stream.UdpSend;
 import com.library.util.OtherUtil;
 import com.library.util.SingleThreadExecutor;
 
+import cn.com.erayton.usagreement.utils.LogUtils;
+
 /**
  * Created by android1 on 2017/9/22.
  */
@@ -24,6 +26,7 @@ public class VoiceRecord {
 
     private SingleThreadExecutor singleThreadExecutor;
 
+//    public VoiceRecord(int collectionbitrate_vc, int publishbitrate_vc, WriteMp4 writeMp4) {
     public VoiceRecord(int collectionbitrate_vc, int publishbitrate_vc, WriteMp4 writeMp4, UdpSend udpSend) {
 //    public VoiceRecord(TcpSend udpSend, int collectionbitrate_vc, int publishbitrate_vc, WriteMp4 writeMp4) {
         recBufSize = AudioRecord.getMinBufferSize(
@@ -37,9 +40,19 @@ public class VoiceRecord {
                 AudioFormat.ENCODING_PCM_16BIT,
                 recBufSize);
         vencoder = new VCEncoder(publishbitrate_vc, recBufSize, udpSend);
+//        vencoder = new VCEncoder(publishbitrate_vc, recBufSize, udpSend);
+        vencoder.setUdpSend(udpSend);
         recordEncoderVC = new RecordEncoderVC(collectionbitrate_vc, recBufSize, writeMp4);
         singleThreadExecutor = new SingleThreadExecutor();
     }
+
+//    public void setTcp(TcpSend tcpSend){
+//        vencoder.setUdpSend(tcpSend);
+//    }
+//
+//    public void setUdpSend(UdpSend udpSend){
+//        vencoder.setUdpSend(udpSend);
+//    }
 
     /**
      * 得到语音原始数据
@@ -81,7 +94,14 @@ public class VoiceRecord {
     }
 
     public void startRecode() {
-        recordEncoderVC.startRecode();
+        LogUtils.d("startRecode------------------------");
+        //  判断是否正在录制
+        if (!recordEncoderVC.isCanEncoder()){
+            LogUtils.d("!startRecode------------------------");
+            //  未录制,开始录制
+            recordEncoderVC.startRecode();
+        }
+
     }
 
     public void stopRecode() {

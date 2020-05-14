@@ -374,15 +374,16 @@ public class Constants {
     public static int VIDEO_INIT_TIME = 2 ;
 
     //  kpbs 进制 ？
-    private static int SCALE = 1024 ;
+    private static int SCALE = 1000 ;
+//    private static int SCALE = 1024 ;
 
     //  帧率
     public static int FRAME_RATE = 30 ;
     //  推流分辨率
 //        public static int PUSHER_RESOLUTION_W = 700 ;
 //        public static int PUSHER_RESOLUTION_H = 525 ;
-    public static int PUSHER_RESOLUTION_W = 480 ;
-    public static int PUSHER_RESOLUTION_H = 320 ;
+    public static int PUSHER_RESOLUTION_W = 1280 ;
+    public static int PUSHER_RESOLUTION_H = 720 ;
     //  预览分辨率
     public static int PREVIEW_RESOLUTION_W = 1280 ;
     public static int PREVIEW_RESOLUTION_H = 720 ;

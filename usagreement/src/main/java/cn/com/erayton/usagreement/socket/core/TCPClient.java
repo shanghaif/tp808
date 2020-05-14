@@ -78,17 +78,11 @@ public class TCPClient implements Runnable {
 
         try {
             socket = new Socket() ;
-            Log.d("cjh", "--------------1---------------- "+socket.isConnected()+" ----------------------------") ;
             InetSocketAddress socketAddress = new InetSocketAddress(host, port) ;
-            Log.d("cjh", "---------------2--------------- "+socket.isConnected()+" ----------------------------") ;
             socket.connect(socketAddress, Constants.TCPTHREAD_TIMEOUT);
-            Log.d("cjh", "----------------3-------------- "+socket.isConnected()+" ----------------------------") ;
             socket.setKeepAlive(true);
-            Log.d("cjh", "-----------------4------------- "+socket.isConnected()+" ----------------------------") ;
             socket.setSoTimeout(Constants.TCPTHREAD_SO_TIMEOUT);
-            Log.d("cjh", "------------------5------------ "+socket.isConnected()+" ----------------------------") ;
             startReceiveThread() ;
-            Log.d("cjh", "-------------------6----------- "+socket.isConnected()+" ----------------------------") ;
         } catch (SocketException e) {
             e.printStackTrace();
             result = -1 ;

@@ -180,7 +180,8 @@ public class TCPClient implements Runnable {
         receiveThread = new Thread(this) ;
         setReceiveStop(false);
         receiveThread.setName("video TCP RECEIVE THREAD");
-        receiveThread.start();
+        if (receiveThread != null &&!receiveThread.isAlive())
+            receiveThread.start();
     }
 
     @Override

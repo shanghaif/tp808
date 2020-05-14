@@ -1,6 +1,7 @@
 package com.library;
 
 
+import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -12,6 +13,9 @@ import android.util.Log;
 import cn.com.erayton.usagreement.VideoPushAIDL;
 import cn.com.erayton.usagreement.VideoPushCallback;
 import cn.com.erayton.usagreement.service.VideoPushService;
+import cn.com.erayton.usagreement.utils.LogUtils;
+
+import static android.content.Context.ACTIVITY_SERVICE;
 
 /**
  * 视频开放接口类
@@ -22,6 +26,17 @@ public class USVideo {
     private Context context ;
     private static USVideo instance ;
     private VideoPushAIDL videoPushAIDL ;
+    private ServiceConnection serviceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            videoPushAIDL = VideoPushAIDL.Stub.asInterface(service) ;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+
+        }
+    } ;
 
 
     //  初始化
@@ -42,17 +57,18 @@ public class USVideo {
     //  初始化视频服务
     private void bindServiceAidl(){
         Intent intent = new Intent(context, VideoPushService.class) ;
-        context.bindService(intent, new ServiceConnection() {
-            @Override
-            public void onServiceConnected(ComponentName name, IBinder service) {
-                videoPushAIDL = VideoPushAIDL.Stub.asInterface(service) ;
-            }
-
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-
-            }
-        },Context.BIND_AUTO_CREATE) ;
+        context.bindService(intent, serviceConnection ,Context.BIND_AUTO_CREATE) ;
+//        context.bindService(intent, new ServiceConnection() {
+//            @Override
+//            public void onServiceConnected(ComponentName name, IBinder service) {
+//                videoPushAIDL = VideoPushAIDL.Stub.asInterface(service) ;
+//            }
+//
+//            @Override
+//            public void onServiceDisconnected(ComponentName name) {
+//
+//            }
+//        },Context.BIND_AUTO_CREATE) ;
     }
 
     /**  设置视频服务参数，设置之后自动开始视频录制
@@ -81,7 +97,8 @@ public class USVideo {
      *
      * */
     public void stopRecord() throws RemoteException {
-        videoPushAIDL.distoryVideo() ;
+        assert videoPushAIDL != null ;
+        videoPushAIDL.closeVideo() ;
     }
 
 //    /**截屏
@@ -96,6 +113,7 @@ public class USVideo {
      * @throws RemoteException
      */
     public void tackPicture() throws RemoteException {
+        assert videoPushAIDL != null ;
         videoPushAIDL.tackPicture();
     }
 
@@ -104,6 +122,7 @@ public class USVideo {
      * @param isOpen    是否开启摄像头
      */
     public void openCamera(boolean isOpen) throws RemoteException {
+        assert videoPushAIDL != null ;
         videoPushAIDL.openCamera(isOpen);
     }
 
@@ -122,5 +141,39 @@ public class USVideo {
      * */
     public void unRegisterCallbackListener(VideoPushCallback callback) throws RemoteException {
         videoPushAIDL.unRegisterCallback(callback);
+    }
+
+    public void onDestory(){
+        try {
+            if (videoPushAIDL != null) {
+                videoPushAIDL.distoryVideo();
+            }
+            if (isRunService(context, "cn.com.erayton.usagreement.service.VideoPushService")) {
+                LogUtils.d("service---------------------------------------running");
+                context.unbindService(serviceConnection);
+//                IllegalArgumentException
+            }
+            instance = null ;
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
+     * 判断服务是否在运行
+     * @param context
+     * @param serviceName
+     * @return
+     * 服务名称为全路径 例如com.ghost.WidgetUpdateService
+     */
+    public boolean isRunService(Context context,String serviceName) {
+        ActivityManager manager = (ActivityManager) context.getSystemService(ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceName.equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 }

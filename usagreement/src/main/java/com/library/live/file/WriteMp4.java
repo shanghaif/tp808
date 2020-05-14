@@ -23,6 +23,7 @@ import java.nio.ByteBuffer;
 import cn.com.erayton.usagreement.ApplicationProvider;
 import cn.com.erayton.usagreement.data.db.DbTools;
 import cn.com.erayton.usagreement.utils.BitOperator;
+import cn.com.erayton.usagreement.utils.LogUtils;
 
 /**
  * 视频录制与保存
@@ -81,7 +82,7 @@ public class WriteMp4 {
 
         @Override
         public void failure(String err) {
-            Log.e("cjh", "failure"+err) ;
+            LogUtils.e("cjh", "failure"+err) ;
         }
     };
 
@@ -106,10 +107,18 @@ public class WriteMp4 {
 
 
     public void start() {
+        LogUtils.d("start ----------------------------");
         startTime = BitOperator.getInstance().getNowBCDTimeString() ;
         RECODE_STATUS = RECODE_STATUS_READY;
         synchronized (lock) {
+
+            LogUtils.d("start -----------lock-----------------");
+            LogUtils.d("start -----------lock------------(voiceFormat != null)-----"+(voiceFormat != null));
+            LogUtils.d("start -----------lock------------(videoFormat != null)-----"+(videoFormat != null));
+            LogUtils.d("start -----------lock------------(mMediaMuxer == null)-----"+(mMediaMuxer == null));
             if (voiceFormat != null && videoFormat != null && mMediaMuxer == null) {
+
+                LogUtils.d("start -------lock------------voiceFormat != null && videoFormat != null && mMediaMuxer == null---------");
                 isShouldStart = false;
                 setPath();
                 try {
@@ -156,6 +165,7 @@ public class WriteMp4 {
     }
 
     private void setPath() {
+        LogUtils.d("setPath ----------------------------");
         FileUtils.createDirFile(dirpath);
 //        //  文件名规则， 开始时间(YYMMDDHHmmss)_通道号_资源类型(音视频,音频,视频,)_码流类型(主,子码流)
 //        String format="%s_%d_%d_%d" ;
@@ -168,8 +178,11 @@ public class WriteMp4 {
     }
 
     public void stop() {
+        LogUtils.d("stop ----------------------------");
         synchronized (lock) {
+            LogUtils.d("stop ----------------lock------------");
             if (RECODE_STATUS == RECODE_STATUS_START) {
+                LogUtils.d("stop ------------RECODE_STATUS == RECODE_STATUS_START----------------"+(RECODE_STATUS == RECODE_STATUS_START));
                 endTime = BitOperator.getInstance().getNowBCDTimeString() ;
                 boolean iscatch = false;
                 try {
@@ -178,7 +191,7 @@ public class WriteMp4 {
                         path = FileUtils.FixFileName(path, String.format(format, startTime, endTime, channel, 0, 0)) ;
                         writeFileCallback.success(path);
                     }
-                    Log.d("app_WriteMp4", "文件录制关闭");
+                    LogUtils.d("app_WriteMp4", "文件录制关闭");
                 } catch (Exception e) {
                     iscatch = true;
                 } finally {
