@@ -5,6 +5,7 @@ package cn.com.erayton.usagreement.model.decode;
 import cn.com.erayton.usagreement.model.encode.HeaderMsg;
 import cn.com.erayton.usagreement.utils.BitOperator;
 import cn.com.erayton.usagreement.utils.HexStringUtils;
+import cn.com.erayton.usagreement.utils.LogUtils;
 
 /**
  * JT808协议转义工具类
@@ -21,6 +22,7 @@ public class DataHeader {
 
     private static final String FLAG_7D ="0X7D" ;
     private static final String FLAG_7E ="0X7E" ;
+    private static boolean isPackage = false ;
 
     /**
      * 包装808数据

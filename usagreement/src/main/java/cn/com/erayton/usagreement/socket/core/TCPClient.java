@@ -1,7 +1,5 @@
 package cn.com.erayton.usagreement.socket.core;
 
-import android.util.Log;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -14,6 +12,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import cn.com.erayton.usagreement.data.Constants;
+import cn.com.erayton.usagreement.utils.HexStringUtils;
+import cn.com.erayton.usagreement.utils.LogUtils;
 
 public class TCPClient implements Runnable {
     public interface TCPClientListener {
@@ -134,7 +134,6 @@ public class TCPClient implements Runnable {
         threadPoolExecutor.execute(new Runnable() {
             @Override
             public void run() {
-                Log.d("cjh", "------------------------------ onTcpSend ----------------------------") ;
                 listener.onTcpSend(bytes, send(bytes));
             }
         });
@@ -146,7 +145,7 @@ public class TCPClient implements Runnable {
         if( socket == null ){
             return false;
         }
-
+        LogUtils.d("cjh", "send -----------\n "+ HexStringUtils.toHexString(bytes)) ;
         synchronized (sendLock) {
             try {
                 OutputStream sokectWrite = socket.getOutputStream();
@@ -199,7 +198,6 @@ public class TCPClient implements Runnable {
                 byte[] buffer = new byte[socket.getReceiveBufferSize()];
 //                byte[] buffer = new byte[256];
                 int count = inputStream.read(buffer);
-                Log.i("cjh", "count:"+count) ;
                 if (count > 0) {
                     receiveBytes = new byte[count];
 //                    receiveBytes = new byte[256];

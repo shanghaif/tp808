@@ -56,9 +56,13 @@ import cn.erayton.voicelib.Mp3Lib;
 
 public class MainActivity extends AppCompatActivity {
     private final int REQUEST_CAMERA = 666;
-    private String host1 = "106.14.186.44" ;
+    private String host1 = "192.168.1.145" ;
+    private int port1 =5508 ;
+    private int port =0 ;
+//    private String host1 = "106.14.186.44" ;
     private String host = "" ;
     private String host2 = "video.erayton.cn" ;
+    private int port2 = 7000 ;
 //    private String phone ="23803560303" ;
     private String phone ="23803560285" ;
 //    private String phone ="23803641388" ;
@@ -74,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
         EventBusUtils.register(this);
         requestpermission();
         host = host2 ;
+        port = port2 ;
         initView();
     }
 
@@ -82,12 +87,14 @@ public class MainActivity extends AppCompatActivity {
             case R.id.changeIp:
                 if (host.equalsIgnoreCase(host1)){
                     host = host2 ;
+                    port = port2;
                 }else {
                     host = host1 ;
+                    port = port1 ;
                 }
                 ipButton.setText(host);
                 USManager.getSingleton().ServerLogin(phone, host,
-                        7000, 7000, false);
+                        port, port, false);
             break;
         }
     }
@@ -150,14 +157,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (isRecord){
+                    USManager.getSingleton().setIsLocation(false);
+
                     publish.stopRecode();
                     button.setText("start Record");
                     isRecord = false ;
                 }else {
+                    USManager.getSingleton().setIsLocation(true);
                     publish.startRecode();
                     button.setText("stop Record");
                     isRecord = true ;
                 }
+                USManager.getSingleton().SendGPS(true, true, true, true) ;
             }
         });
         button.setOnLongClickListener(new View.OnLongClickListener() {
@@ -170,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         USManager.getSingleton().ServerLogin(phone, host,
-                7000, 7000, false);
+                port, port, false);
 
 
         publishView.setVisibility(View.VISIBLE);
@@ -315,7 +326,6 @@ public class MainActivity extends AppCompatActivity {
         byte[] a = { 1, 1, 1, 1, 1, 1, 1, 1 };
         for (VideoRecord v:DbTools.queryVideoRecord()){
             TerminalResourceInfo info = new TerminalResourceInfo() ;
-            Log.e("cjh", "list:"+v) ;
             info.setChannelNum(v.getChannel());
             info.setStartTime(String.valueOf(v.getStartTime()));
             info.setEndTime(String.valueOf(v.getEndTime()));

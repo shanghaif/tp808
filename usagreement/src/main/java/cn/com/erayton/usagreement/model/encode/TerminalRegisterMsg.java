@@ -102,7 +102,7 @@ public class TerminalRegisterMsg extends PacketData {
 
 
     public byte[] packageDataBody2Byte() {
-
+        byte[] type ;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
             //拼接消息体
@@ -111,11 +111,20 @@ public class TerminalRegisterMsg extends PacketData {
             //市县域 ID
             baos.write(BitOperator.getInstance().integerTo2Bytes(terminalRegInfo.getCityId()));
             //制造商 ID
-            baos.write(terminalRegInfo.getManufacturerId().getBytes());
+            type = new byte[5] ;
+            System.arraycopy(terminalRegInfo.getManufacturerId().getBytes(), 0, type, 0, Math.min(terminalRegInfo.getManufacturerId().getBytes().length, type.length)) ;
+            baos.write(type);
+//            baos.write(terminalRegInfo.getManufacturerId().getBytes());
             //终端型号
-            baos.write(terminalRegInfo.getTerminalType().getBytes());
+            type = new byte[20] ;
+            System.arraycopy(terminalRegInfo.getTerminalType().getBytes(), 0, type, 0, Math.min(terminalRegInfo.getTerminalType().getBytes().length, type.length)) ;
+            baos.write(type);
+//            baos.write(terminalRegInfo.getTerminalType().getBytes());
             //终端 ID
-            baos.write(terminalRegInfo.getTerminalId().getBytes());
+            type = new byte[7] ;
+            System.arraycopy(terminalRegInfo.getTerminalId().getBytes(), 0, type, 0, Math.min(terminalRegInfo.getTerminalId().getBytes().length, type.length)) ;
+            baos.write(type);
+//            baos.write(terminalRegInfo.getTerminalId().getBytes());
             //车牌颜色
             baos.write(BitOperator.getInstance().integerTo1Byte(terminalRegInfo.getLicensePlateColor()));
             //车牌标识

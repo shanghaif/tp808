@@ -9,6 +9,8 @@ import java.io.IOException;
 import cn.com.erayton.usagreement.model.decode.PacketData;
 import cn.com.erayton.usagreement.model.model.TerminalGPSInfo;
 import cn.com.erayton.usagreement.utils.BitOperator;
+import cn.com.erayton.usagreement.utils.HexStringUtils;
+import cn.com.erayton.usagreement.utils.LogUtils;
 
 /**
  * 终端 GPS 信息
@@ -54,7 +56,7 @@ public class TerminalGPSMsg extends PacketData {
             baos.write(BitOperator.getInstance().longToBytes(terminalGPSInfo.getLongitude(), 4));
             baos.write(BitOperator.getInstance().integerTo2Bytes(terminalGPSInfo.getAltitude()));
             baos.write(BitOperator.getInstance().integerTo2Bytes(terminalGPSInfo.getSpeed()));
-            baos.write(BitOperator.getInstance().integerTo2Bytes(terminalGPSInfo.getDirection()));
+            baos.write(BitOperator.getInstance().integerTo1Bytes(terminalGPSInfo.getDirection()));
 //            baos.write(BCD8421Operator.getInstance().getBCDTime());
             baos.write(terminalGPSInfo.getBCDTime());
             baos.write(BitOperator.getInstance().integerTo1Bytes(terminalGPSInfo.getAdditionalInformationId()));

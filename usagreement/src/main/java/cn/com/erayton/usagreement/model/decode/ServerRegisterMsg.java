@@ -8,7 +8,9 @@ import cn.com.erayton.usagreement.utils.LogUtils;
 
 
 public class ServerRegisterMsg extends PacketData {
+    //  结果
     private int registerResult;
+    //  鉴权码
     private String authentication;
 
 
@@ -47,7 +49,9 @@ public class ServerRegisterMsg extends PacketData {
         LogUtils.e(HexStringUtils.toHexString(tmp));
         setAnswerFlowId(BitOperator.getInstance().parseIntFromBytes(tmp, 0, 2));
         setRegisterResult(BitOperator.getInstance().parseIntFromBytes(tmp, 2, 1));
-        setAuthentication(new String(tmp, 3, tmp.length - 3));
+       if (getRegisterResult() == 0) {
+           setAuthentication(new String(tmp, 3, tmp.length - 3));
+       }
     }
 
     @Override

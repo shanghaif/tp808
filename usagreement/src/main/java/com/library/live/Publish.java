@@ -265,7 +265,7 @@ public class Publish implements TextureView.SurfaceTextureListener {
         }
         try {
             //  打开相机
-            Log.e("cjh", "cameraId-*------------:" + cameraId);
+            Log.e("cjh", "cameraId -------------:" + cameraId);
             manager.openCamera(cameraId, new CameraDevice.StateCallback() {
                 @Override
                 public void onOpened( CameraDevice device) {
@@ -604,6 +604,7 @@ public class Publish implements TextureView.SurfaceTextureListener {
     };
 
     public void initTcp(String phone, String ip, int port, int channelNum, boolean isVoice){
+//        Integer.toBinaryString()
         this.tcpSend = new TcpSend(phone, ip, port, channelNum) ;
         vdEncoder.setTcpSend(tcpSend);
 //        recordEncoderVD = new RecordEncoderVD(previewSize, map.getFrameRate(), map.getCollectionBitrate(), writeMp4, map.getCodetype());

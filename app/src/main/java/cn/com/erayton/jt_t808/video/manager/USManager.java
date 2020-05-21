@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.speedtalk.protocol.tscobjs.paramobjs.IP;
 
+import java.util.Arrays;
 import java.util.List;
 
 import cn.com.erayton.jt_t808.constants.PublicConstants;
@@ -16,6 +17,7 @@ import cn.com.erayton.usagreement.data.Constants;
 import cn.com.erayton.usagreement.model.decode.ServerFileUploadMsg;
 import cn.com.erayton.usagreement.model.decode.ServerVideoReplayMsg;
 import cn.com.erayton.usagreement.model.model.TerminalAuthInfo;
+import cn.com.erayton.usagreement.model.model.TerminalGPSInfo;
 import cn.com.erayton.usagreement.model.model.TerminalGeneralInfo;
 import cn.com.erayton.usagreement.model.model.TerminalParametersInfo;
 import cn.com.erayton.usagreement.model.model.TerminalRegInfo;
@@ -132,17 +134,26 @@ public class USManager {
         regInfo.setProvinceId(0x00);
         regInfo.setCityId(0x00);
         regInfo.setManufacturerId("12345");
-        regInfo.setTerminalType("12345678901234567890");
+        regInfo.setTerminalType("Z210");
         regInfo.setTerminalId("ABCD123");
         regInfo.setLicensePlateColor(0x01);
-        regInfo.setLicensePlate("测试03");        // 终端名称 - 别名
-        Log.d(TAG, "SendRegister ---------------------------------"+regInfo) ;
+        regInfo.setLicensePlate("粤O88888");        // 终端名称 - 别名
+        Log.d(TAG, "SendRegister ---------------------------------"+regInfo+"---"+(Arrays.toString("O8ss03".getBytes()))) ;
         SocketClientSender.sendRegister(regInfo, false ,false) ;
     }
 
-    //  发送GPS
-//    public void SendGPS(Gps gps){
-//        TerminalGPSMsg.TerminalGPSInfo terminalGPSInfo = new TerminalGPSMsg.TerminalGPSInfo() ;
+////      发送GPS
+//    public void SendGPS(){
+//    //        报警状态
+//        int acc = 1;
+//        int loc = 2 ;
+//        int lat = 4;
+//        int lon = 8 ;
+//        int sta = 16 ;
+//        int laon = 32 ;
+//
+//
+//        TerminalGPSInfo terminalGPSInfo = new TerminalGPSInfo() ;
 //        terminalGPSInfo.setWarningMark(0);
 //
 //        String radix2State = null;
@@ -155,17 +166,71 @@ public class USManager {
 //        }
 //
 //        terminalGPSInfo.setState(radix2State);
-//        terminalGPSInfo.setLatitude(gps.getLt());
-//        terminalGPSInfo.setLongitude(gps.getLg());
-//        terminalGPSInfo.setAltitude(gps.getHight());
-//        terminalGPSInfo.setSpeed((int) gps.getSpeed());
+//        terminalGPSInfo.setLatitude(23.102456);
+//        terminalGPSInfo.setLongitude(111.123456);
+//        terminalGPSInfo.setAltitude(20);
+//        terminalGPSInfo.setSpeed(50);
 //        terminalGPSInfo.setAdditionalInformationId(0x01);
 //        terminalGPSInfo.setAdditionalInformationLength(4);
 //        terminalGPSInfo.setMileage(10);
-//        terminalGPSInfo.setDirection(gps.getDirection());
-//        Log.d(TAG, "SendGPS ---------------------------------"+gps) ;
+//        terminalGPSInfo.setDirection(40);
+//        Log.d(TAG, "SendGPS ---------------------------------") ;
 //        SocketClientSender.sendGPS(terminalGPSInfo, false, false) ;
 //    }
+//      发送GPS
+    public void SendGPS(boolean isAcc, boolean isLocation, boolean isGps , boolean isBeiDou){
+    //        报警状态
+        int acc = 1;
+        int loc = 2 ;
+        int nowStatus = 31 ;
+
+        if (isGps){
+            nowStatus = nowStatus<<1 | acc ;
+            if (isBeiDou){
+                nowStatus = nowStatus<<1 | acc ;
+            }
+        }else {
+            if (isBeiDou){
+                nowStatus = nowStatus<<2 | loc ;
+            }
+        }
+
+        nowStatus <<= 12 ;
+        if (isAcc) nowStatus |= acc ;
+        TerminalGPSInfo terminalGPSInfo = new TerminalGPSInfo() ;
+        terminalGPSInfo.setWarningMark(0);
+
+//        String radix2State = null;
+//        if (isLocation){
+//            //  定位成功
+//            radix2State = "00000000000001100000000000000011";
+//        }else {
+//            //  未定位
+//            radix2State = "00000000000001100000000000000001";
+//        }
+        if (isLocation){
+            //  定位成功
+            nowStatus |= loc ;
+        }
+//        else {
+//            //  未定位
+////            radix2State = "00000000000001100000000000000001";
+//            nowStatus = nowStatus;
+//        }
+
+        terminalGPSInfo.setState(Integer.toBinaryString(nowStatus));
+//        terminalGPSInfo.setState(radix2State);
+        terminalGPSInfo.setLatitude(23.102456);
+        terminalGPSInfo.setLongitude(111.123456);
+        terminalGPSInfo.setAltitude(20);
+        terminalGPSInfo.setSpeed(50);
+        terminalGPSInfo.setAdditionalInformationId(0x01);
+        terminalGPSInfo.setAdditionalInformationLength(4);
+        terminalGPSInfo.setMileage(10);
+        terminalGPSInfo.setDirection(40);
+        Log.d(TAG, "SendGPS ---------------------------------") ;
+        SocketClientSender.sendGPS(terminalGPSInfo, false, false) ;
+    }
 
     //  发送鉴权
     public void SendAuth() {
@@ -179,12 +244,13 @@ public class USManager {
 //        }else {
 //            authInfo.setAuth(authCode);
 //        }
-//        Log.d(TAG, "SendAuth ---------------------------------"+authCode) ;
+        Log.d(TAG, "SendAuth ---------------------------------"+authCode+","+PublicConstants.ApiConstants.USAUTHCODE) ;
 //        SocketClientSender.sendAuth(authInfo, false, false) ;
         TerminalAuthInfo authInfo = new TerminalAuthInfo();
         if (authCode == null){
             if (PublicConstants.ApiConstants.USAUTHCODE.equals("0")){
                 USLogin() ;     //  重新登陆
+                return;
             }else {
                 authInfo.setAuth(PublicConstants.ApiConstants.USAUTHCODE);
             }
@@ -193,6 +259,7 @@ public class USManager {
         }
         Log.d(TAG, "SendAuth ---------------------------------"+authCode) ;
         SocketClientSender.sendAuth(authInfo, false, false) ;
+
     }
 
     public void SendGeneralResp(int seNum ,int respId, int code){
@@ -443,6 +510,10 @@ public class USManager {
             isReconnect = true ;
             Log.i(TAG, "reconnect()-----------------------------------") ;
 //            connect(false);
+        if (getAuthCode() != null){
+            setAuthCode(null) ;
+            PublicConstants.ApiConstants.USAUTHCODE = "0" ;
+        }
 //        }
     }
 

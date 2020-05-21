@@ -389,15 +389,16 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
     }
 
     public boolean sendUdpMsg(byte[] data, boolean isAsyn){
+        LogUtils.d( "Send " + HexStringUtils.toHexString(data));
         if (!isAsyn) {
             udpClient.sendAsyn(data) ;
             if (!udpClient.sendAsyn(data)) {
-                LogUtils.d( "Send " + data + " to fail. [Asyn][UDP] error:" + data);
+                LogUtils.d( "Send " + data + " to fail. [Asyn][UDP] error");
                 return false;
             }
         }else {
             if (!udpClient.send(data)) {
-                LogUtils.d( "Send " + data + " to fail. [Sync][UDP] error:" + data);
+                LogUtils.d( "Send " + data + " to fail. [Sync][UDP] error");
                 return false;
             } else {
                 LogUtils.d( "Send " + data + " success.[UDP][Sync]");
@@ -603,7 +604,9 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
                         packetData.setMsgHeader(msgHeader);
                         packetData.inflatePackageBody(data);
                         int registerResult = ((ServerRegisterMsg) packetData).getRegisterResult() ;
-                        LogUtils.d( "----------------------注册应答-------- OnDispathCmd --------------45------------\n registerResult  -"+registerResult) ;
+                        LogUtils.d( "----------------------注册应答-------- OnDispathCmd --------------45------------\n registerResult:"+registerResult+
+                                "auth:"+((ServerRegisterMsg) packetData).getAuthentication()
+                                ) ;
 
                         if (registerResult == 0 ){      //  注册成功
                             listener.registerResp(registerResult, ((ServerRegisterMsg) packetData).getAuthentication());

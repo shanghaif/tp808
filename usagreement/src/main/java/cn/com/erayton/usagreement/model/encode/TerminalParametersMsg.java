@@ -31,7 +31,6 @@ public class TerminalParametersMsg extends PacketData {
     @Override
     public int getBodyLength() {
         byte[] bytes = packageDataBody2Byte() ;
-
         return bytes.length;
     }
 
