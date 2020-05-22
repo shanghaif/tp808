@@ -36,4 +36,10 @@ dependencies {
     // https://mvnrepository.com/artifact/commons-net/commons-net
     implementation group: 'commons-net', name: 'commons-net', version: '3.6'
 
+
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.5.4'
+    releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
+
+    implementation 'org.greenrobot:eventbus:3.0.0'
+
 }

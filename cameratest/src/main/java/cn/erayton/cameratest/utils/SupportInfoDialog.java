@@ -1,9 +1,12 @@
 package cn.erayton.cameratest.utils;
 
+public class SupportInfoDialog extends CameraDialog {
+    private String message ;
 
-import android.content.DialogInterface;
+    public void setMessage(String message) {
+        this.message = message;
+    }
 
-public class PermissionDialog extends CameraDialog {
     @Override
     String getTitle() {
         return null;
@@ -11,7 +14,7 @@ public class PermissionDialog extends CameraDialog {
 
     @Override
     String getMessage() {
-        return null;
+        return message;
     }
 
     @Override
@@ -26,6 +29,8 @@ public class PermissionDialog extends CameraDialog {
 
     @Override
     void onButtonClick(int which) {
-
+        dismiss();
     }
+
+
 }
