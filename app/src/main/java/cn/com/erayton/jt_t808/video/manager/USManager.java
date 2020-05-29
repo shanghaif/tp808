@@ -5,8 +5,6 @@ import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.speedtalk.protocol.tscobjs.paramobjs.IP;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -24,6 +22,7 @@ import cn.com.erayton.usagreement.model.model.TerminalRegInfo;
 import cn.com.erayton.usagreement.model.model.TerminalResourceInfo;
 import cn.com.erayton.usagreement.socket.client.SocketClient;
 import cn.com.erayton.usagreement.socket.client.SocketClientSender;
+import cn.com.erayton.usagreement.utils.Utils;
 
 
 public class USManager {
@@ -177,48 +176,18 @@ public class USManager {
 //        Log.d(TAG, "SendGPS ---------------------------------") ;
 //        SocketClientSender.sendGPS(terminalGPSInfo, false, false) ;
 //    }
-//      发送GPS
+
+    /** 发送GPS
+     *
+     * @param isAcc acc 是否开
+     * @param isLocation    是否有效定位
+     * @param isGps         是否开启 gps 定位
+     * @param isBeiDou      是否开启北斗定位
+     */
     public void SendGPS(boolean isAcc, boolean isLocation, boolean isGps , boolean isBeiDou){
-    //        报警状态
-        int acc = 1;
-        int loc = 2 ;
-        int nowStatus = 31 ;
-
-        if (isGps){
-            nowStatus = nowStatus<<1 | acc ;
-            if (isBeiDou){
-                nowStatus = nowStatus<<1 | acc ;
-            }
-        }else {
-            if (isBeiDou){
-                nowStatus = nowStatus<<2 | loc ;
-            }
-        }
-
-        nowStatus <<= 12 ;
-        if (isAcc) nowStatus |= acc ;
         TerminalGPSInfo terminalGPSInfo = new TerminalGPSInfo() ;
         terminalGPSInfo.setWarningMark(0);
-
-//        String radix2State = null;
-//        if (isLocation){
-//            //  定位成功
-//            radix2State = "00000000000001100000000000000011";
-//        }else {
-//            //  未定位
-//            radix2State = "00000000000001100000000000000001";
-//        }
-        if (isLocation){
-            //  定位成功
-            nowStatus |= loc ;
-        }
-//        else {
-//            //  未定位
-////            radix2State = "00000000000001100000000000000001";
-//            nowStatus = nowStatus;
-//        }
-
-        terminalGPSInfo.setState(Integer.toBinaryString(nowStatus));
+        terminalGPSInfo.setState(Utils.getStateAssembly(isAcc, isLocation, isGps, isBeiDou));
 //        terminalGPSInfo.setState(radix2State);
         terminalGPSInfo.setLatitude(23.102456);
         terminalGPSInfo.setLongitude(111.123456);

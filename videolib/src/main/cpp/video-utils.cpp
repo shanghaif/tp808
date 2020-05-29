@@ -1,5 +1,11 @@
+#include "video-utils.h"
 #include <jni.h>
 #include <string>
+
+#include <cstdlib>
+#include <cstdio>
+#include <cstring>
+#include <sys/time.h>
 //#include "libyuv.h"
 
 void scaleI420(jbyte *src_i420_data, jint width, jint height, jbyte *dst_i420_data, jint dst_width,
@@ -211,5 +217,11 @@ Java_cn_erayton_videolib_utils_VideoLib_cropYUV(JNIEnv *env, jclass type, jbyteA
 
     env->ReleaseByteArrayElements(src_, src_i420_data, 0);
     env->ReleaseByteArrayElements(dst_, dst_i420_data, 0);
-}
+    }
+};
+
+
 //cn_erayton_videolib_utils_VideoLib_
+
+
+

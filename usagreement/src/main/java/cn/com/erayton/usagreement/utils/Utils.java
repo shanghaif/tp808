@@ -99,4 +99,69 @@ public class Utils {
 //        Log.d(TAG, "getSixPoint"+Double.parseDouble(String.format("%.6f", d))) ;
         return Double.parseDouble(String.format("%.6f", d)) ;
     }
+
+    /** 状态位定义
+     *
+     * @param isAcc         acc 是否开
+     * @param isLocation    是否有效定位
+     * @param isGps         是否开启 gps 定位
+     * @param isBeiDou      是否开启北斗定位
+     */
+    public static String getStateAssembly(boolean isAcc, boolean isLocation, boolean isGps , boolean isBeiDou){
+        //        报警状态
+        int acc = 1;    //  1
+        int loc = 2 ;   //  10
+        int nowStatus = 31 ;        //  11111
+
+        if (isGps){
+            nowStatus = nowStatus<<1 | acc ;
+            if (isBeiDou){
+                nowStatus = nowStatus<<1 | acc ;
+            }
+        }else {
+            if (isBeiDou){
+                nowStatus = nowStatus<<2 | loc ;
+            }
+        }
+        //  后补 0
+        nowStatus <<= 12 ;
+        if (isAcc) nowStatus |= acc ;
+        if (isLocation){
+            //  定位成功
+            nowStatus |= loc ;
+        }
+        //  int 类型转为二进制字符串
+        return Integer.toBinaryString(nowStatus) ;
+    }
+
+
+
+    /** 报警标志位定义
+     */
+    public static String getWarnAssembly(){
+//        //        报警状态
+//        int acc = 1;    //  1
+//        int loc = 2 ;   //  10
+        int nowStatus = 31 ;    //  11111
+//
+//        if (isGps){
+//            nowStatus = nowStatus<<1 | acc ;
+//            if (isBeiDou){
+//                nowStatus = nowStatus<<1 | acc ;
+//            }
+//        }else {
+//            if (isBeiDou){
+//                nowStatus = nowStatus<<2 | loc ;
+//            }
+//        }
+//        //  后补 0
+//        nowStatus <<= 12 ;
+//        if (isAcc) nowStatus |= acc ;
+//        if (isLocation){
+//            //  定位成功
+//            nowStatus |= loc ;
+//        }
+
+        return Integer.toBinaryString(nowStatus) ;
+    }
 }

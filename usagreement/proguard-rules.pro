@@ -19,34 +19,36 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
-
-
-
-###########################以下是AndroidStudio自带的混淆配置协议###############################
-
-# 表示混淆时不使用大小写混合类名
--dontusemixedcaseclassnames
-
-# 表示不跳过library中的非public的类
--dontskipnonpubliclibraryclasses
-
-# 打印混淆的详细信息
--verbose
-
+#基本不用动区域-----------------------------------------
+#基本指令区---------------------------------------------
+-optimizationpasses 5 # 代码混淆的压缩比例，值在0-7之间
+-dontusemixedcaseclassnames # 混淆后类名都为小写
+-dontskipnonpubliclibraryclasses # 指定不去忽略非公共的库的类
+-dontskipnonpubliclibraryclassmembers # 指定不去忽略非公共的库的类的成员
+-dontshrink
 # Optimization is turned off by default. Dex does not like code run
 # through the ProGuard optimize and preverify steps (and performs some
 # of these optimizations on its own).
 -dontoptimize
+-dontpreverify #    不做预校验的操作, 表示不进行校验,这个校验作用 在java平台上的
+-verbose    # 打印混淆的详细信息
+-printmapping proguardMapping.txt # 生成原类名和混淆后的类名的映射文件
+-optimizations !code/simplification/cast,!field/*,!class/merging/* # 指定混淆是采用的算法
+-keepattributes *Annotation*,InnerClasses # #使用注解需要添加, 不混淆Annotation
+-keepattributes Signature # 不混淆泛型
+-keepattributes SourceFile,LineNumberTable # 抛出异常时保留代码行号
+-keepattributes EnclosingMethod
+-ignorewarnings
 
-# 表示不进行校验,这个校验作用 在java平台上的
--dontpreverify
+
+###########################以下是AndroidStudio自带的混淆配置协议###############################
+
+
 # Note that if you want to enable optimization, you cannot just
 # include optimization flags in your own project configuration file;
 # instead you will need to point to the
 # "proguard-android-optimize.txt" file instead of this one from your
 # project.properties file.
-#使用注解需要添加
--keepattributes *Annotation*
 -keep public class com.google.vending.licensing.ILicensingService
 -keep public class com.android.vending.licensing.ILicensingService
 
@@ -122,13 +124,14 @@
 # 注意：以上两个路径需要将以上路径是自己jar包的位置，需要根据自己情况进行修改，如果报重复配置的错误，注释掉即可
 
 #代码迭代优化的次数，默认5
--optimizationpasses 5
-#混淆时不会产生形形色色的类名
--dontusemixedcaseclassnames
-
-
-#忽略警告
--ignorewarnings
+#-optimizationpasses 5
+##混淆时不会产生形形色色的类名
+#-dontusemixedcaseclassnames
+#-optimizations !code/simplification/cast,!field/*,!class/merging/* #指定混淆是采用的算法
+#-keepattributes Signature #不混淆泛型
+#
+##忽略警告
+#-ignorewarnings
 # 以下是不需要混淆的文件
 
 # 保持项目中的第三方jar不混淆
