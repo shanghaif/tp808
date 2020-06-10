@@ -1,7 +1,6 @@
 package cn.erayton.cameratest.utils;
 
 
-import android.content.DialogInterface;
 
 public class PermissionDialog extends CameraDialog {
     @Override

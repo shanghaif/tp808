@@ -1,13 +1,13 @@
 package cn.erayton.cameratest.utils;
 
 import android.app.Dialog;
+import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.fragment.app.DialogFragment;
 
 public abstract class CameraDialog extends DialogFragment implements DialogInterface.OnClickListener {
     abstract String getTitle() ;

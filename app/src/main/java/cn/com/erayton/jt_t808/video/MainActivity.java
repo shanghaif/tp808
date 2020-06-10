@@ -1,20 +1,12 @@
 package cn.com.erayton.jt_t808.video;
 
 import android.Manifest;
-import android.content.ComponentName;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.IBinder;
-import android.os.RemoteException;
-import android.provider.MediaStore;
-import android.provider.UserDictionary;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
@@ -23,9 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatSeekBar;
 import androidx.core.app.ActivityCompat;
 
-
 import com.library.live.Publish;
-import com.library.live.stream.TcpSend;
 import com.library.live.view.PublishView;
 import com.library.util.FTPUtils;
 
@@ -37,29 +27,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.com.erayton.jt_t808.R;
-import cn.com.erayton.jt_t808.constants.PublicConstants;
 import cn.com.erayton.jt_t808.video.eventBus.EventBusUtils;
 import cn.com.erayton.jt_t808.video.eventBus.event.BroadCastMainEvent;
 import cn.com.erayton.jt_t808.video.manager.USManager;
-import cn.com.erayton.jt_t808.video.video.Send;
-import cn.com.erayton.usagreement.VideoPushAIDL;
 import cn.com.erayton.usagreement.data.Constants;
 import cn.com.erayton.usagreement.data.db.DbTools;
 import cn.com.erayton.usagreement.data.db.table.VideoRecord;
 import cn.com.erayton.usagreement.model.decode.ServerFileUploadMsg;
 import cn.com.erayton.usagreement.model.model.TerminalResourceInfo;
-import cn.com.erayton.usagreement.service.VideoPushService;
-import cn.com.erayton.usagreement.socket.client.SocketClient;
 import cn.com.erayton.usagreement.socket.client.SocketClientSender;
 import cn.com.erayton.usagreement.utils.LogUtils;
-import cn.erayton.voicelib.Mp3Lib;
 
 public class MainActivity extends AppCompatActivity {
     private final int REQUEST_CAMERA = 666;
-    private String host1 = "192.168.1.145" ;
-    private int port1 =5508 ;
+//    private String host1 = "192.168.1.145" ;
+//    private int port1 =5508 ;
     private int port =0 ;
-//    private String host1 = "106.14.186.44" ;
+    private String host1 = "106.14.186.44" ;
+    private int port1 = 7000 ;
     private String host = "" ;
     private String host2 = "video.erayton.cn" ;
     private int port2 = 7000 ;
@@ -150,6 +135,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onLongClick(View v) {
                 ipButton.setVisibility(View.GONE);
+                publish.flashMode(com.library.data.Constants.CameraSettings.FLASH_VALUE_TORCH);
                 return false;
             }
         });
@@ -176,6 +162,7 @@ public class MainActivity extends AppCompatActivity {
             public boolean onLongClick(View v) {
                 if (ipButton.getVisibility() == View.GONE){
                     ipButton.setVisibility(View.VISIBLE);
+                    publish.flashMode(com.library.data.Constants.CameraSettings.FLASH_VALUE_AUTO);
                 }
                 return false;
             }
@@ -263,7 +250,7 @@ public class MainActivity extends AppCompatActivity {
             case EventBusUtils.EventCode.CLOSE_VIDEO:
 //                    videoPushAIDL.distoryVideo() ;
                     publish.stop();
-                publish.destroy();
+//                publish.destroy();
 //                stopVideo();
 
                 break;

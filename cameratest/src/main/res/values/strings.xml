@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">CameraTest</string>
+    <string name="app_name">Camera2</string>
 
     <string name="flashlight_auto">auto</string>
     <string name="flashlight_on">on</string>

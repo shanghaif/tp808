@@ -60,7 +60,18 @@ public class ShutterButton extends AppCompatButton {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         switch (currentMode) {
-
+            case PHOTO_MODE:
+                drawOuterCircle(canvas, outerCircleColor);
+                drawInnerCircle(canvas, innerCircleColor);
+                break;
+            case VIDEO_MODE:
+                drawOuterCircle(canvas, recordColor);
+                drawInnerCircle(canvas, innerCircleColor);
+                break;
+            case VIDEO_RECORDING_MODE:
+                drawOuterCircle(canvas, innerCircleColor);
+                drawInnerCircle(canvas, recordColor);
+                break;
         }
     }
 

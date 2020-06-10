@@ -1,6 +1,5 @@
 package com.library.live.file;
 
-import android.graphics.Bitmap;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.media.MediaMuxer;
@@ -12,7 +11,6 @@ import com.library.common.WriteFileCallback;
 import com.library.util.BitmapUtils;
 import com.library.util.FileUtils;
 import com.library.util.MediaFunc;
-import com.library.util.OtherUtil;
 import com.library.util.RegularUtils;
 import com.library.util.Storage;
 
@@ -64,7 +62,6 @@ public class WriteMp4 {
     private WriteFileCallback writeFileCallback = new WriteFileCallback() {
         @Override
         public void success(String name) {
-            Log.e("cjh", "fileName"+name) ;
             //  成功之后返回文件名
             String fileName = RegularUtils.getOneResult(name, RegularUtils.videoRex);
             //  处理文件名

@@ -224,9 +224,7 @@ public class TcpSend implements Runnable{
 
 
     public void send(byte[] bytes){
-//        boolean sendSucc = tcpClient.sendAsyn(bytes) ;
-        boolean sendSucc = tcpClient.send(bytes) ;
-        LogUtils.d("onTcpSend:"+sendSucc);
+        tcpClient.send(bytes) ;
     }
 
     public void closeTCPSocket(){

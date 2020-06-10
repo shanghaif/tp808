@@ -7,8 +7,6 @@ import com.library.live.vd.VDEncoder;
 import java.io.File;
 import java.nio.charset.Charset;
 
-import cn.com.erayton.usagreement.service.VideoPushService;
-
 /**
  * Created by android on 2017/3/31.
  */
@@ -391,9 +389,9 @@ public class Constants {
 //    public static int PREVIEW_RESOLUTION_H = 1050 ;
 
     //  视频推流码率      kpbs
-    public static int VIDEO_PUSH_RATE = 400 * SCALE ;
+    public static int VIDEO_PUSH_RATE = 600 * SCALE ;
     //  视频采集码率      kpbs
-    public static int VIDEO_SAMPLING_RATE = 1200  * SCALE ;
+    public static int VIDEO_SAMPLING_RATE = 1800  * SCALE ;
 
     //  编码方式
     public static String VIDEO_ENCODING = VDEncoder.H264 ;

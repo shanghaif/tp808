@@ -1,11 +1,11 @@
-package cn.erayton.cameratest.ui;
+package cn.erayton.cameratest.callback;
 
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CaptureRequest;
 
 import androidx.annotation.Nullable;
 
-public class CameraUiEvent {
+public abstract class CameraUiEvent {
 
     public static final String ACTION_CLICK = "camera.action.click";
     public static final String ACTION_CHANGE_MODULE = "camera.action.change.module";

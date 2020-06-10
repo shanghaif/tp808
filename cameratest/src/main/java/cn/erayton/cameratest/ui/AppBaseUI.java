@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import cn.erayton.cameratest.R;
+import cn.erayton.cameratest.callback.CameraUiEvent;
 import cn.erayton.cameratest.utils.CameraUtil;
 import cn.erayton.cameratest.utils.MediaFunc;
 

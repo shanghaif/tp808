@@ -3,13 +3,11 @@ package cn.com.erayton.usagreement.service;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.Build;
-import android.os.Environment;
 import android.os.IBinder;
 import android.os.RemoteCallbackList;
 import android.os.RemoteException;
@@ -23,10 +21,8 @@ import android.view.WindowManager;
 
 import com.library.live.PictureCallback;
 import com.library.live.Publish;
-import com.library.live.stream.TcpSend;
 import com.library.live.view.PublishView;
 
-import java.io.File;
 import java.util.concurrent.TimeUnit;
 
 import cn.com.erayton.usagreement.R;
@@ -245,7 +241,6 @@ public class VideoPushService extends Service {
 //     * 初始化文字为
 //     * */
     private void initNotification(){
-        Log.d("cjh", "initNotification -------------------- ") ;
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         setNotificationMessage(getString(R.string.tip_video_record), true);
 
