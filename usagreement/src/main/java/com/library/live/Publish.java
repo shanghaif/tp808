@@ -169,8 +169,9 @@ public class Publish implements TextureView.SurfaceTextureListener {
                     StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
                     //选取最佳分辨率初始化编码器（未必和设置的匹配，由于摄像头不支持设置的分辨率）
                     this.cameraId = cameraId;
-                    Log.e("cjh", "this.cameraId:" + this.cameraId);
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    Log.e("cjh", "this.cameraId:" + this.cameraId+",SDK_INT:"+Build.VERSION.SDK_INT);
+                    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
+//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         manager.setTorchMode(cameraId, false);
                     }
                     rotateAngle = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
@@ -549,11 +550,19 @@ public class Publish implements TextureView.SurfaceTextureListener {
         }
         voiceRecord.start();
         voiceRecord.startRecode();
+        if (recordEncoderVD == null || writeMp4 == null){
+            LogUtils.d("recordEncoderVD == null || writeMp4 == null");
+            return;
+        }
         recordEncoderVD.start();
         writeMp4.start();
     }
 
     public void stopRecode() {
+        if (voiceRecord == null || recordEncoderVD == null|| writeMp4 == null){
+            LogUtils.d("voiceRecord == null || recordEncoderVD == null|| writeMp4 == null");
+            return;
+        }
         voiceRecord.stopRecode();
         recordEncoderVD.stop();
         writeMp4.stop();
@@ -632,8 +641,6 @@ public class Publish implements TextureView.SurfaceTextureListener {
             }
             voiceRecord.start();
         }
-
-
     }
 
     public void start() {
@@ -791,9 +798,15 @@ public class Publish implements TextureView.SurfaceTextureListener {
 //    }
 
     private CaptureRequest.Builder getPreviewBuilder() {
-        if (previewBuilder ==null){
+        if (previewBuilder ==null && map.isPreview()){
             previewBuilder = createBuilder(CameraDevice.TEMPLATE_PREVIEW, getTextureSurface()) ;
 //            previewBuilder = createBuilder(CameraDevice.TEMPLATE_STILL_CAPTURE, getTextureSurface()) ;
+        }else {
+            try {
+                previewBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW) ;
+            } catch (CameraAccessException e) {
+                e.printStackTrace();
+            }
         }
         return previewBuilder;
     }
@@ -977,7 +990,6 @@ public class Publish implements TextureView.SurfaceTextureListener {
 //            map.getPushMode().setUdpControl(udpControl);
 //            return this;
 //        }
-
         public Publish build() {
             return new Publish(context, map);
         }

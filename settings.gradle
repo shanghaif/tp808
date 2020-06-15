@@ -1,2 +1,2 @@
-include ':app', ':EasyToolsJava', ':voicelib', ':easytoolsandroid', ':cameratest', 'usagreement'
+include ':app', ':EasyToolsJava', ':voicelib', ':easytoolsandroid', ':cameratest', ':usprotocol', 'usagreement', 'tts'
 //':videolib', ':mediaplayertest',

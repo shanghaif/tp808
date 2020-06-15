@@ -7,7 +7,6 @@ import android.util.Log;
 import android.util.Size;
 
 import com.library.live.stream.TcpSend;
-import com.library.live.stream.UdpSend;
 import com.library.util.ByteUtil;
 import com.library.util.ImagUtil;
 import com.library.util.OtherUtil;
@@ -109,7 +108,8 @@ public class VDEncoder {
                 while (isRuning) {
                     try {
                         take = YUVQueue.take();
-                        LogUtils.d("YUVQueue.take()----------------------------------------");
+                        LogUtils.d("YUVQueue.take()----------------------------------------isScale:"+isScale+
+                                ",cWidth:"+cWidth+",cHeight:"+cHeight+",pWidth:"+pWidth+",pHeight:"+pHeight);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                         break;

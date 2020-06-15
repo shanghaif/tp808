@@ -1,18 +1,11 @@
 package cn.com.erayton.usagreement.utils;
 
 import com.speedtalk.protocol.utils.MessageUtils;
+
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-
-import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
 
 /**
  *
@@ -215,6 +208,7 @@ public class USGate
         byte[] temp = new byte[read - 1];
         System.arraycopy(resp,0,temp,0,temp.length);
         String respStr = new String(MessageUtils.encryptAndDecrypt(temp));
+        Utils.print("respStr============"+respStr);
         String [] temp1;
         temp1 = respStr.split(",");
         for (String i: temp1){

@@ -225,9 +225,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        super.onDestroy();
         EventBusUtils.unregister(this);
         publish.destroy();
-        super.onDestroy();
     }
 
     /**
