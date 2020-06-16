@@ -3,18 +3,16 @@ package cn.com.erayton.usagreement.socket.client;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
 import cn.com.erayton.usagreement.data.Constants;
 import cn.com.erayton.usagreement.data.ResponseReason;
 import cn.com.erayton.usagreement.model.decode.PacketData;
 import cn.com.erayton.usagreement.model.decode.ServerAVTranslateControlMsg;
 import cn.com.erayton.usagreement.model.decode.ServerAVTranslateMsg;
-import cn.com.erayton.usagreement.model.decode.ServerApertureMsg;
 import cn.com.erayton.usagreement.model.decode.ServerCouldControlMsg;
 import cn.com.erayton.usagreement.model.decode.ServerFileUploadControlMsg;
 import cn.com.erayton.usagreement.model.decode.ServerFileUploadMsg;
-import cn.com.erayton.usagreement.model.decode.ServerFocalLengthMsg;
 import cn.com.erayton.usagreement.model.decode.ServerGeneralMsg;
-import cn.com.erayton.usagreement.model.decode.ServerInfraredlightMsg;
 import cn.com.erayton.usagreement.model.decode.ServerParametersMsg;
 import cn.com.erayton.usagreement.model.decode.ServerRegisterMsg;
 import cn.com.erayton.usagreement.model.decode.ServerResourceQueryMsg;
@@ -22,9 +20,6 @@ import cn.com.erayton.usagreement.model.decode.ServerRotateMsg;
 import cn.com.erayton.usagreement.model.decode.ServerTransferStatusMsg;
 import cn.com.erayton.usagreement.model.decode.ServerVideoReplayControlMsg;
 import cn.com.erayton.usagreement.model.decode.ServerVideoReplayMsg;
-import cn.com.erayton.usagreement.model.decode.ServerWiperMsg;
-import cn.com.erayton.usagreement.model.decode.ServerZoomMsg;
-import cn.com.erayton.usagreement.model.model.TerminalAVPropertieInfo;
 import cn.com.erayton.usagreement.socket.core.TCPClient;
 import cn.com.erayton.usagreement.socket.core.UDPClient;
 import cn.com.erayton.usagreement.utils.BitOperator;
@@ -791,168 +786,4 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
     }
 
 
-    private String getDebugString(int msgId) {
-        switch(msgId) {
-
-            //  平台通用应答
-            case Constants.SERVER_COMMOM_RSP:
-                return "平台通用应答" ;
-            //  补传分包请求
-            case Constants.SERVER_SUBCONTRACT_REQ:
-                return "补传分包请求" ;
-            //  终端注册应答
-            case Constants.SERVER_REGISTER_RSP:
-                return "终端注册应答" ;
-            //  位置信息查询
-//            case Constants.SERVER_LOCATION_REQ:
-//                return "" ;
-
-            //  设置终端参数
-            case Constants.TERMINAL_PARAMETERS_SETTING:
-                return "设置终端参数" ;
-            //  终端参数子参数
-            //  DWORD 位置汇报策略，0：定时汇报；1：定距汇报；2：定时和定距汇报
-            case Constants.TERMINAL_PARAMETERS_SETTING_0X0020:
-                return "位置汇报策略" ;
-            case Constants.TERMINAL_PARAMETERS_SETTING_0X0021:
-                return "" ;
-            case Constants.TERMINAL_PARAMETERS_SETTING_0X0022:
-                return "" ;
-
-            case Constants.TERMINAL_PARAMETERS_SETTING_0X0027:
-                return "" ;
-            case Constants.TERMINAL_PARAMETERS_SETTING_0X0028:
-                return "" ;
-            //  DWORD 缺省时间汇报间隔，单位为秒（s），>0
-            case Constants.TERMINAL_PARAMETERS_SETTING_0X0029:
-                return "缺省时间汇报间隔" ;
-            case Constants.TERMINAL_PARAMETERS_SETTING_0X0030:
-                return "" ;
-            case Constants.TERMINAL_PARAMETERS_SETTING_0X0031:
-                return "" ;
-
-            //  查询终端参数
-            case Constants.TERMINAL_PARAMETERS_QUERY:
-                return "查询终端参数" ;
-            //  终端控制
-            case Constants.TERMINAL_CONTROL:
-                return "终端控制" ;
-            //  查询指定终端参数
-            case Constants.TERMINAL_PARAMETERS_SPECIFY_QUERY:
-                return "查询指定终端参数" ;
-            //  查询终端属性
-            case Constants.TERMINAL_PROPERTIES_QUERY:
-                return "查询终端属性" ;
-            //  下发终端升级包
-            case Constants.TERMINAL_ISSUE_UPGRADE_PACKAGE:
-                return "下发终端升级包" ;
-            //  位置信息查询
-            case Constants.TERMINAL_LOCATION_INFORMATION_QUERY:
-                return "位置信息查询" ;
-            //  临时位置跟踪控制
-            case Constants.SERVER_LOCATION_TMP_REQ:
-                return "临时位置跟踪控制" ;
-            //  人工确认报警消息
-            case Constants.TERMINAL_CONFIRM_ALARM:
-                return "人工确认报警消息" ;
-            //  文本信息下发
-            case Constants.SERVER_DISTRIBUTION_MSG:
-                return "文本信息下发" ;
-            //  事件设置
-            case Constants.SERVER_EVENT_SET:
-                return "事件设置" ;
-            //  提问下发
-            case Constants.SERVER_QUESTIONS_ISSUED:
-                return "提问下发" ;
-            //  信息点播菜单设置
-            case Constants.SERVER_INFORMATION_DEMAND:
-                return "信息点播菜单设置" ;
-            //  信息服务
-            case Constants.SERVER_INFORMATION_SERVICE:
-                return "信息服务" ;
-            //  电话回拨
-            case Constants.SERVER_TEL_RESPONSE:
-                return "电话回拨" ;
-            //  设置电话本
-            case Constants.SERVER_PHONE_BOOK:
-                return "设置电话本" ;
-            //  车辆控制
-            case Constants.SERVER_VEHICLE_CONTROL:
-                return "车辆控制" ;
-
-//    p32
-
-            //  实时音视频传输请求
-            case Constants.SERVER_AVTRANSMISSION_REQUEST:
-                return "实时音视频传输请求" ;
-            //  音视频实时传输控制
-            case Constants.SERVER_AVTRANSMISSION_CONTROL:
-                return "音视频实时传输控制" ;
-
-
-
-            //  终端通用应答
-            case Constants.TERMINAL_CONMOM_RSP:
-                return "终端通用应答" ;
-            //  终端心跳
-            case Constants.TERMINAL_HEART_BEAT:
-                return "终端心跳" ;
-            //  终端注销
-            case Constants.TERMINAL_UNREGISTER:
-                return "终端注销" ;
-            //  终端注册
-            case Constants.TERMINAL_REGISTER:
-                return "终端注册" ;
-            //  终端鉴权
-            case Constants.TERMINAL_AUTHEN:
-                return "终端鉴权" ;
-            //  查询终端参数应答
-            case Constants.SERVER_PARAMETERS_QUERY_RSP:
-                return "查询终端参数应答" ;
-            //  查询终端属性应答
-            case Constants.SERVER_PROPERTIES_REQ:
-                return "查询终端属性应答" ;
-//              终端升级结果通知
-//            case Constants.TERMINAL_UPGRADE_RESULTS:
-//                return "" ;
-            //  位置信息汇报
-            case Constants.TERMINAL_LOCATION_UPLOAD:
-                return "位置信息汇报" ;
-            //  位置信息查询应答
-            case Constants.TERMINAL_LOCATION_RSP:
-                return "位置信息查询应答" ;
-            //  事件报告
-            case Constants.TERMINAL_INCIDENT_REPORT:
-                return "事件报告" ;
-            //  提问应答
-            case Constants.TERMINAL_QUESTIONS_ANSWER:
-                return "提问应答" ;
-            //  信息点播/取消
-            case Constants.TERMINAL_INFORMATION_OPERATION:
-                return "信息点播/取消" ;
-            //  车辆控制应答
-            case Constants.TERMINAL_VEHICLE_CONTROL_RESPONSE:
-                return "车辆控制应答" ;
-            //  定位数据批量上传
-            case Constants.TERMINAL_LOCATION_BATCH_UPLOAD:
-                return "定位数据批量上传" ;
-
-            //region 云台控制指令 --------------- start ---------------
-            case Constants.SERVER_CLOUD_CONTROL_ROTATE:
-                return "云台旋转";
-            case Constants.SERVER_CLOUD_CONTROL_FOCALLENGTH:
-                return "云台调整焦距";
-            case Constants.SERVER_CLOUD_CONTROL_APERTURE:
-                return "云台调整光圈";
-            case Constants.SERVER_CLOUD_CONTROL_WIPER:
-                return "云台雨刷";
-            case Constants.SERVER_CLOUD_CONTROL_INFRAREDLIGHT:
-                return "红外补光";
-            case Constants.SERVER_CLOUD_CONTROL_ZOOM:
-                return "云台变倍";
-            //endregion --------------- end ---------------
-            default:
-                return "其它应答";
-        }
-    }
 }

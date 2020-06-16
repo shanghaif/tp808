@@ -23,11 +23,13 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.Range;
 import android.util.Size;
 import android.view.Surface;
 import android.view.TextureView;
+
 import com.library.common.WriteFileCallback;
 import com.library.data.Constants;
 import com.library.live.file.WriteMp4;
@@ -53,6 +55,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 
+import cn.com.erayton.usagreement.ApplicationProvider;
 import cn.com.erayton.usagreement.utils.LogUtils;
 
 public class Publish implements TextureView.SurfaceTextureListener {
@@ -74,6 +77,7 @@ public class Publish implements TextureView.SurfaceTextureListener {
     private boolean useuvPicture = false;
 
     public static final int TAKEPHOTO = 0;
+    //  截屏模式
     public static final int CONVERSION = 1;
 
     private ParameterMap map;
@@ -162,18 +166,19 @@ public class Publish implements TextureView.SurfaceTextureListener {
             for (String cameraId : manager.getCameraIdList()) {
                 characteristics = manager.getCameraCharacteristics(cameraId);
 //                CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
-                Log.e("cjh", "camera num:" + manager.getCameraIdList().length + ",cameraId:" + cameraId+"\nLENS_FACING:"+characteristics.get(CameraCharacteristics.LENS_FACING));
                 if (characteristics.get(CameraCharacteristics.LENS_FACING) ==
                         (map.isRotate() ? CameraCharacteristics.LENS_FACING_FRONT : CameraCharacteristics.LENS_FACING_BACK)) {
                     //获取StreamConfigurationMap管理摄像头支持的所有输出格式和尺寸,根据TextureView的尺寸设置预览尺寸
                     StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
                     //选取最佳分辨率初始化编码器（未必和设置的匹配，由于摄像头不支持设置的分辨率）
                     this.cameraId = cameraId;
-                    Log.e("cjh", "this.cameraId:" + this.cameraId+",SDK_INT:"+Build.VERSION.SDK_INT);
                     if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
 //                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        //  在不打开相机的情况下，设置给定ID的相机闪光灯单元的手电筒模式
                         manager.setTorchMode(cameraId, false);
                     }
+
+                    //  视频上传平台时, 比例不一样，需要旋转90°, 否则会出现绿条
                     rotateAngle = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
 
                     initCode(map.getOutputSizes(SurfaceTexture.class));
@@ -187,11 +192,11 @@ public class Publish implements TextureView.SurfaceTextureListener {
 
     private void initCode(Size[] outputSizes) {
         if (vdEncoder == null) {
-            publishSize = initSize(publishSize, outputSizes);
+//            publishSize = initSize(publishSize, outputSizes);
             previewSize = initSize(previewSize, outputSizes);
 
-            Log.d("pictureSize", "推流分辨率  =  " + publishSize.getWidth() + " * " + publishSize.getHeight());
-            Log.d("pictureSize", "预览分辨率  =  " + previewSize.getWidth() + " * " + previewSize.getHeight());
+            LogUtils.d("pictureSize", "推流分辨率  =  " + publishSize.getWidth() + " * " + publishSize.getHeight());
+            LogUtils.d("pictureSize", "预览分辨率  =  " + previewSize.getWidth() + " * " + previewSize.getHeight());
 
             //计算比例(需对调宽高)
 //            tcpSend.setWeight((double) publishSize.getHeight() / publishSize.getWidth());
@@ -236,10 +241,8 @@ public class Publish implements TextureView.SurfaceTextureListener {
 //    }
 
     private Size initSize(Size publishSize, Size[] outputSizes) {
-//        int numw = 10000;
-//        int numh = 10000;
-        int numw = 1920;
-        int numh = 1080;
+        int numw = 10000;
+        int numh = 10000;
         int num = 0;
         for (int i = 0; i < outputSizes.length; i++) {
             Log.d("Size_app", outputSizes[i].getWidth() + "--" + outputSizes[i].getHeight());
@@ -253,6 +256,7 @@ public class Publish implements TextureView.SurfaceTextureListener {
         }
         return outputSizes[num];
     }
+
 
     /**
      * 打开相机
@@ -269,7 +273,7 @@ public class Publish implements TextureView.SurfaceTextureListener {
         }
         try {
             //  打开相机
-            Log.e("cjh", "cameraId -------------:" + cameraId);
+            LogUtils.e("cameraId -------------:" + cameraId);
             manager.openCamera(cameraId, new CameraDevice.StateCallback() {
                 @Override
                 public void onOpened( CameraDevice device) {
@@ -315,14 +319,14 @@ public class Publish implements TextureView.SurfaceTextureListener {
             previewRequestBuilder.addTarget(previewSurface);
             surfaces.add(previewSurface);
 
-            //预览
+//              预览
             if (map.isPreview()) {
                 Surface textureSurface = getTextureSurface();
                 previewRequestBuilder.addTarget(textureSurface);
                 surfaces.add(textureSurface);
             }
 
-            //拍照数据输出
+            //  拍照数据输出
             if (map.getScreenshotsMode() == TAKEPHOTO) {
                 final CaptureRequest.Builder captureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
 //                final CaptureRequest.Builder captureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
@@ -332,9 +336,14 @@ public class Publish implements TextureView.SurfaceTextureListener {
                 captureRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
                 captureRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
                 captureRequestBuilder.set(CaptureRequest.JPEG_ORIENTATION, rotateAngle);
-                Surface pictureSurface = getPictureImageReaderSurface();
-                captureRequestBuilder.addTarget(pictureSurface);
-                surfaces.add(pictureSurface);
+
+                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
+                    Surface pictureSurface = getPictureImageReaderSurface();
+                    captureRequestBuilder.addTarget(pictureSurface);
+                    surfaces.add(pictureSurface);
+                }
+
+
                 captureRequest = captureRequestBuilder.build();
             }
 
@@ -342,6 +351,7 @@ public class Publish implements TextureView.SurfaceTextureListener {
             //创建相机捕获会话，第一个参数是捕获数据的输出Surface列表(同时输出屏幕，输出预览，拍照)，
             // 第二个参数是CameraCaptureSession的状态回调接口，当它创建好后会回调onConfigured方法，
             // 第三个参数用来确定Callback在哪个线程执行，为null的话就在当前线程执行
+//            cameraDevice.createCaptureSession(surfaces, sessionStateCb, camearHandler);
             cameraDevice.createCaptureSession(surfaces, new CameraCaptureSession.StateCallback() {
                 @Override
                 public void onConfigured( CameraCaptureSession session) {
@@ -414,18 +424,22 @@ public class Publish implements TextureView.SurfaceTextureListener {
         frameHandler.post(new Runnable() {
             @Override
             public void run() {
-                //帧率控制时间
+                //  帧率控制时间
                 frameHandler.postDelayed(this, 1000 / map.getFrameRate());
                 if (!frameRateControlQueue.isEmpty()) {
-                    //耗时检测
-                    long time = System.currentTimeMillis();
+                    //  耗时检测
+//                    long time = System.currentTimeMillis();
                     Image image = frameRateControlQueue.poll();
-                    //YUV_420_888先转成I420
+                    //  YUV_420_888先转成I420
                     byte[] i420 = ImagUtil.YUV420888toI420(image);
                     image.close();
                     byte[] input = new byte[i420.length];
-                    //旋转I420(270需要镜像)然后交给编码器等待编码
+                    //  旋转I420(270需要镜像)然后交给编码器等待编码
                     ImagUtil.rotateI420(i420, previewSize.getWidth(), previewSize.getHeight(), input, rotateAngle, map.isRotate());
+//                    LogUtils.e("getWidth:"+previewSize.getWidth()+
+//                            ",previewSize.getHeight():"+previewSize.getHeight()+
+//                            ",rotateAngle:"+rotateAngle+
+//                            ",isRotate:"+map.isRotate()) ;
                     if (useuvPicture && yuvPicture == null) {
                         useuvPicture = false;
                         yuvPicture = Arrays.copyOf(input, input.length);
@@ -490,8 +504,11 @@ public class Publish implements TextureView.SurfaceTextureListener {
         if (map.getScreenshotsMode() == CONVERSION) {
             byte[] picture = new byte[bytes.length];
             ImagUtil.yuvI420ToNV21(bytes, picture, previewSize.getHeight(), previewSize.getWidth());
+//            ImagUtil.yuvI420ToNV21(bytes, picture, previewSize.getWidth(), previewSize.getHeight());
             YuvImage yuvImage = new YuvImage(picture, ImageFormat.NV21, previewSize.getHeight(), previewSize.getWidth(), null);
+//            YuvImage yuvImage = new YuvImage(picture, ImageFormat.NV21, previewSize.getWidth(), previewSize.getHeight(), null);
             yuvImage.compressToJpeg(new Rect(0, 0, previewSize.getHeight(), previewSize.getWidth()), 100, output);
+//            yuvImage.compressToJpeg(new Rect(0, 0, previewSize.getWidth(), previewSize.getHeight()), 100, output);
 
         } else if (map.getScreenshotsMode() == TAKEPHOTO) {
             if (map.isRotate()) {
@@ -645,6 +662,8 @@ public class Publish implements TextureView.SurfaceTextureListener {
 
     public void start() {
         tcpSend.startsend();
+        LogUtils.d("startsend -------------------------------");
+//        getMatchingSize2() ;
     }
 
     public void stop() {
@@ -701,6 +720,7 @@ public class Publish implements TextureView.SurfaceTextureListener {
      * @param currentFingerSpacing  控制放大缩小的数值,随意大小,只需要保证放大时数值比缩小数值大
      */
     public void updateZoom(float currentFingerSpacing){
+
         Rect rect = characteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE);
         if (rect == null) return ;
         CaptureRequest.Builder builder = null;
@@ -799,11 +819,12 @@ public class Publish implements TextureView.SurfaceTextureListener {
 
     private CaptureRequest.Builder getPreviewBuilder() {
         if (previewBuilder ==null && map.isPreview()){
-            previewBuilder = createBuilder(CameraDevice.TEMPLATE_PREVIEW, getTextureSurface()) ;
-//            previewBuilder = createBuilder(CameraDevice.TEMPLATE_STILL_CAPTURE, getTextureSurface()) ;
+            previewBuilder = createBuilder(CameraDevice.TEMPLATE_STILL_CAPTURE, getTextureSurface()) ;
+//            previewBuilder = createBuilder(CameraDevice.TEMPLATE_RECORD, getTextureSurface()) ;
         }else {
             try {
-                previewBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW) ;
+                previewBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE) ;
+//                previewBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD) ;
             } catch (CameraAccessException e) {
                 e.printStackTrace();
             }
@@ -848,6 +869,8 @@ public class Publish implements TextureView.SurfaceTextureListener {
         }
         return result;
     }
+
+
 
 
 
@@ -1151,5 +1174,62 @@ public class Publish implements TextureView.SurfaceTextureListener {
         private void setVideodirpath(String videodirpath) {
             this.videodirpath = videodirpath;
         }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+    private Size getMatchingSize2(){
+        Size selectSize = null;
+
+        LogUtils.d("getMatchingSize2 -------------------------------");
+        try {
+            CameraCharacteristics cameraCharacteristics = manager.getCameraCharacteristics(cameraId);
+            StreamConfigurationMap streamConfigurationMap = cameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+            Size[] sizes = streamConfigurationMap.getOutputSizes(ImageFormat.JPEG);
+            DisplayMetrics displayMetrics = ApplicationProvider.context.getResources().getDisplayMetrics(); //因为我这里是将预览铺满屏幕,所以直接获取屏幕分辨率
+            int deviceWidth = displayMetrics.widthPixels; //屏幕分辨率宽
+            int deviceHeigh = displayMetrics.heightPixels; //屏幕分辨率高
+            LogUtils.e("getMatchingSize2: 屏幕密度宽度="+deviceWidth);
+            LogUtils.e("getMatchingSize2: 屏幕密度高度="+deviceHeigh );
+            /**
+             * 循环40次,让宽度范围从最小逐步增加,找到最符合屏幕宽度的分辨率,
+             * 你要是不放心那就增加循环,肯定会找到一个分辨率,不会出现此方法返回一个null的Size的情况
+             * ,但是循环越大后获取的分辨率就越不匹配
+             */
+            for (int j = 1; j < 41; j++) {
+                for (int i = 0; i < sizes.length; i++) { //遍历所有Size
+                    Size itemSize = sizes[i];
+                    LogUtils.e("当前itemSize 宽="+itemSize.getWidth()+"高="+itemSize.getHeight());
+                    //判断当前Size高度小于屏幕宽度+j*5  &&  判断当前Size高度大于屏幕宽度-j*5
+                    if (itemSize.getHeight() < (deviceWidth + j*5) && itemSize.getHeight() > (deviceWidth - j*5)) {
+                        if (selectSize != null){ //如果之前已经找到一个匹配的宽度
+                            if (Math.abs(deviceHeigh-itemSize.getWidth()) < Math.abs(deviceHeigh - selectSize.getWidth())){ //求绝对值算出最接近设备高度的尺寸
+                                selectSize = itemSize;
+                                continue;
+                            }
+                        }else {
+                            selectSize = itemSize;
+                        }
+
+                    }
+                }
+
+            }
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
+        }
+        LogUtils.e("getMatchingSize2: 选择的分辨率宽度="+selectSize.getWidth());
+        LogUtils.e("getMatchingSize2: 选择的分辨率高度="+selectSize.getHeight());
+        return selectSize;
     }
 }

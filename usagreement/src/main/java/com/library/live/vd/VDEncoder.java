@@ -25,7 +25,7 @@ public class VDEncoder {
     private MediaCodec mediaCodec;
     private TcpSend udpSend;
 
-    //编码参数
+    //  编码参数
     private byte[] information;
     private boolean isRuning = false;
     private ArrayBlockingQueue<byte[]> YUVQueue = new ArrayBlockingQueue<>(OtherUtil.QueueNum);
@@ -46,7 +46,8 @@ public class VDEncoder {
         cWidth = csize.getHeight();
         cHeight = csize.getWidth();
         pWidth = psize.getHeight();
-        pHeight = psize.getWidth();
+        //  裁剪绿色部分， 仅用于 zjx, zfjly tianlong 2020年6月16日19:42:07
+        pHeight =psize.getWidth()/2;
 
         try {
             mediaCodec = MediaCodec.createEncoderByType(codetype);
@@ -115,7 +116,10 @@ public class VDEncoder {
                         break;
                     }
                     if (isScale) {
-                        ImagUtil.scaleI420(take, cWidth, cHeight, data, pWidth, pHeight, 0);
+                        //  原来部分
+//                        ImagUtil.scaleI420(take, cWidth, cHeight, data, pWidth, pHeight, 0);
+                        //  裁剪绿色部分， 仅用于 zjx, zfjly tianlong 2020年6月16日19:42:07
+                        ImagUtil.cropYUV(take, cWidth, cHeight, data, pWidth, pHeight, 0, 0);
                     } else {
                         data = take;
                     }
@@ -123,6 +127,7 @@ public class VDEncoder {
                         input = data;
                     } else {
                         ImagUtil.yuvI420ToNV12(data, input, pWidth, pHeight);
+
                     }
                     try {
                         int inputBufferIndex = mediaCodec.dequeueInputBuffer(OtherUtil.waitTime);

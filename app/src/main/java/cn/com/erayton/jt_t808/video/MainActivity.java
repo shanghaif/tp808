@@ -198,8 +198,9 @@ public class MainActivity extends AppCompatActivity {
                 .setRotate(Constants.CAMERA)
                 .setVideoDirPath(Environment.getExternalStorageDirectory().getPath() + File.separator + "erayTonLive")
                 .setPictureDirPath(Environment.getExternalStorageDirectory().getPath() + File.separator + "erayTonPicture")
+                //  按比例显示图像
                 .setCenterScaleType(true)
-                .setScreenshotsMode(Publish.TAKEPHOTO)
+                .setScreenshotsMode(Publish.CONVERSION)
                 .build();
     }
 
@@ -304,7 +305,7 @@ public class MainActivity extends AppCompatActivity {
 //                .setCenterScaleType(true)
 //                .setScreenshotsMode(Publish.TAKEPHOTO)
 //                .build();
-        publish.initTcp(phone, host, port, channelNum, false);
+        publish.initTcp(phone, ip, port, channelNum, false);
         publish.start();
     }
 
@@ -360,4 +361,6 @@ public class MainActivity extends AppCompatActivity {
 
 //        SocketClientSender.sendUploadStatus(seNum, 0, false, false) ;
     }
+
+
 }
