@@ -322,21 +322,21 @@ public class Publish implements TextureView.SurfaceTextureListener {
                 surfaces.add(textureSurface);
             }
 
-            //拍照数据输出
-            if (map.getScreenshotsMode() == TAKEPHOTO) {
-                final CaptureRequest.Builder captureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
-//                final CaptureRequest.Builder captureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-//                captureRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, captureRequestBuilder.get(CaptureRequest.CONTROL_AF_MODE));
-//                captureRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, captureRequestBuilder.get(CaptureRequest.CONTROL_AE_MODE));
-//                captureRequestBuilder.set(CaptureRequest.FLASH_MODE, captureRequestBuilder.get(CaptureRequest.FLASH_MODE));
-                captureRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
-                captureRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
-                captureRequestBuilder.set(CaptureRequest.JPEG_ORIENTATION, rotateAngle);
-                Surface pictureSurface = getPictureImageReaderSurface();
-                captureRequestBuilder.addTarget(pictureSurface);
-                surfaces.add(pictureSurface);
-                captureRequest = captureRequestBuilder.build();
-            }
+//            //拍照数据输出
+//            if (map.getScreenshotsMode() == TAKEPHOTO) {
+//                final CaptureRequest.Builder captureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
+////                final CaptureRequest.Builder captureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+////                captureRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, captureRequestBuilder.get(CaptureRequest.CONTROL_AF_MODE));
+////                captureRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, captureRequestBuilder.get(CaptureRequest.CONTROL_AE_MODE));
+////                captureRequestBuilder.set(CaptureRequest.FLASH_MODE, captureRequestBuilder.get(CaptureRequest.FLASH_MODE));
+//                captureRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
+//                captureRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
+//                captureRequestBuilder.set(CaptureRequest.JPEG_ORIENTATION, rotateAngle);
+//                Surface pictureSurface = getPictureImageReaderSurface();
+//                captureRequestBuilder.addTarget(pictureSurface);
+//                surfaces.add(pictureSurface);
+//                captureRequest = captureRequestBuilder.build();
+//            }
 
 
             //创建相机捕获会话，第一个参数是捕获数据的输出Surface列表(同时输出屏幕，输出预览，拍照)，
@@ -668,12 +668,16 @@ public class Publish implements TextureView.SurfaceTextureListener {
             tcpSend.destroy();
         if (frameHandler != null)
             frameHandler.removeCallbacksAndMessages(null);
-        if (controlFrameRateThread != null)
+        if (controlFrameRateThread != null) {
+            controlFrameRateThread.getLooper().quitSafely();
             controlFrameRateThread.quitSafely();
+        }
         if (camearHandler != null)
             camearHandler.removeCallbacksAndMessages(null);
-        if (handlerCamearThread != null)
+        if (handlerCamearThread != null) {
+            handlerCamearThread.getLooper().quitSafely();
             handlerCamearThread.quitSafely();
+        }
         if (writeMp4 != null)
             writeMp4.destroy();
         pictureCallback = null;
@@ -799,11 +803,11 @@ public class Publish implements TextureView.SurfaceTextureListener {
 
     private CaptureRequest.Builder getPreviewBuilder() {
         if (previewBuilder ==null && map.isPreview()){
-            previewBuilder = createBuilder(CameraDevice.TEMPLATE_PREVIEW, getTextureSurface()) ;
+            previewBuilder = createBuilder(CameraDevice.TEMPLATE_STILL_CAPTURE, getTextureSurface()) ;
 //            previewBuilder = createBuilder(CameraDevice.TEMPLATE_STILL_CAPTURE, getTextureSurface()) ;
         }else {
             try {
-                previewBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW) ;
+                previewBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE) ;
             } catch (CameraAccessException e) {
                 e.printStackTrace();
             }

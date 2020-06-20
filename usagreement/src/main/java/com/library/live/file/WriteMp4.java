@@ -62,6 +62,7 @@ public class WriteMp4 {
     private WriteFileCallback writeFileCallback = new WriteFileCallback() {
         @Override
         public void success(String name) {
+            LogUtils.e("cjh", "success:"+name) ;
             //  成功之后返回文件名
             String fileName = RegularUtils.getOneResult(name, RegularUtils.videoRex);
             //  处理文件名
@@ -79,7 +80,7 @@ public class WriteMp4 {
 
         @Override
         public void failure(String err) {
-            LogUtils.e("cjh", "failure"+err) ;
+            LogUtils.e("cjh", "failure:"+err) ;
         }
     };
 
@@ -179,7 +180,8 @@ public class WriteMp4 {
         synchronized (lock) {
             LogUtils.d("stop ----------------lock------------");
             if (RECODE_STATUS == RECODE_STATUS_START) {
-                LogUtils.d("stop ------------RECODE_STATUS == RECODE_STATUS_START----------------"+(RECODE_STATUS == RECODE_STATUS_START));
+                LogUtils.d("stop ------------RECODE_STATUS == RECODE_STATUS_START----------------"
+                        +(RECODE_STATUS == RECODE_STATUS_START));
                 endTime = BitOperator.getInstance().getNowBCDTimeString() ;
                 boolean iscatch = false;
                 try {
@@ -191,6 +193,8 @@ public class WriteMp4 {
                     LogUtils.d("app_WriteMp4", "文件录制关闭");
                 } catch (Exception e) {
                     iscatch = true;
+                    e.printStackTrace();
+                    LogUtils.d("stop ----------------Exception------------"+iscatch+e.getMessage());
                 } finally {
                     mMediaMuxer = null;
                     voiceFormat = null;

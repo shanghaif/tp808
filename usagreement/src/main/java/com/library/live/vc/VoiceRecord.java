@@ -5,7 +5,6 @@ import android.media.AudioRecord;
 import android.media.MediaRecorder;
 
 import com.library.live.file.WriteMp4;
-import com.library.live.stream.TcpSend;
 import com.library.live.stream.UdpSend;
 import com.library.util.OtherUtil;
 import com.library.util.SingleThreadExecutor;
@@ -64,18 +63,23 @@ public class VoiceRecord {
                 if (audioRecord != null) {
                     byte[] buffer = new byte[recBufSize];
                     int bufferReadResult;
-                    audioRecord.startRecording();//开始录制
-                    while (audioRecord != null && audioRecord.getRecordingState() == AudioRecord.RECORDSTATE_RECORDING) {
-                        /*
-                        两针间采集大概40ms，编码发送大概10ms，单线程顺序执行没有问题
-                         */
-                        bufferReadResult = audioRecord.read(buffer, 0, recBufSize);
+                    try {
+                        audioRecord.startRecording();//开始录制
 
-                        if (bufferReadResult == AudioRecord.ERROR_INVALID_OPERATION || bufferReadResult == AudioRecord.ERROR_BAD_VALUE || bufferReadResult == 0 || bufferReadResult == -1) {
-                            continue;
+                        while (audioRecord != null && audioRecord.getRecordingState() == AudioRecord.RECORDSTATE_RECORDING) {
+                            /*
+                            两针间采集大概40ms，编码发送大概10ms，单线程顺序执行没有问题
+                             */
+                            bufferReadResult = audioRecord.read(buffer, 0, recBufSize);
+
+                            if (bufferReadResult == AudioRecord.ERROR_INVALID_OPERATION || bufferReadResult == AudioRecord.ERROR_BAD_VALUE || bufferReadResult == 0 || bufferReadResult == -1) {
+                                continue;
+                            }
+                            vencoder.encode(buffer, bufferReadResult);
+                            recordEncoderVC.encode(buffer, bufferReadResult);
                         }
-                        vencoder.encode(buffer, bufferReadResult);
-                        recordEncoderVC.encode(buffer, bufferReadResult);
+                    }catch (IllegalStateException e){
+                        e.printStackTrace();
                     }
                 }
             }
