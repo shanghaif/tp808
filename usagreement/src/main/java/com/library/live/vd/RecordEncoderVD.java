@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.ArrayBlockingQueue;
 
+import cn.com.erayton.usagreement.utils.LogUtils;
+
 /**
  * Created by android1 on 2017/12/2.
  */
@@ -32,7 +34,7 @@ public class RecordEncoderVD {
 
     public RecordEncoderVD(Size csize, int framerate, int collectionBitrate, WriteMp4 writeMp4, String codetype) {
         this.writeMp4 = writeMp4;
-        //由于图片旋转过，所以高度宽度需要对调
+        //  由于图片旋转过，所以高度宽度需要对调
         width = csize.getHeight();
         height = csize.getWidth();
 
@@ -68,6 +70,8 @@ public class RecordEncoderVD {
     }
 
     public void start() {
+
+        LogUtils.d("startRecodeEncoderVD------------------------");
         if (isRuning){
             //  正在录制,不开启动
             return;
@@ -99,11 +103,10 @@ public class RecordEncoderVD {
                         e.printStackTrace();
                         break;
                     }
-
                     if (COLOR_FORMAT == MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Planar) {
                         input = take;
                     } else {
-                        ImagUtil.yuvI420ToNV12(take, input, width, height);
+                        ImagUtil.yuvI420ToNV12(take, input, width, height/2);
                     }
                     try {
                         int inputBufferIndex = mediaCodec.dequeueInputBuffer(OtherUtil.waitTime);

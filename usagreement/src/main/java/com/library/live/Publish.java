@@ -55,7 +55,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import cn.com.erayton.usagreement.ApplicationProvider;
 import cn.com.erayton.usagreement.utils.LogUtils;
 
 public class Publish implements TextureView.SurfaceTextureListener {
@@ -136,6 +135,10 @@ public class Publish implements TextureView.SurfaceTextureListener {
         } else {
             openCamera();
         }
+    }
+
+    public Context getContext() {
+        return context;
     }
 
     @Override
@@ -428,7 +431,7 @@ public class Publish implements TextureView.SurfaceTextureListener {
                 frameHandler.postDelayed(this, 1000 / map.getFrameRate());
                 if (!frameRateControlQueue.isEmpty()) {
                     //  耗时检测
-//                    long time = System.currentTimeMillis();
+                    long time = System.currentTimeMillis();
                     Image image = frameRateControlQueue.poll();
                     //  YUV_420_888先转成I420
                     byte[] i420 = ImagUtil.YUV420888toI420(image);
@@ -460,10 +463,10 @@ public class Publish implements TextureView.SurfaceTextureListener {
 //                    vdEncoder.addFrame(input);
 
 
-//                    if ((System.currentTimeMillis() - time) > (1000 / map.getFrameRate())) {
-//                        Log.e("Frame_loss", "图像处理速度过慢");
-////                        Log.d("Frame_slow", "图像处理速度过慢");
-//                    }
+                    if ((System.currentTimeMillis() - time) > (1000 / map.getFrameRate())) {
+                        Log.e("Frame_loss", "图像处理速度过慢");
+//                        Log.d("Frame_slow", "图像处理速度过慢");
+                    }
                 } else {
                     Log.d("Frame_loss", "图像采集速率不够");
                 }
@@ -677,24 +680,47 @@ public class Publish implements TextureView.SurfaceTextureListener {
 
     public void destroy() {
         releaseCamera();
-        if (recordEncoderVD != null)
+        if (recordEncoderVD != null) {
             recordEncoderVD.destroy();
-        if (vdEncoder != null)
+            recordEncoderVD = null ;
+        }
+        if (vdEncoder != null) {
             vdEncoder.destroy();
-        if (voiceRecord != null)
+            vdEncoder = null ;
+        }
+        if (voiceRecord != null) {
             voiceRecord.destroy();
-        if (tcpSend != null)
+            voiceRecord = null ;
+        }
+        if (tcpSend != null) {
             tcpSend.destroy();
-        if (frameHandler != null)
+            tcpSend = null ;
+        }
+        if (frameHandler != null) {
             frameHandler.removeCallbacksAndMessages(null);
-        if (controlFrameRateThread != null)
+            frameHandler = null ;
+        }
+        if (controlFrameRateThread != null) {
+            controlFrameRateThread.getLooper().quitSafely();
             controlFrameRateThread.quitSafely();
-        if (camearHandler != null)
+            controlFrameRateThread = null ;
+        }
+        if (camearHandler != null) {
             camearHandler.removeCallbacksAndMessages(null);
-        if (handlerCamearThread != null)
+            camearHandler = null ;
+        }
+        if (handlerCamearThread != null) {
+            handlerCamearThread.getLooper().quitSafely();
             handlerCamearThread.quitSafely();
-        if (writeMp4 != null)
+            handlerCamearThread = null ;
+        }
+        if (writeMp4 != null) {
             writeMp4.destroy();
+            writeMp4 = null ;
+        }
+        if (manager != null){
+            manager = null ;
+        }
         pictureCallback = null;
     }
 
@@ -1196,7 +1222,7 @@ public class Publish implements TextureView.SurfaceTextureListener {
             CameraCharacteristics cameraCharacteristics = manager.getCameraCharacteristics(cameraId);
             StreamConfigurationMap streamConfigurationMap = cameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
             Size[] sizes = streamConfigurationMap.getOutputSizes(ImageFormat.JPEG);
-            DisplayMetrics displayMetrics = ApplicationProvider.context.getResources().getDisplayMetrics(); //因为我这里是将预览铺满屏幕,所以直接获取屏幕分辨率
+            DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics(); //  因为我这里是将预览铺满屏幕,所以直接获取屏幕分辨率
             int deviceWidth = displayMetrics.widthPixels; //屏幕分辨率宽
             int deviceHeigh = displayMetrics.heightPixels; //屏幕分辨率高
             LogUtils.e("getMatchingSize2: 屏幕密度宽度="+deviceWidth);

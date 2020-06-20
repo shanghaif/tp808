@@ -24,7 +24,7 @@ import static android.content.Context.ACTIVITY_SERVICE;
 public class USVideo {
     private String TAG = USVideo.class.getName() ;
     private Context context ;
-    private static USVideo instance ;
+    volatile private static USVideo instance ;
     private VideoPushAIDL videoPushAIDL ;
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
@@ -42,7 +42,9 @@ public class USVideo {
     //  初始化
     public static USVideo getInstance(Context context) {
         if (instance == null){
-            instance = new USVideo(context) ;
+            synchronized (USVideo.class) {
+                instance = new USVideo(context);
+            }
         }
         return instance;
     }

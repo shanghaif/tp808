@@ -295,7 +295,7 @@ public class Constants {
     /**
      * 心跳间隔 3 分钟
      * */
-    public static final int HBTHREAD_SLEEPIME = 3 * 60 * MILLISECONDSTOSECONDS ;     //  3 分钟
+    public static final int HBTHREAD_SLEEPIME = (int) (0.5 * 60 * MILLISECONDSTOSECONDS);     //  3 分钟
 
     /**
      * 心跳时间间隔检测时间 3 分钟
@@ -372,8 +372,8 @@ public class Constants {
     public static int VIDEO_INIT_TIME = 2 ;
 
     //  kpbs 进制 ？
-    private static int SCALE = 1000 ;
-//    private static int SCALE = 1024 ;
+//    private static int SCALE = 1000 ;
+    private static int SCALE = 1024 ;
 
     //  帧率
     public static int FRAME_RATE = 30 ;
@@ -389,6 +389,7 @@ public class Constants {
 //    public static int PREVIEW_RESOLUTION_H = 1280 ;
 
     //  视频推流码率      kpbs
+//    public static int VIDEO_PUSH_RATE = 800 * SCALE ;
     public static int VIDEO_PUSH_RATE = 600 * SCALE ;
     //  视频采集码率      kpbs
     public static int VIDEO_SAMPLING_RATE = 1800  * SCALE ;

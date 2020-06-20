@@ -5,7 +5,6 @@ import android.media.AudioRecord;
 import android.media.MediaRecorder;
 
 import com.library.live.file.WriteMp4;
-import com.library.live.stream.TcpSend;
 import com.library.live.stream.UdpSend;
 import com.library.util.OtherUtil;
 import com.library.util.SingleThreadExecutor;
@@ -88,6 +87,7 @@ public class VoiceRecord {
             audioRecord.release();
             audioRecord = null;
         }
+
         vencoder.destroy();
         recordEncoderVC.destroy();
         singleThreadExecutor.shutdownNow();

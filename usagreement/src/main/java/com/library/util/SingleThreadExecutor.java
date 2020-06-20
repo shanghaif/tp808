@@ -7,7 +7,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 自定义单例线程池
+ * 线程池创建工具类
  */
 
 public class SingleThreadExecutor {

@@ -7,8 +7,11 @@
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/cameratest/cameratest.iml" filepath="$PROJECT_DIR$/cameratest/cameratest.iml" />
       <module fileurl="file://$PROJECT_DIR$/easytoolsandroid/easytoolsandroid.iml" filepath="$PROJECT_DIR$/easytoolsandroid/easytoolsandroid.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ffmpeglib/ffmpeglib.iml" filepath="$PROJECT_DIR$/ffmpeglib/ffmpeglib.iml" />
       <module fileurl="file://$PROJECT_DIR$/tp808.iml" filepath="$PROJECT_DIR$/tp808.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tts/tts.iml" filepath="$PROJECT_DIR$/tts/tts.iml" />
       <module fileurl="file://$PROJECT_DIR$/usagreement/usagreement.iml" filepath="$PROJECT_DIR$/usagreement/usagreement.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usprotocol/usprotocol.iml" filepath="$PROJECT_DIR$/usprotocol/usprotocol.iml" />
       <module fileurl="file://$PROJECT_DIR$/voicelib/voicelib.iml" filepath="$PROJECT_DIR$/voicelib/voicelib.iml" />
     </modules>
   </component>

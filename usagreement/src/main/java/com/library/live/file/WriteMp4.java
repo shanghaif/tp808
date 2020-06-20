@@ -10,15 +10,12 @@ import android.util.Log;
 import com.library.common.WriteFileCallback;
 import com.library.util.BitmapUtils;
 import com.library.util.FileUtils;
-import com.library.util.MediaFunc;
 import com.library.util.RegularUtils;
-import com.library.util.Storage;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import cn.com.erayton.usagreement.ApplicationProvider;
 import cn.com.erayton.usagreement.data.db.DbTools;
 import cn.com.erayton.usagreement.utils.BitOperator;
 import cn.com.erayton.usagreement.utils.LogUtils;
@@ -72,14 +69,15 @@ public class WriteMp4 {
 
             DbTools.insertVideoRecord(name, Long.parseLong(names[0]),  Long.parseLong(names[1]),
                     Integer.parseInt(names[2]), file.length());
-            Storage.addVideoToDB(ApplicationProvider.context.getContentResolver(), file.getName(),
-                    System.currentTimeMillis(), null, file.length(), name,
-                    200, 200, FileUtils.getMimeType(MediaFunc.MEDIA_TYPE_VIDEO));
+//            Storage.addVideoToDB(Context.getContentResolver(), file.getName(),
+////            Storage.addVideoToDB(ApplicationProvider.context.getContentResolver(), file.getName(),
+//                    System.currentTimeMillis(), null, file.length(), name,
+//                    200, 200, FileUtils.getMimeType(MediaFunc.MEDIA_TYPE_VIDEO));
         }
 
         @Override
         public void failure(String err) {
-            LogUtils.e("cjh", "failure"+err) ;
+            LogUtils.e("failure"+err) ;
         }
     };
 
@@ -175,6 +173,10 @@ public class WriteMp4 {
     }
 
     public void stop() {
+        if (mMediaMuxer == null){
+            return;
+        }
+        mMediaMuxer.stop();
         LogUtils.d("stop ----------------------------");
         synchronized (lock) {
             LogUtils.d("stop ----------------lock------------");
@@ -187,26 +189,29 @@ public class WriteMp4 {
                     if (frameNum >= 20) {
                         path = FileUtils.FixFileName(path, String.format(format, startTime, endTime, channel, 0, 0)) ;
                         writeFileCallback.success(path);
+                        LogUtils.d("app_WriteMp4", "writeFileCallback.success:"+path);
                     }
-                    LogUtils.d("app_WriteMp4", "文件录制关闭");
+                    LogUtils.d("app_WriteMp4", "文件录制关闭,"+frameNum);
                 } catch (Exception e) {
+                    LogUtils.d("app_WriteMp4", "Exception,"+e);
                     iscatch = true;
+                    e.printStackTrace();
                 } finally {
                     mMediaMuxer = null;
                     voiceFormat = null;
                     videoFormat = null;
-                    //文件过短或异常，删除文件
+                    //  文件过短或异常，删除文件
                     File file = new File(path);
                     if (file.exists()) {
                         if (iscatch) {
                             file.delete();
-                            writeFileCallback.failure("文件录制失败");
+                            writeFileCallback.failure("文件录制失败:"+path+","+frameNum+",iscatch:"+iscatch);
                         } else if (frameNum < 20) {
                             file.delete();
                             writeFileCallback.failure("文件过短");
                         }
                     } else {
-                        writeFileCallback.failure("文件录制失败");
+                        writeFileCallback.failure("文件录制失败,"+frameNum);
                     }
                 }
             } else if (RECODE_STATUS == RECODE_STATUS_READY) {

@@ -248,7 +248,7 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
         this.isOpenHB = isOpenHB;
     }}
 
-    private long hBInterval = 90 ;            //  心跳时间间隔    3 分钟
+    private long hBInterval = 15 ;            //  心跳时间间隔    3 分钟 ->90 sec
     private Object hBIntervalLock = new Object() ;
     public long getHBInterval() {synchronized (hBIntervalLock){
         return hBInterval;
@@ -446,7 +446,7 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
     @Override
     public void onTcpSend(byte[] data, boolean result) {
 //      something here
-
+        LogUtils.d( "onTcpSend -- result:"+result);
         if (listener != null) {
             listener.onSend(data, result) ;
         }
@@ -461,6 +461,7 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
     public void OnUdpSend(byte[] data, boolean result) {
         //      something here
 
+        LogUtils.d( "OnUdpSend -- result:"+result);
         if (listener != null) {
             listener.onSend(data, result) ;
         }
