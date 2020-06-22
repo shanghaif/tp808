@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -36,6 +37,8 @@ import cn.com.erayton.usagreement.data.db.table.VideoRecord;
 import cn.com.erayton.usagreement.model.decode.ServerFileUploadMsg;
 import cn.com.erayton.usagreement.model.model.TerminalResourceInfo;
 import cn.com.erayton.usagreement.socket.client.SocketClientSender;
+import cn.com.erayton.usagreement.utils.FileMsg;
+import cn.com.erayton.usagreement.utils.FileUtils;
 import cn.com.erayton.usagreement.utils.LogUtils;
 
 public class MainActivity extends AppCompatActivity {
@@ -309,20 +312,41 @@ public class MainActivity extends AppCompatActivity {
         publish.start();
     }
 
+//    public void queryVideo(int seNum){
+        List<TerminalResourceInfo> infos = new ArrayList<>() ;
+//        byte[] a = { 1, 1, 1, 1, 1, 1, 1, 1 };
+//        for (VideoRecord v:DbTools.queryVideoRecord()){
+//            TerminalResourceInfo info = new TerminalResourceInfo() ;
+//            info.setChannelNum(v.getChannel());
+//            info.setStartTime(String.valueOf(v.getStartTime()));
+//            info.setEndTime(String.valueOf(v.getEndTime()));
+//            // byte[] a = { 0, 0, 0, 0, 0, 0, 0, 0 };
+//            info.setWrang(a);
+//            info.setResourceType(v.getSourceType());
+//            info.setSteamType(v.getStreamType());
+//            info.setMemoryType(v.getMemoryType());
+//            info.setFileSize(v.getSize());
+//            infos.add(info) ;
+//        }
+//
+//        USManager.getSingleton().SendAVResourceList(seNum, infos) ;
+//    }
+
     public void queryVideo(int seNum){
         List<TerminalResourceInfo> infos = new ArrayList<>() ;
         byte[] a = { 1, 1, 1, 1, 1, 1, 1, 1 };
-        for (VideoRecord v:DbTools.queryVideoRecord()){
+        for (FileMsg v: FileUtils.getNativeVideo(getContentResolver(), 0)){
+            LogUtils.d("cjh", ""+v) ;
             TerminalResourceInfo info = new TerminalResourceInfo() ;
-            info.setChannelNum(v.getChannel());
-            info.setStartTime(String.valueOf(v.getStartTime()));
-            info.setEndTime(String.valueOf(v.getEndTime()));
+            info.setChannelNum(1);
+            info.setStartTime(v.getStartTime());
+            info.setEndTime(v.getEndTime());
             // byte[] a = { 0, 0, 0, 0, 0, 0, 0, 0 };
             info.setWrang(a);
-            info.setResourceType(v.getSourceType());
-            info.setSteamType(v.getStreamType());
-            info.setMemoryType(v.getMemoryType());
-            info.setFileSize(v.getSize());
+            info.setResourceType(v.getFileType());
+            info.setSteamType(1);
+            info.setMemoryType(1);
+            info.setFileSize(v.getFileSize());
             infos.add(info) ;
         }
 
