@@ -15,9 +15,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatSeekBar;
 import androidx.core.app.ActivityCompat;
 
+import com.library.bean.FileMsg;
 import com.library.live.Publish;
 import com.library.live.view.PublishView;
 import com.library.util.FTPUtils;
+import com.library.util.FileUtils;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -31,16 +33,15 @@ import cn.com.erayton.jt_t808.video.eventBus.EventBusUtils;
 import cn.com.erayton.jt_t808.video.eventBus.event.BroadCastMainEvent;
 import cn.com.erayton.jt_t808.video.manager.USManager;
 import cn.com.erayton.usagreement.data.Constants;
-import cn.com.erayton.usagreement.data.db.DbTools;
-import cn.com.erayton.usagreement.data.db.table.VideoRecord;
 import cn.com.erayton.usagreement.model.decode.ServerFileUploadMsg;
 import cn.com.erayton.usagreement.model.model.TerminalResourceInfo;
 import cn.com.erayton.usagreement.socket.client.SocketClientSender;
 import cn.com.erayton.usagreement.utils.LogUtils;
+import cn.com.erayton.usagreement.utils.TimeUtils;
 
 public class MainActivity extends AppCompatActivity {
     private final int REQUEST_CAMERA = 666;
-//    private String host1 = "192.168.1.145" ;
+    //    private String host1 = "192.168.1.145" ;
 //    private int port1 =5508 ;
     private int port =0 ;
     private String host1 = "106.14.186.44" ;
@@ -48,9 +49,9 @@ public class MainActivity extends AppCompatActivity {
     private String host = "" ;
     private String host2 = "video.erayton.cn" ;
     private int port2 = 7000 ;
-//    private String phone ="23803560303" ;
+    //    private String phone ="23803560303" ;
     private String phone ="23803560285" ;
-//    private String phone ="23803641388" ;
+//        private String phone ="23803641388" ;
     PublishView publishView ;
     Publish publish ;
     Button button , ipButton;
@@ -80,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
                 ipButton.setText(host);
                 USManager.getSingleton().ServerLogin(phone, host,
                         port, port, false);
-            break;
+                break;
         }
     }
 
@@ -198,8 +199,9 @@ public class MainActivity extends AppCompatActivity {
                 .setRotate(Constants.CAMERA)
                 .setVideoDirPath(Environment.getExternalStorageDirectory().getPath() + File.separator + "erayTonLive")
                 .setPictureDirPath(Environment.getExternalStorageDirectory().getPath() + File.separator + "erayTonPicture")
+                //  按比例显示图像
                 .setCenterScaleType(true)
-                .setScreenshotsMode(Publish.TAKEPHOTO)
+                .setScreenshotsMode(Publish.CONVERSION)
                 .build();
     }
 
@@ -249,7 +251,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case EventBusUtils.EventCode.CLOSE_VIDEO:
 //                    videoPushAIDL.distoryVideo() ;
-                    publish.stop();
+                publish.stop();
 //                publish.destroy();
 //                stopVideo();
 
@@ -304,35 +306,79 @@ public class MainActivity extends AppCompatActivity {
 //                .setCenterScaleType(true)
 //                .setScreenshotsMode(Publish.TAKEPHOTO)
 //                .build();
-        publish.initTcp(phone, host, port, channelNum, false);
+        publish.initTcp(phone, ip, port, channelNum, false);
         publish.start();
     }
+
+    //    public void queryVideo(int seNum){
+    List<TerminalResourceInfo> infos = new ArrayList<>() ;
+//        byte[] a = { 1, 1, 1, 1, 1, 1, 1, 1 };
+//        for (VideoRecord v:DbTools.queryVideoRecord()){
+//            TerminalResourceInfo info = new TerminalResourceInfo() ;
+//            info.setChannelNum(v.getChannel());
+//            info.setStartTime(String.valueOf(v.getStartTime()));
+//            info.setEndTime(String.valueOf(v.getEndTime()));
+//            // byte[] a = { 0, 0, 0, 0, 0, 0, 0, 0 };
+//            info.setWrang(a);
+//            info.setResourceType(v.getSourceType());
+//            info.setSteamType(v.getStreamType());
+//            info.setMemoryType(v.getMemoryType());
+//            info.setFileSize(v.getSize());
+//            infos.add(info) ;
+//        }
+//
+//        USManager.getSingleton().SendAVResourceList(seNum, infos) ;
+//    }
 
     public void queryVideo(int seNum){
         List<TerminalResourceInfo> infos = new ArrayList<>() ;
         byte[] a = { 1, 1, 1, 1, 1, 1, 1, 1 };
-        for (VideoRecord v:DbTools.queryVideoRecord()){
+        for (FileMsg v: FileUtils.getNativeVideo(getContentResolver(), 0, "1592928000", "1593014399")){
+//        for (FileMsg v: FileUtils.getNativeVideo(getContentResolver(), 0, "1592964770", "1593014399")){
+            LogUtils.d("cjh", ""+v) ;
             TerminalResourceInfo info = new TerminalResourceInfo() ;
-            info.setChannelNum(v.getChannel());
-            info.setStartTime(String.valueOf(v.getStartTime()));
-            info.setEndTime(String.valueOf(v.getEndTime()));
+            info.setChannelNum(1);
+            info.setStartTime(v.getStartTime());
+            info.setEndTime(v.getEndTime());
             // byte[] a = { 0, 0, 0, 0, 0, 0, 0, 0 };
             info.setWrang(a);
-            info.setResourceType(v.getSourceType());
-            info.setSteamType(v.getStreamType());
-            info.setMemoryType(v.getMemoryType());
-            info.setFileSize(v.getSize());
+            info.setResourceType(v.getFileType());
+            info.setSteamType(1);
+            info.setMemoryType(1);
+            info.setFileSize(v.getFileSize());
             infos.add(info) ;
         }
 
         USManager.getSingleton().SendAVResourceList(seNum, infos) ;
     }
 
+
+    String uri = null ;
     private void fileUpload(final int seNum, final ServerFileUploadMsg msg){
         //  文件上传，通过开始时间和结束时间，找到文件路径
-        final String uri =DbTools.queryVideoRecord(Long.parseLong(msg.getStartTime())).getName() ;    //  文件路径
+        LogUtils.d("cjh", "fileUpload:"+msg);
         FTPUtils.getInstance().initFtpClient(msg.getHost(), msg.getPort(),
                 msg.getUserName(), msg.getPassword());
+//        final String uri =DbTools.queryVideoRecord(Long.parseLong(msg.getStartTime())).getName() ;    //  文件路径
+        for (FileMsg v:FileUtils.getNativeVideo(getContentResolver(), msg.getResourceType(),
+                TimeUtils.date2TimeStamp(msg.getStartTime(), "yyMMddHHmmss"))){
+            LogUtils.d("cjh", "getStartTime():"+v);
+            uri = v.getFilePath()  ;
+            break;
+        }
+//        for (FileMsg v: FileUtils.getNativeVideo(getContentResolver(), msg.getResourceType())){
+//            if (v.getStartTime().equals(msg.getStartTime())){
+//                LogUtils.d("cjh", "v.getStartTime():"+v.getFilePath());
+//                uri = v.getFilePath()  ;
+//                break;
+//            }
+//        }
+        LogUtils.d("FTP", "uri:"+uri);
+        if (uri == null){
+            return;
+        }
+
+
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -360,4 +406,6 @@ public class MainActivity extends AppCompatActivity {
 
 //        SocketClientSender.sendUploadStatus(seNum, 0, false, false) ;
     }
+
+
 }

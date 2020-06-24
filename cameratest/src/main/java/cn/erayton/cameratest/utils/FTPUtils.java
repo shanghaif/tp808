@@ -221,7 +221,7 @@ public class FTPUtils {
         return flag;
     }
 
-    //创建多层目录文件，如果有ftp服务器已存在该文件，则不创建，如果无，则创建
+    //  创建多层目录文件，如果有ftp服务器已存在该文件，则不创建，如果无，则创建
     public boolean CreateDirecroty(String remote) throws IOException {
         boolean success = true;
         String directory = remote + "/";

@@ -2,7 +2,6 @@ package cn.com.erayton.usagreement.socket.client;
 
 import android.util.Log;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import cn.com.erayton.usagreement.data.Constants;
@@ -265,7 +264,7 @@ public class SocketClientSender {
         terminalGeneralInfo.setSeNum(seNum);
         terminalGeneralInfo.setRespId(Constants.SERVER_AVTRANSMISSION_REQUEST);
         terminalGeneralInfo.setResult(code);
-        return sendGeneralReponse(terminalGeneralInfo, false, false) ;
+        return sendGeneralReponse(terminalGeneralInfo, true, false) ;
 
     }
 
@@ -282,7 +281,7 @@ public class SocketClientSender {
         terminalGeneralInfo.setSeNum(seNum);
         terminalGeneralInfo.setRespId(Constants.SERVER_FILEUPLOAD_REQUEST);
         terminalGeneralInfo.setResult(code);
-        return sendGeneralReponse(terminalGeneralInfo, false, false) ;
+        return sendGeneralReponse(terminalGeneralInfo, true, false) ;
     }
 
     /** 文件上传完成通知

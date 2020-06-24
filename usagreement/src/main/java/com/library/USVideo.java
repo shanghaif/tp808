@@ -53,10 +53,10 @@ public class USVideo {
         bindServiceAidl();
     }
 
-
+    Intent intent ;
     //  初始化视频服务
     private void bindServiceAidl(){
-        Intent intent = new Intent(context, VideoPushService.class) ;
+         intent = new Intent(context, VideoPushService.class) ;
         context.bindService(intent, serviceConnection ,Context.BIND_AUTO_CREATE) ;
 //        context.bindService(intent, new ServiceConnection() {
 //            @Override
@@ -108,6 +108,7 @@ public class USVideo {
 //    public void tackPicture() throws RemoteException {
 //        videoPushAIDL.tackPicture();
 //    }
+
     /**截屏
      *
      * @throws RemoteException
@@ -145,13 +146,16 @@ public class USVideo {
 
     public void onDestory(){
         try {
-            if (videoPushAIDL != null) {
-                videoPushAIDL.distoryVideo();
-            }
+
             if (isRunService(context, "cn.com.erayton.usagreement.service.VideoPushService")) {
                 LogUtils.d("service---------------------------------------running");
                 context.unbindService(serviceConnection);
+                context.stopService(intent) ;
 //                IllegalArgumentException
+            }
+            if (videoPushAIDL != null) {
+                videoPushAIDL.distoryVideo();
+                videoPushAIDL = null ;
             }
             instance = null ;
         } catch (RemoteException e) {

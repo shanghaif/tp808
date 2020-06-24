@@ -28,7 +28,7 @@ public class FTPUtils {
     private String password = "";
     //超时时间
     public int timeOut = 2;
-    //被动模式开关 如果不开被动模式 有防火墙 可能会上传失败， 但被动模式需要ftp支持
+    //  被动模式开关 如果不开被动模式 有防火墙 可能会上传失败， 但被动模式需要ftp支持
     public boolean enterLocalPassiveMode = true;
 
     private FTPClient ftpClient = null;
@@ -73,7 +73,6 @@ public class FTPUtils {
         ftpClient.setConnectTimeout(timeOut * 1000);
         ftpClient.setDataTimeout(timeOut * 1000);
         ftpClient.setControlEncoding("utf-8");
-
     }
 
 
@@ -90,7 +89,7 @@ public class FTPUtils {
             ftpClient.connect(hostname, port); //连接ftp服务器
             //是否开启被动模式
             if (enterLocalPassiveMode) {
-                ftpClient.setRemoteVerificationEnabled(false);
+                ftpClient.setRemoteVerificationEnabled(true);
                 ftpClient.enterLocalPassiveMode();
             }
             ftpClient.login(username, password); //登录ftp服务器
@@ -183,12 +182,14 @@ public class FTPUtils {
             inputStream.close();
             ftpClient.logout();
         } catch (Exception e) {
+            e.printStackTrace();
             LogUtils.e(e.getMessage(), e+"");
         } finally {
             if (ftpClient.isConnected()) {
                 try {
                     ftpClient.disconnect();
                 } catch (IOException e) {
+                    e.printStackTrace();
                     LogUtils.e(e.getMessage(), e+"");
                 }
             }
@@ -196,6 +197,7 @@ public class FTPUtils {
                 try {
                     inputStream.close();
                 } catch (IOException e) {
+                    e.printStackTrace();
                     LogUtils.e(e.getMessage(), e+"");
                 }
             }
@@ -262,6 +264,7 @@ public class FTPUtils {
             inputStream.close();
             ftpClient.logout();
         } catch (Exception e) {
+            e.printStackTrace();
             LogUtils.e(e.getMessage(), e+"");
         } finally {
             if (ftpClient.isConnected()) {
@@ -275,6 +278,7 @@ public class FTPUtils {
                 try {
                     inputStream.close();
                 } catch (IOException e) {
+                    e.printStackTrace();
                     LogUtils.e(e.getMessage(), e+"");
                 }
             }
@@ -532,7 +536,7 @@ public class FTPUtils {
     private static String toFtpFilename(String fileName) throws Exception {
         return new String(fileName.getBytes("UTF-8"), "ISO8859-1");
     }
-
+private String charsetName = "UTF-8" ;
 
     public interface FTPListener{
         void Success() ;
