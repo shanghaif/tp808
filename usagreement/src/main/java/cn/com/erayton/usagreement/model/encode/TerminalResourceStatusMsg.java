@@ -46,7 +46,6 @@ public class TerminalResourceStatusMsg extends PacketData {
             baos.write(bitOperator.integerTo1Bytes(getResult()));
 //            baos.write(bitOperator.integerTo4Bytes(0));
 
-
         }catch (IOException e){
             e.printStackTrace();
         } catch (Exception e) {

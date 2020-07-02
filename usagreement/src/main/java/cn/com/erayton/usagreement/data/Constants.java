@@ -16,12 +16,12 @@ public class Constants {
     /**
      * GBK编码格式
      */
-    private static final String string_encoding = "UTF-8";
+    public static final String ENCODING_UTF8 = "UTF-8";
 
     //  标识位
     public static final int PKG_DELIMITER = 0x7e;
 
-    public static final Charset string_charset = Charset.forName(string_encoding);
+    public static final Charset string_charset = Charset.forName(ENCODING_UTF8);
 
     //  平台通用应答
     public static final int SERVER_COMMOM_RSP = 0x8001;
@@ -296,6 +296,7 @@ public class Constants {
      * 心跳间隔 3 分钟
      * */
     public static final int HBTHREAD_SLEEPIME = 3 * 60 * MILLISECONDSTOSECONDS ;     //  3 分钟
+//    public static final int HBTHREAD_SLEEPIME =  30 * MILLISECONDSTOSECONDS ;     //  30 秒
 
     /**
      * 心跳时间间隔检测时间 3 分钟
@@ -372,24 +373,26 @@ public class Constants {
     public static int VIDEO_INIT_TIME = 2 ;
 
     //  kpbs 进制 ？
-    private static int SCALE = 1000 ;
-//    private static int SCALE = 1024 ;
+//    private static int SCALE = 1000 ;
+    private static int SCALE = 1024 ;
 
     //  帧率
-    public static int FRAME_RATE = 30 ;
-    //  推流分辨率
-//        public static int PUSHER_RESOLUTION_W = 700 ;
-//        public static int PUSHER_RESOLUTION_H = 525 ;
+    public static int FRAME_RATE = 10 ;
+//    public static int FRAME_RATE = 29 ;
+    //  推流分辨率   清晰度
+//        public static int PUSHER_RESOLUTION_W = 640 ;
+//        public static int PUSHER_RESOLUTION_H = 360 ;
     public static int PUSHER_RESOLUTION_W = 1280 ;
     public static int PUSHER_RESOLUTION_H = 720 ;
+
     //  预览分辨率
     public static int PREVIEW_RESOLUTION_W = 1280 ;
     public static int PREVIEW_RESOLUTION_H = 720 ;
 //    public static int PREVIEW_RESOLUTION_W = 1400 ;
 //    public static int PREVIEW_RESOLUTION_H = 1050 ;
 
-    //  视频推流码率      kpbs
-    public static int VIDEO_PUSH_RATE = 600 * SCALE ;
+    //  视频推流码率      kpbs    清晰度，延时
+    public static int VIDEO_PUSH_RATE = 1400 * SCALE ;
     //  视频采集码率      kpbs
     public static int VIDEO_SAMPLING_RATE = 1800  * SCALE ;
 

@@ -8,8 +8,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.library.common.WriteFileCallback;
-import com.library.util.FileUtils;
-import com.library.util.OtherUtil;
+import cn.com.erayton.usagreement.utils.FileUtils;
 
 import java.io.File;
 import java.io.IOException;

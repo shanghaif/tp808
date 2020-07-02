@@ -1,4 +1,4 @@
-package com.library.util;
+package cn.com.erayton.usagreement.utils;
 
 import android.content.ContentResolver;
 import android.database.Cursor;
@@ -6,6 +6,7 @@ import android.media.MediaMetadataRetriever;
 import android.provider.MediaStore;
 
 import com.library.bean.FileMsg;
+import com.library.util.MediaFunc;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,13 +17,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Vector;
 
-import cn.com.erayton.usagreement.utils.LogUtils;
-import cn.com.erayton.usagreement.utils.TimeUtils;
-
 public class FileUtils {
     private static final String JPEG = "image/jpeg";
     private static final String VIDEO = "video/mpeg";
     private static final String YUV = "image/yuv";
+    private static final int PACKAGE_COUNT = 18 ;        //  一包的数据量
 
     public static boolean isPath(String path){
         String matches = "[A-Za-z]:\\\\[^:?\"><*]*";
@@ -310,24 +309,42 @@ public class FileUtils {
      * @param type MediaStore.Video.Media.EXTERNAL_CONTENT_URI ->0 , MediaStore.Audio.Media.EXTERNAL_CONTENT_URI->1
      */
     public static List<FileMsg> getNativeVideo(ContentResolver mResolver, int type){
-        List<FileMsg> fileMsgList = new ArrayList<>() ;
+     return getNativeVideo(mResolver, type, TimeUtils.dayAgo(-1, null)) ;
+    }
 
-        //获取视频的名称
-        // String[] projection = new String[]{MediaStore.Video.Media.TITLE};
-        //获取视频路径
-        String[] projection = new String[]{MediaStore.Video.Media.DATA, MediaStore.Video.Media.TITLE, MediaStore.Video.Media.SIZE,
-                MediaStore.Video.Media.DATE_MODIFIED, MediaStore.Video.Media.DURATION, MediaStore.Video.Media.DATE_ADDED,
-                MediaStore.Video.Media.DISPLAY_NAME
+    /**
+     * 获取SD卡视频文件
+     * @param mResolver
+     * @param startTime 单位为秒的时间戳
+     * @param type MediaStore.Video.Media.EXTERNAL_CONTENT_URI ->0 , MediaStore.Audio.Media.EXTERNAL_CONTENT_URI->1
+     */
+    public static List<FileMsg> getNativeVideo(ContentResolver mResolver, int type, String startTime){
+        return getNativeVideo(mResolver, type, startTime, TimeUtils.dayAgo(1, null)) ;
+    }
+
+    /**
+     * 获取SD卡视频文件
+     * @param mResolver
+     * @param startTime 单位为秒的时间戳
+     * @param type MediaStore.Video.Media.EXTERNAL_CONTENT_URI ->0 , MediaStore.Audio.Media.EXTERNAL_CONTENT_URI->1
+     */
+    public static List<FileMsg> getVideoPath(ContentResolver mResolver, int type, String startTime){
+        List<FileMsg> fileMsgList = new ArrayList<>() ;
+//          获取视频指定信息
+        String[] projection = new String[]{MediaStore.Video.Media.TITLE, MediaStore.Video.Media.DATA, MediaStore.Video.Media.SIZE,
+                MediaStore.Video.Media.DISPLAY_NAME, MediaStore.Video.Media.DURATION, MediaStore.Video.Media.DATE_MODIFIED,
+                MediaStore.Video.Media.DATE_ADDED
         };
         //  获取视频路径所有信息
-        Cursor cursor = mResolver.query(type ==0?MediaStore.Video.Media.EXTERNAL_CONTENT_URI:MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null,
-                null,
-                null,
+        Cursor cursor = mResolver.query(type ==0?MediaStore.Video.Media.EXTERNAL_CONTENT_URI:MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                projection,
+                MediaStore.Video.Media.DATE_MODIFIED+" = ?",
+                new String[]{startTime},
                 MediaStore.Video.Media.DEFAULT_SORT_ORDER);
         cursor.moveToFirst();
         int fileNum = cursor.getCount();
-        //  防止太多,只显示20条
-        for(int counter = 0; counter < (fileNum>20?20:fileNum); counter++){
+        //  防止太多,只显示指定条数
+        for(int counter = 0; counter < (fileNum>PACKAGE_COUNT?PACKAGE_COUNT:fileNum); counter++){
             FileMsg fileMsg = new FileMsg() ;
             fileMsg.setFileName(cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.TITLE)));
             fileMsg.setStartTime(TimeUtils.timeStamp2Date(cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DATE_MODIFIED)), "yyMMddHHmmss"));
@@ -337,27 +354,72 @@ public class FileUtils {
             fileMsg.setDisplayName(cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DISPLAY_NAME)));
             fileMsg.setDuration(cursor.getInt(cursor.getColumnIndex(MediaStore.Video.Media.DURATION)));
             fileMsg.setEndTime(TimeUtils.timeStamp2Date(String.valueOf((cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.DATE_MODIFIED))+cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.DURATION))/1000)),"yyMMddHHmmss" ));
-            fileMsgList.add(fileMsg) ;//            //获取视频的名称
-//            LogUtils.d("----------------------file is: " + cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.TITLE)) );
-//            //获取视频路径
-//            LogUtils.d("----------------------DATA is: " + cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DATA)) );
-////            LogUtils.d("----------------------SIZE is: " + cursor.getInt(cursor.getColumnIndex(MediaStore.Video.Media.SIZE)) );
-//            LogUtils.d("----------------------SIZE is: " + ShowLongFileSzie(cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.SIZE)) ));
-//            LogUtils.d("----------------------DISPLAY_NAME is: " + cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DISPLAY_NAME)) );
-//            LogUtils.d("----------------------DATE_ADDED is: " + cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DATE_ADDED)) );
-//            LogUtils.d("----------------------DATE_ADDED_format is: " + TimeUtils.timeStamp2Date(cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DATE_ADDED)), "yy-MM-dd HH:mm:ss"));
-//            LogUtils.d("----------------------WIDTH is: " + cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.WIDTH)) );
-//            LogUtils.d("----------------------HEIGHT is: " + cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.HEIGHT)) );
-//            LogUtils.d("----------------------DATE_MODIFIED is: " + cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DATE_MODIFIED)) );
-//            LogUtils.d("----------------------DATE_MODIFIED_format is: " + TimeUtils.timeStamp2Date(cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DATE_MODIFIED)), "yy-MM-dd HH:mm:ss"));
-//            LogUtils.d("----------------------MIME_TYPE is: " + cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.MIME_TYPE)) );
-//            LogUtils.d("----------------------DESCRIPTION is: " + cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DESCRIPTION)) );
-//            LogUtils.d("----------------------DURATION is: " + cursor.getInt(cursor.getColumnIndex(MediaStore.Video.Media.DURATION)) );
+            fileMsgList.add(fileMsg) ;
             cursor.moveToNext();
         }
         cursor.close();
         return fileMsgList ;
     }
+
+    /**
+     * 获取SD卡视频文件
+     * @param mResolver
+     * @param startTime 单位为秒的时间戳
+     * @param type MediaStore.Video.Media.EXTERNAL_CONTENT_URI -> 0 , MediaStore.Audio.Media.EXTERNAL_CONTENT_URI -> 1
+     */
+    public static List<FileMsg> getNativeVideo(ContentResolver mResolver, int type, String startTime, String endTime){
+        List<FileMsg> fileMsgList = new ArrayList<>() ;
+        //  获取视频指定信息
+        String[] projection = new String[]{MediaStore.Video.Media.TITLE, MediaStore.Video.Media.DATA, MediaStore.Video.Media.SIZE,
+                MediaStore.Video.Media.DISPLAY_NAME, MediaStore.Video.Media.DURATION, MediaStore.Video.Media.DATE_MODIFIED,
+                MediaStore.Video.Media.DATE_ADDED
+        };
+
+        Cursor cursor = mResolver.query(type ==0 ? MediaStore.Video.Media.EXTERNAL_CONTENT_URI:MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                projection,
+                MediaStore.Video.Media.DATE_MODIFIED+" >= ? AND "+MediaStore.Video.Media.DATE_MODIFIED+" <= ? ",
+                //  文件创建时间
+//                MediaStore.Video.Media.DATE_ADDED+" >= ? AND "+MediaStore.Video.Media.DATE_ADDED+" <= ? ",
+//                "( "+MediaStore.Video.Media.DATE_ADDED+" >= ? AND "+MediaStore.Video.Media.DATE_ADDED+" <= ? ) AND ("
+//                        +MediaStore.Video.Media.DATE_MODIFIED+" IS NULL OR ( "
+//                        +MediaStore.Video.Media.DATE_MODIFIED+" >= ? AND "
+//                        +MediaStore.Video.Media.DATE_MODIFIED+" <= ? ))",
+                new String[]{startTime, endTime},
+//                new String[]{startTime, endTime, startTime, endTime},
+//                MediaStore.Video.Media.DEFAULT_SORT_ORDER);
+                //  时间顺序排列
+                MediaStore.Files.FileColumns.DATE_MODIFIED + " DESC");
+        cursor.moveToFirst();
+        int fileNum = cursor.getCount();
+        //  防止太多,只显示18条
+        for(int counter = 0; counter < (fileNum>PACKAGE_COUNT?PACKAGE_COUNT:fileNum); counter++){
+            FileMsg fileMsg = new FileMsg() ;
+            //    获取视频的名称
+            fileMsg.setFileName(cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.TITLE)));
+            //  文件最后一次修改的时间
+            fileMsg.setStartTime(TimeUtils.timeStamp2Date(cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DATE_MODIFIED)), "yyMMddHHmmss"));
+            //    获取视频路径
+            fileMsg.setFilePath(cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DATA)));
+            //  文件大小
+            fileMsg.setFileSize(cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.SIZE)));
+            //  文件类型
+            fileMsg.setFileType(type);
+            fileMsg.setDisplayName(cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DISPLAY_NAME)));
+            fileMsg.setDuration(cursor.getInt(cursor.getColumnIndex(MediaStore.Video.Media.DURATION)));
+            //  @link{DURATION} 文件持续时长
+            fileMsg.setEndTime(TimeUtils.timeStamp2Date(String.valueOf((cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.DATE_MODIFIED))+
+                    cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.DURATION))/1000)),"yyMMddHHmmss" ));
+//            LogUtils.d("----------------------parseLong is: " +(cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.DATE_ADDED))+cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.DURATION)) ));
+            LogUtils.e("cjh","----------------------" +fileMsg);
+            fileMsgList.add(fileMsg) ;
+            cursor.moveToNext();
+        }
+        cursor.close();
+        LogUtils.e("cjh","------------------ num ------------------ \n" +fileMsgList.size());
+        return fileMsgList ;
+    }
+
+
 
 //    /**
 //     * 获取SD卡视频文件
@@ -410,126 +472,6 @@ public class FileUtils {
 //        cursor.close();
 //        return fileMsgList ;
 //    }
-
-    /**
-     * 获取SD卡视频文件
-     * @param mResolver
-     * @param startTime 单位为秒的时间戳
-     * @param type MediaStore.Video.Media.EXTERNAL_CONTENT_URI ->0 , MediaStore.Audio.Media.EXTERNAL_CONTENT_URI->1
-     */
-    public static List<FileMsg> getNativeVideo(ContentResolver mResolver, int type, String startTime){
-        List<FileMsg> fileMsgList = new ArrayList<>() ;
-
-        //获取视频的名称
-        // String[] projection = new String[]{MediaStore.Video.Media.TITLE};
-        //获取视频路径
-//        String[] projection = new String[]{MediaStore.Video.Media.DATA};
-        //  获取视频路径所有信息
-        Cursor cursor = mResolver.query(type ==0?MediaStore.Video.Media.EXTERNAL_CONTENT_URI:MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null,
-                MediaStore.Video.Media.DATE_MODIFIED+"=?",
-                new String[]{startTime},
-
-                MediaStore.Video.Media.DEFAULT_SORT_ORDER);
-        cursor.moveToFirst();
-        int fileNum = cursor.getCount();
-        //  防止太多,只显示20条
-        for(int counter = 0; counter < (fileNum>20?20:fileNum); counter++){
-            //获取视频的名称
-//            LogUtils.d("----------------------file is: " + cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.TITLE)) );
-//            //获取视频路径
-//            LogUtils.d("----------------------DATA is: " + cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DATA)) );
-//            LogUtils.d("----------------------SIZE is: " + cursor.getInt(cursor.getColumnIndex(MediaStore.Video.Media.SIZE)) );
-//            LogUtils.d("----------------------SIZE is: " + ShowLongFileSzie(cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.SIZE)) ));
-//            LogUtils.d("----------------------DISPLAY_NAME is: " + cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DISPLAY_NAME)) );
-//            LogUtils.d("----------------------DATE_ADDED is: " + cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.DATE_ADDED)) );
-//            LogUtils.d("----------------------timeStamp2Date is: " + TimeUtils.timeStamp2Date(cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DATE_ADDED)), "yyMMddHHmmss"));
-//            LogUtils.d("----------------------WIDTH is: " + cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.WIDTH)) );
-//            LogUtils.d("----------------------HEIGHT is: " + cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.HEIGHT)) );
-//            LogUtils.d("----------------------DATE_MODIFIED is: " + cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DATE_MODIFIED)) );
-//            LogUtils.d("----------------------MIME_TYPE is: " + cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.MIME_TYPE)) );
-//            LogUtils.d("----------------------DESCRIPTION is: " + cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DESCRIPTION)) );
-//            LogUtils.d("----------------------DURATION is: " + cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DURATION)) );
-            FileMsg fileMsg = new FileMsg() ;
-            fileMsg.setFileName(cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.TITLE)));
-            fileMsg.setStartTime(TimeUtils.timeStamp2Date(cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DATE_MODIFIED)), "yyMMddHHmmss"));
-            fileMsg.setFilePath(cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DATA)));
-            fileMsg.setFileSize(cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.SIZE)));
-            fileMsg.setFileType(type);
-            fileMsg.setDisplayName(cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DISPLAY_NAME)));
-            fileMsg.setDuration(cursor.getInt(cursor.getColumnIndex(MediaStore.Video.Media.DURATION)));
-            fileMsg.setEndTime(TimeUtils.timeStamp2Date(String.valueOf((cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.DATE_MODIFIED))+cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.DURATION))/1000)),"yyMMddHHmmss" ));
-//            LogUtils.d("----------------------parseLong is: " +(cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.DATE_ADDED))+cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.DURATION)) ));
-//            LogUtils.d("----------------------endTime  is: " +TimeUtils.timeStamp2Date(String.valueOf((cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.DATE_ADDED))+cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.DURATION))/1000)),"yyMMddHHmmss" ));
-            fileMsgList.add(fileMsg) ;
-            cursor.moveToNext();
-        }
-        cursor.close();
-        return fileMsgList ;
-    }
-
-    /**
-     * 获取SD卡视频文件
-     * @param mResolver
-     * @param startTime 单位为秒的时间戳
-     * @param type MediaStore.Video.Media.EXTERNAL_CONTENT_URI ->0 , MediaStore.Audio.Media.EXTERNAL_CONTENT_URI->1
-     */
-    public static List<FileMsg> getNativeVideo(ContentResolver mResolver, int type, String startTime, String endTime){
-        List<FileMsg> fileMsgList = new ArrayList<>() ;
-
-        //获取视频的名称
-        // String[] projection = new String[]{MediaStore.Video.Media.TITLE};
-        //获取视频路径
-        String[] projection = new String[]{MediaStore.Video.Media.TITLE, MediaStore.Video.Media.DATA, MediaStore.Video.Media.SIZE,
-                MediaStore.Video.Media.DISPLAY_NAME, MediaStore.Video.Media.DURATION, MediaStore.Video.Media.DATE_MODIFIED,
-                MediaStore.Video.Media.DATE_ADDED
-        };
-        //  获取视频路径所有信息
-        Cursor cursor = mResolver.query(type ==0?MediaStore.Video.Media.EXTERNAL_CONTENT_URI:MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, projection,
-//                MediaStore.Video.Media.DATE_MODIFIED+" >= ? AND "+MediaStore.Video.Media.DATE_MODIFIED+"<= ? ",
-//                MediaStore.Video.Media.DATE_ADDED+" >= ? AND "+MediaStore.Video.Media.DATE_ADDED+"<= ? ",
-                "( "+MediaStore.Video.Media.DATE_ADDED+" >= ? AND "+MediaStore.Video.Media.DATE_ADDED+" <= ? ) AND ("
-                        +MediaStore.Video.Media.DATE_MODIFIED+" IS NULL OR ( "
-                        +MediaStore.Video.Media.DATE_MODIFIED+" >= ? AND "
-                        +MediaStore.Video.Media.DATE_MODIFIED+" <= ? ))",
-//                new String[]{startTime, endTime},
-                new String[]{startTime, endTime, startTime, endTime},
-                MediaStore.Video.Media.DEFAULT_SORT_ORDER);
-        cursor.moveToFirst();
-        int fileNum = cursor.getCount();
-        //  防止太多,只显示20条
-        for(int counter = 0; counter < (fileNum>20?20:fileNum); counter++){
-//            //    获取视频的名称
-//            LogUtils.d("----------------------file is: " + cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.TITLE)) );
-//            //    获取视频路径
-//            LogUtils.d("----------------------DATA is: " + cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DATA)) );
-//            LogUtils.d("----------------------SIZE is: " + cursor.getInt(cursor.getColumnIndex(MediaStore.Video.Media.SIZE)) );
-//            LogUtils.d("----------------------MB SIZE is: " + ShowLongFileSzie(cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.SIZE)) ));
-//            LogUtils.d("----------------------DISPLAY_NAME is: " + cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DISPLAY_NAME)) );
-//            LogUtils.d("----------------------DATE_ADDED is: " + cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.DATE_ADDED)) );
-//            LogUtils.d("----------------------timeStamp2Date is: " + TimeUtils.timeStamp2Date(cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DATE_ADDED)), "yyMMddHHmmss"));
-//            LogUtils.d("----------------------WIDTH is: " + cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.WIDTH)) );
-//            LogUtils.d("----------------------HEIGHT is: " + cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.HEIGHT)) );
-//            LogUtils.d("----------------------DATE_MODIFIED is: " + cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DATE_MODIFIED)) );
-//            LogUtils.d("----------------------MIME_TYPE is: " + cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.MIME_TYPE)) );
-//            LogUtils.d("----------------------DESCRIPTION is: " + cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DESCRIPTION)) );
-//            LogUtils.d("----------------------DURATION is: " + cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DURATION)) );
-            FileMsg fileMsg = new FileMsg() ;
-            fileMsg.setFileName(cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.TITLE)));
-            fileMsg.setStartTime(TimeUtils.timeStamp2Date(cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DATE_MODIFIED)), "yyMMddHHmmss"));
-            fileMsg.setFilePath(cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DATA)));
-            fileMsg.setFileSize(cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.SIZE)));
-            fileMsg.setFileType(type);
-            fileMsg.setDisplayName(cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DISPLAY_NAME)));
-            fileMsg.setDuration(cursor.getInt(cursor.getColumnIndex(MediaStore.Video.Media.DURATION)));
-            fileMsg.setEndTime(TimeUtils.timeStamp2Date(String.valueOf((cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.DATE_MODIFIED))+cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.DURATION))/1000)),"yyMMddHHmmss" ));
-//            LogUtils.d("----------------------parseLong is: " +(cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.DATE_ADDED))+cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.DURATION)) ));
-//            LogUtils.d("----------------------endTime  is: " +TimeUtils.timeStamp2Date(String.valueOf((cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.DATE_ADDED))+cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.DURATION))/1000)),"yyMMddHHmmss" ));
-            fileMsgList.add(fileMsg) ;
-            cursor.moveToNext();
-        }
-        cursor.close();
-        return fileMsgList ;
-    }
 
     /**
      * 获取SD卡音频文件

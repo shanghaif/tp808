@@ -6,7 +6,6 @@ import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -190,6 +189,8 @@ public class OtherUtil {
 //    executeCmd("ping -c 1 -w 1 "+PublicConstants.ApiConstants.USLOGIN_IP, false);
     /**
      * 是否能 ping 通
+     * @param ip host
+     * @param sudo 是否最高权限
      * */
     public static String executeCmd(String ip, boolean sudo){
         String cmdMsg = "ping -c 1 -w 1 %s" ;

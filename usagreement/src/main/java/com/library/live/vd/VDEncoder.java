@@ -47,7 +47,7 @@ public class VDEncoder {
         cHeight = csize.getWidth();
         pWidth = psize.getHeight();
         //  裁剪绿色部分， 仅用于 zjx, zfjly tianlong 2020年6月16日19:42:07
-        pHeight =psize.getWidth()/2;
+        pHeight = (int) (psize.getWidth()*0.56);
 
         try {
             mediaCodec = MediaCodec.createEncoderByType(codetype);

@@ -4,7 +4,6 @@ import java.util.Arrays;
 
 import cn.com.erayton.jt_t808.constants.PublicConstants;
 import cn.com.erayton.usagreement.model.decode.ServerFileUploadMsg;
-import cn.com.erayton.usagreement.model.decode.ServerVideoReplayMsg;
 import cn.com.erayton.usagreement.socket.client.SocketClient;
 import cn.com.erayton.usagreement.socket.client.SocketClientSender;
 import cn.com.erayton.usagreement.utils.LogUtils;
@@ -112,9 +111,14 @@ public class ClientManager {
         }
 
         @Override
-        public void onAVReplayReq(ServerVideoReplayMsg msg) {
+        public void onAVReplayReq(String host, int tPort, int uPort, int channel, int sourceType, int streamType, int memoryType, int playbackMode, int multiple, String startTime, String endTime) {
 
         }
+//
+//        @Override
+//        public void onAVReplayReq(ServerVideoReplayMsg msg) {
+//
+//        }
 
         @Override
         public void onAVReplayControl(int channelNum, int playbackControl, int multiple, String dragTo) {

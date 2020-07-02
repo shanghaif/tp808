@@ -1,10 +1,7 @@
 package cn.com.erayton.usagreement.model.encode;
 
-import android.util.Log;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import cn.com.erayton.usagreement.model.decode.PacketData;
@@ -75,7 +72,8 @@ public class TerminalResourceMsg extends PacketData {
                     baos.write(bitOperator.integerTo1Byte(info.getChannelNum()));
                     baos.write(bitOperator.string2Bcd(info.getStartTime()));
                     baos.write(bitOperator.string2Bcd(info.getEndTime()));
-                    baos.write(info.getWrang());
+//                    baos.write(info.getWrang());
+                    baos.write(bitOperator.toDDbyte(info.getWrang(), 8));
                     baos.write(bitOperator.integerTo1Byte(info.getResourceType()));
                     baos.write(bitOperator.integerTo1Byte(info.getSteamType()));
                     baos.write(bitOperator.integerTo1Byte(info.getMemoryType()));

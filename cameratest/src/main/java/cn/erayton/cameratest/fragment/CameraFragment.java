@@ -11,14 +11,9 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
-
 import cn.erayton.cameratest.CameraActivity;
 import cn.erayton.cameratest.Config;
 import cn.erayton.cameratest.R;
-import cn.erayton.cameratest.event.BusManager;
-import cn.erayton.cameratest.event.entity.RecordEvent;
 import cn.erayton.cameratest.manager.CameraSettings;
 import cn.erayton.cameratest.manager.CameraToolKit;
 import cn.erayton.cameratest.manager.Controller;
@@ -45,7 +40,6 @@ public class CameraFragment extends Fragment {
         mRootView = LayoutInflater.from(getActivity()).inflate(R.layout.camera_fragment_layout, null) ;
         mBaseUI = new AppBaseUI(mAppContext, mRootView) ;
         mModuleManager = new ModuleManager(mAppContext, mController) ;
-        BusManager.register(this);
     }
 
 
@@ -137,14 +131,5 @@ public class CameraFragment extends Fragment {
                 return super.run();
             }
         });
-    }
-
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onRecordEvent(RecordEvent event){
-//        buttonName.performClick();
-        mBaseUI.clickButtonShutter();
-        mBaseUI.clickButtonShutter();
-
     }
 }

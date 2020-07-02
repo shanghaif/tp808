@@ -25,6 +25,10 @@ public class LogUtils {
         return BuildConfig.DEBUG;
     }
 
+//    public static boolean isDebuggable() {
+//        return false;
+//    }
+
     private static String createLog(String log) {
 //        StringBuffer buffer = new StringBuffer();
 //        buffer.append("================");

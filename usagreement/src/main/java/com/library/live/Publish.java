@@ -28,6 +28,7 @@ import android.util.Range;
 import android.util.Size;
 import android.view.Surface;
 import android.view.TextureView;
+
 import com.library.common.WriteFileCallback;
 import com.library.data.Constants;
 import com.library.live.file.WriteMp4;
@@ -37,7 +38,7 @@ import com.library.live.vc.VoiceRecord;
 import com.library.live.vd.RecordEncoderVD;
 import com.library.live.vd.VDEncoder;
 import com.library.live.view.PublishView;
-import com.library.util.FileUtils;
+import cn.com.erayton.usagreement.utils.FileUtils;
 import com.library.util.ImagUtil;
 import com.library.util.OtherUtil;
 import com.library.util.Rotate3dAnimation;
@@ -162,14 +163,14 @@ public class Publish implements TextureView.SurfaceTextureListener {
             for (String cameraId : manager.getCameraIdList()) {
                 characteristics = manager.getCameraCharacteristics(cameraId);
 //                CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
-                Log.e("cjh", "camera num:" + manager.getCameraIdList().length + ",cameraId:" + cameraId+"\nLENS_FACING:"+characteristics.get(CameraCharacteristics.LENS_FACING));
+                LogUtils.e("camera num:" + manager.getCameraIdList().length + ",cameraId:" + cameraId+"\nLENS_FACING:"+characteristics.get(CameraCharacteristics.LENS_FACING));
                 if (characteristics.get(CameraCharacteristics.LENS_FACING) ==
                         (map.isRotate() ? CameraCharacteristics.LENS_FACING_FRONT : CameraCharacteristics.LENS_FACING_BACK)) {
-                    //获取StreamConfigurationMap管理摄像头支持的所有输出格式和尺寸,根据TextureView的尺寸设置预览尺寸
+                    //  获取StreamConfigurationMap管理摄像头支持的所有输出格式和尺寸,根据TextureView的尺寸设置预览尺寸
                     StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
                     //选取最佳分辨率初始化编码器（未必和设置的匹配，由于摄像头不支持设置的分辨率）
                     this.cameraId = cameraId;
-                    Log.e("cjh", "this.cameraId:" + this.cameraId+",SDK_INT:"+Build.VERSION.SDK_INT);
+                    LogUtils.e("this.cameraId:" + this.cameraId+",SDK_INT:"+Build.VERSION.SDK_INT);
                     if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
 //                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         manager.setTorchMode(cameraId, false);
@@ -192,7 +193,7 @@ public class Publish implements TextureView.SurfaceTextureListener {
 
             Log.d("pictureSize", "推流分辨率  =  " + publishSize.getWidth() + " * " + publishSize.getHeight());
             Log.d("pictureSize", "预览分辨率  =  " + previewSize.getWidth() + " * " + previewSize.getHeight());
-
+//            YUVUtils.init(publishSize.getWidth(), publishSize.getHeight(), publishSize.getWidth(), publishSize.getHeight());
             //计算比例(需对调宽高)
 //            tcpSend.setWeight((double) publishSize.getHeight() / publishSize.getWidth());
 //            if (map.isPreview()) {
@@ -269,7 +270,7 @@ public class Publish implements TextureView.SurfaceTextureListener {
         }
         try {
             //  打开相机
-            Log.e("cjh", "cameraId -------------:" + cameraId);
+            LogUtils.e("cameraId -------------:" + cameraId);
             manager.openCamera(cameraId, new CameraDevice.StateCallback() {
                 @Override
                 public void onOpened( CameraDevice device) {
@@ -322,7 +323,7 @@ public class Publish implements TextureView.SurfaceTextureListener {
                 surfaces.add(textureSurface);
             }
 
-//            //拍照数据输出
+//            //    拍照数据输出
 //            if (map.getScreenshotsMode() == TAKEPHOTO) {
 //                final CaptureRequest.Builder captureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
 ////                final CaptureRequest.Builder captureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
@@ -414,7 +415,7 @@ public class Publish implements TextureView.SurfaceTextureListener {
         frameHandler.post(new Runnable() {
             @Override
             public void run() {
-                //帧率控制时间
+                //  帧率控制时间
                 frameHandler.postDelayed(this, 1000 / map.getFrameRate());
                 if (!frameRateControlQueue.isEmpty()) {
                     //耗时检测
@@ -425,6 +426,8 @@ public class Publish implements TextureView.SurfaceTextureListener {
                     image.close();
                     byte[] input = new byte[i420.length];
                     //旋转I420(270需要镜像)然后交给编码器等待编码
+//                    input = i420 ;
+//                    YUVUtils.compressYUV(i420, previewSize.getWidth(), previewSize.getHeight(), input,previewSize.getWidth(), previewSize.getHeight(), 0, 90, map.isRotate());
                     ImagUtil.rotateI420(i420, previewSize.getWidth(), previewSize.getHeight(), input, rotateAngle, map.isRotate());
                     if (useuvPicture && yuvPicture == null) {
                         useuvPicture = false;
@@ -803,11 +806,11 @@ public class Publish implements TextureView.SurfaceTextureListener {
 
     private CaptureRequest.Builder getPreviewBuilder() {
         if (previewBuilder ==null && map.isPreview()){
-            previewBuilder = createBuilder(CameraDevice.TEMPLATE_STILL_CAPTURE, getTextureSurface()) ;
+            previewBuilder = createBuilder(CameraDevice.TEMPLATE_RECORD, getTextureSurface()) ;
 //            previewBuilder = createBuilder(CameraDevice.TEMPLATE_STILL_CAPTURE, getTextureSurface()) ;
         }else {
             try {
-                previewBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE) ;
+                previewBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD) ;
             } catch (CameraAccessException e) {
                 e.printStackTrace();
             }

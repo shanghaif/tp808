@@ -9,8 +9,6 @@ import android.view.TextureView;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 
-import androidx.appcompat.widget.AppCompatSeekBar;
-
 import cn.erayton.cameratest.R;
 import cn.erayton.cameratest.callback.CameraUiEvent;
 
@@ -21,7 +19,7 @@ public class ProfessionalUI extends CameraBaseUI implements TextureView.SurfaceT
     private RelativeLayout mRootView;
 
     private GestureTextureView mPreviewTexture;
-    private AppCompatSeekBar mFocusLensBar;
+    private SeekBar mFocusLensBar;
 
     public ProfessionalUI(Context context, Handler handler, CameraUiEvent event) {
         super(event);

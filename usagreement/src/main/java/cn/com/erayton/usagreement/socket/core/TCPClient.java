@@ -145,7 +145,7 @@ public class TCPClient implements Runnable {
         if( socket == null ){
             return false;
         }
-        LogUtils.d("cjh", "send -----------\n "+ HexStringUtils.toHexString(bytes)) ;
+        LogUtils.d("send -----------\n "+ HexStringUtils.toHexString(bytes)) ;
         synchronized (sendLock) {
             try {
                 OutputStream sokectWrite = socket.getOutputStream();

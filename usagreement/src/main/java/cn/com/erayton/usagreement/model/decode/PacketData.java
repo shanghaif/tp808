@@ -8,6 +8,8 @@ import cn.com.erayton.usagreement.model.encode.HeaderMsg;
 
 public abstract class PacketData {
 
+    //  流水号，从 0 开始
+    private static int flowId = 0 ;
     /**
      * 16byte 消息头
      */
@@ -220,6 +222,10 @@ public abstract class PacketData {
         DataHeader dataHeader = new DataHeader() ;
         headerMsg.setPhone(msgHeader.getTerminalPhone());
         headerMsg.setMsgId(msgHeader.getMsgId());
+        headerMsg.setIsSub(false);
+        headerMsg.setFlowId(flowId);
+        //  有分包，流水号也递增
+        flowId++;
         return dataHeader.generate808(headerMsg, packageDataBody2Byte());
     }
 

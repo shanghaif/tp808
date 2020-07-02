@@ -141,6 +141,7 @@ public class MediaFunc {
                     "com.android.gallery3d", "com.android.gallery3d.app.GalleryActivity");
             intent.setAction(Intent.ACTION_VIEW);
             //intent.setDataAndType(uri,"image/*");
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) ;    //  6.0 须添加
             intent.setData(mCurrentUri);
             context.startActivity(intent);
         } catch (Exception e) {

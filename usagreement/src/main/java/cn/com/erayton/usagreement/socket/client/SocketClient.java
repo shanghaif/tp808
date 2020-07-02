@@ -3,18 +3,16 @@ package cn.com.erayton.usagreement.socket.client;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
 import cn.com.erayton.usagreement.data.Constants;
 import cn.com.erayton.usagreement.data.ResponseReason;
 import cn.com.erayton.usagreement.model.decode.PacketData;
 import cn.com.erayton.usagreement.model.decode.ServerAVTranslateControlMsg;
 import cn.com.erayton.usagreement.model.decode.ServerAVTranslateMsg;
-import cn.com.erayton.usagreement.model.decode.ServerApertureMsg;
 import cn.com.erayton.usagreement.model.decode.ServerCouldControlMsg;
 import cn.com.erayton.usagreement.model.decode.ServerFileUploadControlMsg;
 import cn.com.erayton.usagreement.model.decode.ServerFileUploadMsg;
-import cn.com.erayton.usagreement.model.decode.ServerFocalLengthMsg;
 import cn.com.erayton.usagreement.model.decode.ServerGeneralMsg;
-import cn.com.erayton.usagreement.model.decode.ServerInfraredlightMsg;
 import cn.com.erayton.usagreement.model.decode.ServerParametersMsg;
 import cn.com.erayton.usagreement.model.decode.ServerRegisterMsg;
 import cn.com.erayton.usagreement.model.decode.ServerResourceQueryMsg;
@@ -22,9 +20,6 @@ import cn.com.erayton.usagreement.model.decode.ServerRotateMsg;
 import cn.com.erayton.usagreement.model.decode.ServerTransferStatusMsg;
 import cn.com.erayton.usagreement.model.decode.ServerVideoReplayControlMsg;
 import cn.com.erayton.usagreement.model.decode.ServerVideoReplayMsg;
-import cn.com.erayton.usagreement.model.decode.ServerWiperMsg;
-import cn.com.erayton.usagreement.model.decode.ServerZoomMsg;
-import cn.com.erayton.usagreement.model.model.TerminalAVPropertieInfo;
 import cn.com.erayton.usagreement.socket.core.TCPClient;
 import cn.com.erayton.usagreement.socket.core.UDPClient;
 import cn.com.erayton.usagreement.utils.BitOperator;
@@ -108,7 +103,9 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
          *
          * @param msg
          */
-        void onAVReplayReq(ServerVideoReplayMsg msg) ;
+//        void onAVReplayReq(ServerVideoReplayMsg msg) ;
+        void onAVReplayReq(String host, int tPort, int uPort, int channel, int sourceType,
+                           int streamType, int memoryType, int playbackMode, int multiple, String startTime, String endTime) ;
         /** 平台下发远程录像回放控制
          *
          * @param channelNum        逻辑通道号
@@ -253,7 +250,8 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
         this.isOpenHB = isOpenHB;
     }}
 
-    private long hBInterval = 90 ;            //  心跳时间间隔    3 分钟
+    private long hBInterval = 90 ;            //  心跳时间间隔    3 分钟 ->90
+//    private long hBInterval = 15 ;            //  心跳时间间隔    30 秒钟 ->15
     private Object hBIntervalLock = new Object() ;
     public long getHBInterval() {synchronized (hBIntervalLock){
         return hBInterval;
@@ -697,7 +695,10 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
                         packetData = new ServerVideoReplayMsg() ;
                         packetData.setMsgHeader(msgHeader);
                         packetData.inflatePackageBody(page);
-                        listener.onAVReplayReq((ServerVideoReplayMsg)packetData);
+                        ServerVideoReplayMsg msg = (ServerVideoReplayMsg)packetData ;
+                        listener.onAVReplayReq(msg.getHost(), msg.getTcpPort(), msg.getUdpPort(), msg.getChannelNum(), msg.getResourceType(),
+                                msg.getSteamType(), msg.getMemoryType(), msg.getPlaybackMode(), msg.getMultiple(), msg.getStartTime(), msg.getEndTime());
+//                        listener.onAVReplayReq((ServerVideoReplayMsg)packetData);
                         LogUtils.d( "----------------------- 平台下发远程录像回放请求 0x9201 ---------------------------\n packetData -"+packetData) ;
                         break;
                     case Constants.SERVER_AVREPLAY_CONTROL:

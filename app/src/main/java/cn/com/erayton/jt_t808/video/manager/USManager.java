@@ -13,7 +13,6 @@ import cn.com.erayton.jt_t808.video.eventBus.EventBusUtils;
 import cn.com.erayton.jt_t808.video.eventBus.event.BroadCastMainEvent;
 import cn.com.erayton.usagreement.data.Constants;
 import cn.com.erayton.usagreement.model.decode.ServerFileUploadMsg;
-import cn.com.erayton.usagreement.model.decode.ServerVideoReplayMsg;
 import cn.com.erayton.usagreement.model.model.TerminalAuthInfo;
 import cn.com.erayton.usagreement.model.model.TerminalGPSInfo;
 import cn.com.erayton.usagreement.model.model.TerminalGeneralInfo;
@@ -237,7 +236,7 @@ public class USManager {
         terminalGeneralInfo.setSeNum(seNum);
         terminalGeneralInfo.setRespId(respId);
         terminalGeneralInfo.setResult(code);
-        SocketClientSender.sendGeneralReponse(terminalGeneralInfo, false, false) ;
+        SocketClientSender.sendGeneralReponse(terminalGeneralInfo, true, false) ;
 //        TerminalGeneralMsg.TerminalGeneralInfo terminalGeneralInfo = new TerminalGeneralMsg.TerminalGeneralInfo() ;
 //        terminalGeneralInfo.setSeNum(seNum);
 //        terminalGeneralInfo.setRespId(respId);
@@ -429,9 +428,10 @@ public class USManager {
         }
 
         @Override
-        public void onAVReplayReq(ServerVideoReplayMsg msg) {
+        public void onAVReplayReq(String host, int tPort, int uPort, int channel, int sourceType, int streamType, int memoryType, int playbackMode, int multiple, String startTime, String endTime) {
 
         }
+
 
         @Override
         public void onAVReplayControl(int channelNum, int playbackControl, int multiple, String dragTo) {
@@ -445,7 +445,8 @@ public class USManager {
 
         @Override
         public void onFileUploadControl(int seNum, int uploadControl) {
-
+            SendGeneralResp(seNum, Constants.SERVER_FILEUPLOAD_CONTROL, 0) ;
+//            USManager.getSingleton().SendGeneralResp()
         }
 
         @Override

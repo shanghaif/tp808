@@ -10,40 +10,63 @@
     <EditText
         android:id="@+id/test_path"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    <Button
+        android:layout_height="wrap_content"
+        tools:ignore="MissingConstraints" />
+    <LinearLayout
+        android:id="@+id/ll_l"
         app:layout_constraintTop_toBottomOf="@id/test_path"
-        android:id="@+id/testBtn"
-        android:text="@string/app_name"
+        android:orientation="vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:ignore="MissingConstraints" />
-    <Button
-        app:layout_constraintTop_toBottomOf="@id/testBtn"
-        android:id="@+id/testBtn2"
-        android:text="@string/action_settings"
+        tools:ignore="MissingConstraints">
+        <Button
+            app:layout_constraintTop_toBottomOf="@id/test_path"
+            android:id="@+id/testBtn"
+            android:text="@string/app_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:ignore="MissingConstraints" />
+        <Button
+            app:layout_constraintTop_toBottomOf="@id/testBtn"
+            android:id="@+id/testBtn2"
+            android:text="@string/action_settings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:ignore="MissingConstraints" />
+        <Button
+            app:layout_constraintTop_toBottomOf="@id/testBtn2"
+            android:id="@+id/testBtn3"
+            android:text="@string/action_settings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:ignore="MissingConstraints" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_r"
+        app:layout_constraintTop_toBottomOf="@id/test_path"
+        app:layout_constraintLeft_toRightOf="@id/ll_l"
+        android:orientation="vertical"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:ignore="MissingConstraints" />
-    <Button
-        app:layout_constraintTop_toBottomOf="@id/testBtn2"
-        android:id="@+id/testBtn3"
-        android:text="@string/action_settings"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:ignore="MissingConstraints" />
-    <Button
-        app:layout_constraintTop_toBottomOf="@id/testBtn3"
-        android:id="@+id/testBtn4"
-        android:text="@string/action_settings"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:ignore="MissingConstraints" />
-    <Button
-        app:layout_constraintTop_toBottomOf="@id/testBtn4"
-        android:id="@+id/testBtn5"
-        android:text="upload"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:ignore="MissingConstraints" />
+        android:layout_height="wrap_content">
+        <Button
+            android:id="@+id/testBtn4"
+            android:text="@string/action_settings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:ignore="MissingConstraints" />
+        <Button
+            android:id="@+id/testBtn5"
+            android:text="upload"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:ignore="MissingConstraints" />
+        <Button
+            android:id="@+id/testBtn6"
+            android:text="upload2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:ignore="MissingConstraints" />
+    </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

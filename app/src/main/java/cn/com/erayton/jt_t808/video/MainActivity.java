@@ -2,6 +2,7 @@ package cn.com.erayton.jt_t808.video;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.media.MediaScannerConnection;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -18,8 +19,6 @@ import androidx.core.app.ActivityCompat;
 import com.library.bean.FileMsg;
 import com.library.live.Publish;
 import com.library.live.view.PublishView;
-import com.library.util.FTPUtils;
-import com.library.util.FileUtils;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -36,6 +35,8 @@ import cn.com.erayton.usagreement.data.Constants;
 import cn.com.erayton.usagreement.model.decode.ServerFileUploadMsg;
 import cn.com.erayton.usagreement.model.model.TerminalResourceInfo;
 import cn.com.erayton.usagreement.socket.client.SocketClientSender;
+import cn.com.erayton.usagreement.utils.FTPUtils;
+import cn.com.erayton.usagreement.utils.FileUtils;
 import cn.com.erayton.usagreement.utils.LogUtils;
 import cn.com.erayton.usagreement.utils.TimeUtils;
 
@@ -48,9 +49,12 @@ public class MainActivity extends AppCompatActivity {
     private int port1 = 7000 ;
     private String host = "" ;
     private String host2 = "video.erayton.cn" ;
+//    private String host2 = "60.13.227.76" ;
     private int port2 = 7000 ;
-    //    private String phone ="23803560303" ;
+//        private String phone ="23803560303" ;
+//    private String phone ="23803560297" ;
     private String phone ="23803560285" ;
+//    private String phone ="23803560317" ;
 //        private String phone ="23803641388" ;
     PublishView publishView ;
     Publish publish ;
@@ -66,6 +70,20 @@ public class MainActivity extends AppCompatActivity {
         host = host2 ;
         port = port2 ;
         initView();
+
+
+    }
+
+    //判断sd卡是否存在并返回根目录
+    private String getSDCardPath(){
+        File sdDir = null;
+        boolean sdCardExist = Environment.getExternalStorageState().equals(
+                android.os.Environment.MEDIA_MOUNTED);// 判断sd卡是否存在
+        if (sdCardExist) {
+            sdDir = Environment.getExternalStorageDirectory();// 获取根目录
+        }
+        LogUtils.d("cjh", "getSDCardPath:"+sdDir);
+        return sdDir.toString();
     }
 
     public void buttonClick(View view){
@@ -83,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
                         port, port, false);
                 break;
         }
+
     }
 
 
@@ -149,9 +168,11 @@ public class MainActivity extends AppCompatActivity {
                     publish.stopRecode();
                     button.setText("start Record");
                     isRecord = false ;
+                    MediaScannerConnection.scanFile(MainActivity.this, new String[]{getSDCardPath()}, new String[]{"video/*", "audio/*"}, null);
                 }else {
                     USManager.getSingleton().setIsLocation(true);
                     publish.startRecode();
+                    publish.takePicture();
                     button.setText("stop Record");
                     isRecord = true ;
                 }
@@ -331,11 +352,17 @@ public class MainActivity extends AppCompatActivity {
 //    }
 
     public void queryVideo(int seNum){
+
         List<TerminalResourceInfo> infos = new ArrayList<>() ;
-        byte[] a = { 1, 1, 1, 1, 1, 1, 1, 1 };
-        for (FileMsg v: FileUtils.getNativeVideo(getContentResolver(), 0, "1592928000", "1593014399")){
-//        for (FileMsg v: FileUtils.getNativeVideo(getContentResolver(), 0, "1592964770", "1593014399")){
-            LogUtils.d("cjh", ""+v) ;
+        long a = 0;
+//        byte[] a = { 1, 1, 1, 1, 1, 1, 1, 1 };
+        for (FileMsg v: FileUtils.getNativeVideo(getContentResolver(), 0)){
+//        for (FileMsg v: FileUtils.getNativeVideo(getContentResolver(), 0)){
+//        for (FileMsg v: FileUtils.getNativeVideo(getContentResolver(), 0,
+//                TimeUtils.dayAgo(-1, "yyMMddHHmmss"),
+//                TimeUtils.dayAgo(1, "yyMMddHHmmss"))){
+//        for (FileMsg v: FileUtils.getNativeVideo(getContentResolver(), 0, "1592616780", "1593273599")){
+            LogUtils.d("cjh", ""+v+","+seNum) ;
             TerminalResourceInfo info = new TerminalResourceInfo() ;
             info.setChannelNum(1);
             info.setStartTime(v.getStartTime());
@@ -360,7 +387,7 @@ public class MainActivity extends AppCompatActivity {
         FTPUtils.getInstance().initFtpClient(msg.getHost(), msg.getPort(),
                 msg.getUserName(), msg.getPassword());
 //        final String uri =DbTools.queryVideoRecord(Long.parseLong(msg.getStartTime())).getName() ;    //  文件路径
-        for (FileMsg v:FileUtils.getNativeVideo(getContentResolver(), msg.getResourceType(),
+        for (FileMsg v:FileUtils.getVideoPath(getContentResolver(), msg.getResourceType(),
                 TimeUtils.date2TimeStamp(msg.getStartTime(), "yyMMddHHmmss"))){
             LogUtils.d("cjh", "getStartTime():"+v);
             uri = v.getFilePath()  ;
@@ -388,7 +415,8 @@ public class MainActivity extends AppCompatActivity {
                         msg.getStartTime() + ".mp4", uri, new FTPUtils.FTPListener() {
                             @Override
                             public void Success() {
-                                SocketClientSender.sendUploadStatus(seNum, 0, false, false) ;
+                                boolean su = SocketClientSender.sendUploadStatus(seNum, 0, true, false) ;
+                                LogUtils.d("FTP", "Success --------------------"+seNum+":result:"+su);
                             }
 
                             @Override
@@ -398,7 +426,7 @@ public class MainActivity extends AppCompatActivity {
 
                             @Override
                             public void Failer(String errorMsg) {
-                                SocketClientSender.sendUploadStatus(seNum, 1, false, false) ;
+                                SocketClientSender.sendUploadStatus(seNum, 1, true, false) ;
                             }
                         });
             }

@@ -1,21 +1,19 @@
 package cn.com.erayton.usagreement.model.model;
 
-import java.util.Arrays;
-
 public class TerminalResourceInfo {
-    //  通道号
+    //  通道号 [1]
     private int channelNum ;
-    //  开始时间
+    //  开始时间    [6]
     private String startTime ;
-    //  结束时间
+    //  结束时间    [6]
     private String endTime ;
-    //  报警标志    [0, 0, 0, 0, 0, 0, 0, 0]
-    private byte[] wrang ;
-    //  音视频资源类型 0, 音视频  1, 音频   2, 视频
+    //  报警标志    [0, 0, 0, 0, 0, 0, 0, 0]    [8]
+    private long wrang ;
+    //  音视频资源类型 0, 音视频  1, 音频   2, 视频   [1]
     private int resourceType ;
-    //  1, 主码流  2, 子码流
+    //  1, 主码流  2, 子码流  [1]
     private int steamType ;
-    //  存储类型    1, 主存储器 2, 灾备存储器
+    //  存储类型    1, 主存储器 2, 灾备存储器    [1]
     private int memoryType ;
     //  文件大小, 单位字节(BYTE)  // 1024 -> 1K
     private long fileSize ;
@@ -44,11 +42,11 @@ public class TerminalResourceInfo {
         this.endTime = endTime;
     }
 
-    public byte[] getWrang() {
+    public long getWrang() {
         return wrang;
     }
 
-    public void setWrang(byte[] wrang) {
+    public void setWrang(long wrang) {
         this.wrang = wrang;
     }
 
@@ -90,7 +88,7 @@ public class TerminalResourceInfo {
                 "channelNum=" + channelNum +
                 ", startTime='" + startTime + '\'' +
                 ", endTime='" + endTime + '\'' +
-                ", wrang=" + Arrays.toString(wrang) +
+                ", wrang=" + wrang +
                 ", resourceType=" + resourceType +
                 ", steamType=" + steamType +
                 ", memoryType=" + memoryType +

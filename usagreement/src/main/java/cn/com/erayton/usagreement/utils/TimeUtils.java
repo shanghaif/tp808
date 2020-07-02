@@ -1,7 +1,9 @@
 package cn.com.erayton.usagreement.utils;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 public class TimeUtils {
 
@@ -54,7 +56,56 @@ public class TimeUtils {
      */
     public static String timeStamp(){
         long time = System.currentTimeMillis();
-        String t = String.valueOf(time/1000);
-        return t;
+//        String t = String.valueOf(time/1000);
+//        return t;
+        return String.valueOf(time/1000);
+    }
+
+    /**
+     * 取得当前时间
+     * @param format 如：yyyy-MM-dd HH:mm:ss
+     * @return
+     */
+    public static String getNowTimeFormat(String format){
+        return timeFormat(System.currentTimeMillis(), format);
+    }
+
+    /**
+     * 获取几天前零点的时间戳
+     * */
+    public static String dayAgo(int day,String format){
+        return dayAgo(0, day, format);
+    }
+
+    /**
+     * 获取几个月前零点的时间戳
+     * */
+    public static String dayAgo(int month, int day, String format){
+        return dayAgo(0, month, day, format);
+    }
+
+    public static String dayAgo(int year, int month, int day,String format){
+        Calendar calendar = Calendar.getInstance();
+//        SimpleDateFormat sdf2 = new SimpleDateFormat(format);
+        calendar.add(Calendar.YEAR, year);
+        calendar.add(Calendar.DAY_OF_MONTH, month);
+        calendar.add(Calendar.DATE, day);
+//        String three_days_after = sdf2.format(calendar2.getTime());
+//        System.out.println(calendar2.getTime());
+//        return sdf2.format(calendar2.getTime());
+        if (format == null) {
+            return String.valueOf((calendar.getTimeInMillis()/1000));   //  毫秒转为秒
+        }
+        return timeFormat(calendar.getTime(), format);
+    }
+
+//    private static String timeFormat(Date date, String format){
+//        SimpleDateFormat f = new SimpleDateFormat(format, Locale.getDefault());
+//        return f.format(date) ;
+//    }
+
+    private static String timeFormat(Object date, String format){
+        SimpleDateFormat f = new SimpleDateFormat(format, Locale.getDefault());
+        return f.format(date) ;
     }
 }

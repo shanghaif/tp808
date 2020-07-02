@@ -9,10 +9,10 @@ import android.util.Log;
 
 import com.library.common.WriteFileCallback;
 import com.library.util.BitmapUtils;
-import com.library.util.FileUtils;
+import cn.com.erayton.usagreement.utils.FileUtils;
 import com.library.util.MediaFunc;
-import com.library.util.RegularUtils;
-import com.library.util.Storage;
+import cn.com.erayton.usagreement.utils.RegularUtils;
+import cn.com.erayton.usagreement.utils.StorageUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -62,7 +62,7 @@ public class WriteMp4 {
     private WriteFileCallback writeFileCallback = new WriteFileCallback() {
         @Override
         public void success(String name) {
-            LogUtils.e("cjh", "success:"+name) ;
+            LogUtils.e( "success:"+name) ;
             //  成功之后返回文件名
             String fileName = RegularUtils.getOneResult(name, RegularUtils.videoRex);
             //  处理文件名
@@ -73,14 +73,14 @@ public class WriteMp4 {
 
             DbTools.insertVideoRecord(name, Long.parseLong(names[0]),  Long.parseLong(names[1]),
                     Integer.parseInt(names[2]), file.length());
-            Storage.addVideoToDB(ApplicationProvider.context.getContentResolver(), file.getName(),
+            StorageUtils.addVideoToDB(ApplicationProvider.context.getContentResolver(), file.getName(),
                     System.currentTimeMillis(), null, file.length(), name,
                     200, 200, FileUtils.getMimeType(MediaFunc.MEDIA_TYPE_VIDEO));
         }
 
         @Override
         public void failure(String err) {
-            LogUtils.e("cjh", "failure:"+err) ;
+            LogUtils.e( "failure:"+err) ;
         }
     };
 

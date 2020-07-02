@@ -2,12 +2,17 @@ package com.library.bean;
 
 public class FileMsg {
 
+    //  文件名, 有可能不带文件格式
     private String fileName ;
+    //  文件开始时间
     private String startTime ;
+    //  文件结束时间
     private String endTime ;
     //  以 1024 为1 M
     private long fileSize ;
+    //  文件全名(带.后面的格式)
     private String displayName ;
+    //  文件路径
     private String filePath ;
     private int fileType ;
     //  时间长度    得到的值除以100
