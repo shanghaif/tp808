@@ -3,12 +3,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/rl_preview_container">
-    <cn.erayton.cameratest.ui.GestureTextureView
+    <cn.rayton.camera2.ui.GestureTextureView
         android:id="@+id/texture_preview"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <SeekBar
+    <android.support.v7.widget.AppCompatSeekBar
         android:id="@+id/sb_focus_length"
         android:layout_width="match_parent"
         style="@style/SeekBarTheme"

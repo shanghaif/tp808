@@ -9,5 +9,9 @@ public class Constants {
         public static final String FLASH_VALUE_OFF = "off";
         public static final String FLASH_VALUE_AUTO = "auto";
         public static final String FLASH_VALUE_TORCH = "torch";
+
+
+        public static final int TAKEPHOTO = 0;
+        public static final int CONVERSION = 1;
     }
 }

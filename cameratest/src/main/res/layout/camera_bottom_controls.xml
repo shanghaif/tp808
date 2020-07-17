@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:id="@+id/bottom_container"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_alignParentBottom="true"
-    android:background="@color/bottom_controls_bg">
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:id="@+id/bottom_container"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_alignParentBottom="true"
+              android:background="@color/bottom_controls_bg">
 
-    <cn.erayton.cameratest.ui.IndicatorView
+    <cn.rayton.camera2.ui.IndicatorView
         android:id="@+id/indicator_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -23,7 +23,7 @@
         android:layout_height="match_parent"
         android:orientation="horizontal"
         android:gravity="center">
-        <cn.erayton.cameratest.ui.CircleImageView
+        <cn.rayton.camera2.ui.CircleImageView
             android:id="@+id/thumbnail"
             android:layout_width="@dimen/thumbnail_size"
             android:layout_height="@dimen/thumbnail_size"
@@ -31,7 +31,7 @@
             app:border_color="@color/setting_normal_color"
             android:layout_marginEnd="@dimen/bottom_control_margin" />
 
-        <cn.erayton.cameratest.ui.ShutterButton
+        <cn.rayton.camera2.ui.ShutterButton
             android:id="@+id/btn_shutter"
             android:layout_width="@dimen/shutter_button_size"
             android:layout_height="@dimen/shutter_button_size" />
@@ -46,4 +46,5 @@
             android:scaleType="center"
             android:src="@drawable/ic_vector_settings" />
     </LinearLayout>
+
 </LinearLayout>

@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:id="@+id/rl_preview_container">
 
-    <cn.erayton.cameratest.ui.GestureTextureView
+    <cn.rayton.camera2.ui.GestureTextureView
         android:id="@+id/main_texture"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

@@ -28,11 +28,11 @@ public class FTPUtils {
     //ftp登录密码
     private String password = "";
     //超时时间
-    public int timeOut = 2;
+    public int timeOut = 300;
     //  被动模式开关 如果不开被动模式 有防火墙 可能会上传失败， 但被动模式需要ftp支持
     private boolean enterLocalPassiveMode = true;
     //  启用或禁用远程主机参与的验证; True启用验证，启用false禁用验证
-    private boolean isRemoteVerification = false;
+    private boolean isRemoteVerification = true;
 
     private FTPClient ftpClient = null;
 
@@ -131,18 +131,22 @@ public class FTPUtils {
      * @param originFileName  待上传文件的名称（绝对地址） *
      * @return
      */
+
+    private Object uploadFileStreamObject = new Object() ;
     public boolean uploadFile(String ftpSavePath, String ftpSaveFileName, String originFileName) {
-        boolean flag = false;
+//        synchronized (uploadFileStreamObject) {
+            boolean flag = false;
 
-        try {
-            FileInputStream inputStream = new FileInputStream(new File(originFileName));
-            flag = uploadFileStream(ftpSavePath, ftpSaveFileName, inputStream);
+            try {
+                FileInputStream inputStream = new FileInputStream(new File(originFileName));
+                flag = uploadFileStream(ftpSavePath, ftpSaveFileName, inputStream);
 
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            LogUtils.e("FTP", "------------>"+e.getMessage() + "  " + e);
-        }
-        return flag;
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                LogUtils.e("FTP", "------------>"+e.getMessage() + "  " + e);
+            }
+            return flag;
+//        }
     }
 
     /**
@@ -154,15 +158,16 @@ public class FTPUtils {
      * @return
      */
     public void uploadFile(String ftpSavePath, String ftpSaveFileName, String originFileName , FTPListener listener) {
+//        synchronized (uploadFileStreamObject1) {
+            try {
+                FileInputStream inputStream = new FileInputStream(new File(originFileName));
+                uploadFileStream(ftpSavePath, ftpSaveFileName, inputStream, listener);
 
-        try {
-            FileInputStream inputStream = new FileInputStream(new File(originFileName));
-            uploadFileStream(ftpSavePath, ftpSaveFileName, inputStream, listener);
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            LogUtils.e("FTP", "------------>"+e.getMessage() + "  " + e);
-        }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                LogUtils.e("FTP", "------------>" + e.getMessage() + "  " + e);
+            }
+//        }
     }
 
     /**
@@ -173,6 +178,8 @@ public class FTPUtils {
      * @param inputStream 输入文件流
      * @return
      */
+
+    private Object uploadFileStreamObject1= new Object() ;
     public void uploadFileStream(String ftpSavePath, String ftpSaveFileName, InputStream inputStream, FTPListener listener) {
         boolean flag = false;
         try {
@@ -181,37 +188,37 @@ public class FTPUtils {
             if (ftpSavePath.startsWith("/")) {
                 ftpSavePath = ftpSavePath.substring(1);
             }
-            LogUtils.e("FTP","上传文件的路径 :" +
-                    ftpSavePath+",上传文件名 :"+ftpSaveFileName );
+            LogUtils.e("FTP", "上传文件的路径 :" +
+                    ftpSavePath + ",上传文件名 :" + ftpSaveFileName);
             //  初始化FTP服务器
             connectFtp();
             //创建文件路径
             if (!createDirecroty(ftpSavePath)) {
-                if (listener != null){
-                    listener.Status(123,"创建文件路径失败");
-                    listener = null ;
+                if (listener != null) {
+                    listener.Status(123, "创建文件路径失败");
+                    listener = null;
                 }
-                return ;
+                return;
             }
 
-            LogUtils.e("FTP",  "开始上传文件...");
-            String remote = new String(ftpSaveFileName.getBytes("GBK"), "ISO8859-1") ;
+            LogUtils.e("FTP", "开始上传文件...");
+            String remote = new String(ftpSaveFileName.getBytes("GBK"), "ISO8859-1");
             flag = ftpClient.storeFile(remote, inputStream);
 //            flag = ftpClient.storeFile(new String(ftpSaveFileName.getBytes("GBK"), Constants.ENCODING_UTF8), inputStream);
             inputStream.close();
 //            LogUtils.e("FTP","上传文件结束...结果 :" + (flag ? "成功" : "失败 "));
         } catch (IOException e) {
-            LogUtils.e(e.getMessage(), e+"");
+            LogUtils.e(e.getMessage(), e + "");
             e.printStackTrace();
         } finally {
-            LogUtils.e("FTP","上传文件结束...结果 :" + (flag ? "成功" : "失败 ")+", replyCode:"+ftpClient.getReplyCode());
-            if (listener != null){
+            LogUtils.e("FTP", "上传文件结束...结果 :" + (flag ? "成功" : "失败 ") + ", replyCode:" + ftpClient.getReplyCode());
+            if (listener != null) {
                 if (flag) {
                     listener.Success();
                 } else {
                     listener.Failer("上传失败");
                 }
-                listener = null ;
+                listener = null;
             }
             closeFTP();
         }
@@ -232,28 +239,27 @@ public class FTPUtils {
             if (ftpSavePath.startsWith("/")) {
                 ftpSavePath = ftpSavePath.substring(1);
             }
-            LogUtils.e("FTP","上传文件的路径 :" + ftpSavePath+",上传文件名 :" + ftpSaveFileName);
+            LogUtils.e("FTP", "上传文件的路径 :" + ftpSavePath + ",上传文件名 :" + ftpSaveFileName);
             //  初始化FTP服务器
             connectFtp();
             //创建文件路径
             if (!createDirecroty(ftpSavePath)) {
                 return flag;
             }
-            LogUtils.e("FTP",  "开始上传文件...");
-            String remote = new String(ftpSaveFileName.getBytes("GBK"), "ISO8859-1") ;
+            LogUtils.e("FTP", "开始上传文件...");
+            String remote = new String(ftpSaveFileName.getBytes("GBK"), "ISO8859-1");
             flag = ftpClient.storeFile(remote, inputStream);
-            inputStream.close() ;
+            inputStream.close();
 //            LogUtils.e("FTP","上传文件结束...结果 :" + (flag ? "成功" : "失败 "));
         } catch (IOException e) {
-            LogUtils.e(e.getMessage(), e+"");
+            LogUtils.e(e.getMessage(), e + "");
             e.printStackTrace();
         } finally {
-            LogUtils.e("FTP","上传文件结束...结果 :" + (flag ? "成功" : "失败 ")+", replyCode:"+ftpClient.getReplyCode());
+            LogUtils.e("FTP", "上传文件结束...结果 :" + (flag ? "成功" : "失败 ") + ", replyCode:" + ftpClient.getReplyCode());
             closeFTP();
         }
-        return flag ;
+        return flag;
     }
-
 
     //改变目录路径
     public boolean changeWorkingDirectory(String directory) {

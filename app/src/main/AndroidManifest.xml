@@ -5,6 +5,9 @@
     package="cn.com.erayton.jt_t808">
 
     <dist:module dist:instant="true" />
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -60,6 +63,13 @@
 
         <activity android:name=".video.voice.VoiceReady" />
         <activity android:name=".video.voice.Voice" />
+        <activity android:name="cn.com.erayton.camera.LiveActivity" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

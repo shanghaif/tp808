@@ -19,6 +19,7 @@ import androidx.core.app.ActivityCompat;
 import com.library.bean.FileMsg;
 import com.library.live.Publish;
 import com.library.live.view.PublishView;
+import com.library.param.Buider;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -103,8 +104,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
-
-
 
     private void requestpermission() {
         //  SD卡读写权限
@@ -194,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         publishView.setVisibility(View.VISIBLE);
-        publish = new Publish.Buider(this, publishView)
+        publish = new Buider(this, publishView)
 //                .setPushMode(new UdpSend(phone, ip, port, channelNum))
 //                .setPushMode(new TcpSend(phone, ip, port, channelNum))
                 //  帧率
@@ -222,7 +221,7 @@ public class MainActivity extends AppCompatActivity {
                 .setPictureDirPath(Environment.getExternalStorageDirectory().getPath() + File.separator + "erayTonPicture")
                 //  按比例显示图像
                 .setCenterScaleType(true)
-                .setScreenshotsMode(Publish.CONVERSION)
+                .setScreenshotsMode(com.library.data.Constants.CameraSettings.CONVERSION)
                 .build();
     }
 

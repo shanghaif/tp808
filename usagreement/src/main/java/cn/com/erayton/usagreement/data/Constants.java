@@ -377,24 +377,32 @@ public class Constants {
     private static int SCALE = 1024 ;
 
     //  帧率
-    public static int FRAME_RATE = 10 ;
+    public static int FRAME_RATE = 30 ;
 //    public static int FRAME_RATE = 29 ;
     //  推流分辨率   清晰度
-//        public static int PUSHER_RESOLUTION_W = 640 ;
-//        public static int PUSHER_RESOLUTION_H = 360 ;
-    public static int PUSHER_RESOLUTION_W = 1280 ;
-    public static int PUSHER_RESOLUTION_H = 720 ;
+        public static int PUSHER_RESOLUTION_W = 800 ;
+        public static int PUSHER_RESOLUTION_H = 600 ;
+//    public static int PUSHER_RESOLUTION_W = 1280 ;
+//    public static int PUSHER_RESOLUTION_H = 720 ;
 
     //  预览分辨率
-    public static int PREVIEW_RESOLUTION_W = 1280 ;
-    public static int PREVIEW_RESOLUTION_H = 720 ;
-//    public static int PREVIEW_RESOLUTION_W = 1400 ;
-//    public static int PREVIEW_RESOLUTION_H = 1050 ;
+//    public static int PREVIEW_RESOLUTION_W = 1280 ;
+//    public static int PREVIEW_RESOLUTION_H = 720 ;
+    public static int PREVIEW_RESOLUTION_W = 800 ;
+    public static int PREVIEW_RESOLUTION_H = 600 ;
 
     //  视频推流码率      kpbs    清晰度，延时
-    public static int VIDEO_PUSH_RATE = 1400 * SCALE ;
+    public static int VIDEO_PUSH_RATE = 600 * SCALE ;
     //  视频采集码率      kpbs
-    public static int VIDEO_SAMPLING_RATE = 1800  * SCALE ;
+    public static int VIDEO_SAMPLING_RATE = 1200  * SCALE ;
+
+////    zjx start
+//    //  视频推流码率      kpbs    清晰度，延时
+//    public static int VIDEO_PUSH_RATE = 1400 * SCALE ;
+//    //  视频采集码率      kpbs
+//    public static int VIDEO_SAMPLING_RATE = 1800  * SCALE ;
+////    zjx end
+
 
     //  编码方式
     public static String VIDEO_ENCODING = VDEncoder.H264 ;

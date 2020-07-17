@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceGroup
-    xmlns:camera="http://schemas.android.com/apk/res-auto">
+    xmlns:camera="http://schemas.android.com/apk/res/com.smewise.camera2">
 
-    <cn.erayton.cameratest.data.CamListPreference
-        camera:key="cn.erayton.cameratest.module.VideoModule"
+    <cn.rayton.camera2.data.CamListPreference
+        camera:key="cn.rayton.camera2.module.VideoModule"
         camera:title="@string/mode_video"/>
 
-    <cn.erayton.cameratest.data.CamListPreference
-        camera:key="cn.erayton.cameratest.module.PhotoModule"
+    <cn.rayton.camera2.data.CamListPreference
+        camera:key="cn.rayton.camera2.module.PhotoModule"
         camera:title="@string/mode_photo"/>
 
-    <cn.erayton.cameratest.data.CamListPreference
-        camera:key="cn.erayton.cameratest.module.ProfessionalModule"
+    <cn.rayton.camera2.data.CamListPreference
+        camera:key="cn.rayton.camera2.module.ProfessionalModule"
         camera:title="@string/mode_professional"/>
 
-    <cn.erayton.cameratest.data.CamListPreference
-        camera:key="cn.erayton.cameratest.module.DualCameraModule"
+    <cn.rayton.camera2.data.CamListPreference
+        camera:key="cn.rayton.camera2.module.DualCameraModule"
         camera:title="@string/mode_dual_camera"/>
 </PreferenceGroup>

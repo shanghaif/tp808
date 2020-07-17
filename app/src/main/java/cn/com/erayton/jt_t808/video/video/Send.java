@@ -2,14 +2,13 @@ package cn.com.erayton.jt_t808.video.video;
 
 import android.os.Bundle;
 import android.os.Environment;
-import android.view.View;
-import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.library.live.Publish;
 import com.library.live.stream.UdpSend;
 import com.library.live.view.PublishView;
+import com.library.param.Buider;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
@@ -38,7 +37,7 @@ public class Send extends AppCompatActivity {
 //        takePicture = findViewById(R.id.takePicture);
 //        record = findViewById(R.id.record);
 
-        publish = new Publish.Buider(this, (PublishView) findViewById(R.id.publishView))
+        publish = new Buider(this, (PublishView) findViewById(R.id.publishView))
                 .setPushMode(new UdpSend(getIntent().getExtras().getString("ip"), getIntent().getExtras().getInt("port")))
 //                .setPushMode(new TcpSend(getIntent().getExtras().getString("ip"), getIntent().getExtras().getInt("port")))
                 //  帧率
@@ -64,7 +63,7 @@ public class Send extends AppCompatActivity {
                 .setVideoDirPath(Environment.getExternalStorageDirectory().getPath() + File.separator + "VideoLive")
                 .setPictureDirPath(Environment.getExternalStorageDirectory().getPath() + File.separator + "VideoPicture")
                 .setCenterScaleType(true)
-                .setScreenshotsMode(Publish.TAKEPHOTO)
+                .setScreenshotsMode(com.library.data.Constants.CameraSettings.TAKEPHOTO)
                 .build();
 
 //        tuistar.setOnClickListener(new View.OnClickListener() {

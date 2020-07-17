@@ -13,6 +13,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.library.bean.FileMsg;
 
+import net.rayton.netstatelib.NetWorkMonitor;
+import net.rayton.netstatelib.NetWorkMonitorManager;
+import net.rayton.netstatelib.NetWorkState;
+
 import java.io.File;
 import java.util.Arrays;
 
@@ -51,6 +55,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         button4.setOnClickListener(this);
         button5.setOnClickListener(this);
         button6.setOnClickListener(this);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        NetWorkMonitorManager.getInstance().register(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        NetWorkMonitorManager.getInstance().unregister(this);
+    }
+
+    //不加注解默认监听所有的状态，方法名随意，只需要参数是一个NetWorkState即可
+      @NetWorkMonitor(monitorFilter = {NetWorkState.GPRS, NetWorkState.NONE, NetWorkState.WIFI})//只接受网络状态变为GPRS类型的消息
+    public void onNetWorkStateChange(NetWorkState netWorkState) {
+        LogUtils.i("TAG", "onNetWorkStateChange >>> :" + netWorkState.name());
     }
 
     @Override

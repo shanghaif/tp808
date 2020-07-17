@@ -22,6 +22,7 @@ import android.view.WindowManager;
 import com.library.live.PictureCallback;
 import com.library.live.Publish;
 import com.library.live.view.PublishView;
+import com.library.param.Buider;
 
 import java.util.concurrent.TimeUnit;
 
@@ -65,7 +66,7 @@ public class VideoPushService extends Service {
     }
 
     private void initVideo() {
-        publish = new Publish.Buider(this, null)
+        publish = new Buider(this, null)
 //                .setPushMode(new UdpSend(phone, ip, port, channelNum))
 //                .setPushMode(new TcpSend(phone, ip, port, channelNum))
                 //  帧率
@@ -91,7 +92,7 @@ public class VideoPushService extends Service {
                 .setVideoDirPath(Constants.VIDEOSAVEPATH)
                 .setPictureDirPath(Constants.PICTURESAVEPATH)
                 .setCenterScaleType(true)
-                .setScreenshotsMode(Publish.TAKEPHOTO)
+                .setScreenshotsMode(com.library.data.Constants.CameraSettings.TAKEPHOTO)
                 .build();
     }
 
@@ -344,7 +345,7 @@ public class VideoPushService extends Service {
         if (isOpen) {
             publish.open();
         }else {
-            publish.release();
+//            publish.release();
         }
     }
 

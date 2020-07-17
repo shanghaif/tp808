@@ -7,6 +7,7 @@ import android.os.RemoteException;
 import android.text.TextUtils;
 
 import com.library.live.Publish;
+import com.library.param.Buider;
 
 import java.util.concurrent.TimeUnit;
 
@@ -20,7 +21,6 @@ import io.reactivex.functions.Action;
 
 /**
  * 视频开放接口类
- * 避免 aidl 暴露
  * */
 public class USVideo2 {
     private String TAG = USVideo2.class.getName() ;
@@ -46,7 +46,7 @@ public class USVideo2 {
     }
 
     public void initVideo(){
-        publish = new Publish.Buider(context, null)
+        publish = new Buider(context, null)
                 //  帧率
                 .setFrameRate(Constants.FRAME_RATE)
                 //  编码方式
@@ -70,7 +70,7 @@ public class USVideo2 {
                 .setVideoDirPath(Constants.VIDEOSAVEPATH)
                 .setPictureDirPath(Constants.PICTURESAVEPATH)
                 .setCenterScaleType(true)
-                .setScreenshotsMode(Publish.TAKEPHOTO)
+                .setScreenshotsMode(com.library.data.Constants.CameraSettings.TAKEPHOTO)
                 .build();
     }
 
@@ -158,7 +158,7 @@ public class USVideo2 {
         if (isOpen) {
             publish.open();
         }else {
-            publish.release();
+//            publish.release();
         }
     }
 

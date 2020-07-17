@@ -10,9 +10,9 @@
         android:shortcutDisabledMessage="@string/settings_disable">
 
         <intent
-            android:action="cn.erayton.cameratest.setting"
-            android:targetPackage="cn.erayton.cameratest"
-            android:targetClass="cn.erayton.cameratest.CameraActivity"/>
+            android:action="com.rayton.camera2.setting"
+            android:targetPackage="com.rayton.camera2"
+            android:targetClass="cn.rayton.camera2.CameraActivity"/>
         <categories android:name="android.shortcut.conversation"/>
     </shortcut>
 </shortcuts>

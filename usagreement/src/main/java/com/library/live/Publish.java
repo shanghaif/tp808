@@ -20,7 +20,6 @@ import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
 import android.os.Build;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
@@ -37,8 +36,7 @@ import com.library.live.stream.UdpSend;
 import com.library.live.vc.VoiceRecord;
 import com.library.live.vd.RecordEncoderVD;
 import com.library.live.vd.VDEncoder;
-import com.library.live.view.PublishView;
-import cn.com.erayton.usagreement.utils.FileUtils;
+import com.library.param.ParameterMap;
 import com.library.util.ImagUtil;
 import com.library.util.OtherUtil;
 import com.library.util.Rotate3dAnimation;
@@ -53,8 +51,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
+import cn.com.erayton.usagreement.utils.FileUtils;
 import cn.com.erayton.usagreement.utils.LogUtils;
+
+import static com.library.data.Constants.CameraSettings.CONVERSION;
+import static com.library.data.Constants.CameraSettings.TAKEPHOTO;
 
 public class Publish implements TextureView.SurfaceTextureListener {
     private Context context;
@@ -74,8 +78,6 @@ public class Publish implements TextureView.SurfaceTextureListener {
     private boolean isCameraBegin = false;
     private boolean useuvPicture = false;
 
-    public static final int TAKEPHOTO = 0;
-    public static final int CONVERSION = 1;
 
     private ParameterMap map;
     //相机设备
@@ -100,18 +102,21 @@ public class Publish implements TextureView.SurfaceTextureListener {
     private HandlerThread handlerCamearThread;
     private Handler camearHandler;
     private Handler frameHandler;
-
     private WriteMp4 writeMp4;
-
     private CameraManager manager;
     private String cameraId;
     private CameraCharacteristics characteristics ;
+    private CaptureRequest.Builder previewBuilder ;
+    /** 相机锁
+     * A {@link Semaphore} to prevent the app from exiting before closing the camera.
+     */
+    private Semaphore mCameraOpenCloseLock = new Semaphore(1);
 
 
     //  此摄像头最大放大倍数
     protected float maximumZoomLevel;
 
-    private Publish(Context context, ParameterMap map) {
+    public Publish(Context context, ParameterMap map) {
         this.context = context;
         this.map = map;
         this.publishSize = map.getPublishSize();
@@ -137,21 +142,25 @@ public class Publish implements TextureView.SurfaceTextureListener {
 
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int width, int height) {
+        LogUtils.i( "onSurfaceTextureAvailable: ");
         openCamera();
     }
 
     @Override
     public void onSurfaceTextureSizeChanged(SurfaceTexture surfaceTexture, int i, int i1) {
+        LogUtils.i( "onSurfaceTextureSizeChanged: ");
     }
 
     @Override
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surfaceTexture) {
-        releaseCamera();
+        LogUtils.i( "onSurfaceTextureDestroyed: ");
+//        releaseCamera();
         return true;
     }
 
     @Override
     public void onSurfaceTextureUpdated(SurfaceTexture surfaceTexture) {
+        LogUtils.i( "onSurfaceTextureUpdated: ");
     }
 
     /**
@@ -193,9 +202,7 @@ public class Publish implements TextureView.SurfaceTextureListener {
 
             Log.d("pictureSize", "推流分辨率  =  " + publishSize.getWidth() + " * " + publishSize.getHeight());
             Log.d("pictureSize", "预览分辨率  =  " + previewSize.getWidth() + " * " + previewSize.getHeight());
-//            YUVUtils.init(publishSize.getWidth(), publishSize.getHeight(), publishSize.getWidth(), publishSize.getHeight());
             //计算比例(需对调宽高)
-//            tcpSend.setWeight((double) publishSize.getHeight() / publishSize.getWidth());
 //            if (map.isPreview()) {
 ////              设置预览界面的大小
 //                map.getPublishView().setWeight((double) previewSize.getHeight() / previewSize.getWidth());
@@ -212,33 +219,9 @@ public class Publish implements TextureView.SurfaceTextureListener {
         }
     }
 
-//    private void initCode(Size[] outputSizes) {
-//        if (vdEncoder == null) {
-//            publishSize = initSize(publishSize, outputSizes);
-//            previewSize = initSize(previewSize, outputSizes);
-//
-//            Log.d("pictureSize", "推流分辨率  =  " + publishSize.getWidth() + " * " + publishSize.getHeight());
-//            Log.d("pictureSize", "预览分辨率  =  " + previewSize.getWidth() + " * " + previewSize.getHeight());
-//
-//            //计算比例(需对调宽高)
-////            tcpSend.setWeight((double) publishSize.getHeight() / publishSize.getWidth());
-//            if (map.isPreview()) {
-//                //  设置预览界面的大小
-////                map.getPublishView().setWeight((double) previewSize.getHeight() / previewSize.getWidth());
-//            }
-//
-//            recordEncoderVD = new RecordEncoderVD(previewSize, map.getFrameRate(), map.getCollectionBitrate(), writeMp4, map.getCodetype());
-//            vdEncoder = new VDEncoder(previewSize, publishSize, map.getFrameRate(), map.getPublishBitrate(), map.getCodetype(), tcpSend);
-//            //初始化音频编码
-//            voiceRecord = new VoiceRecord(map.getCollectionbitrate_vc(), map.getPublishbitrate_vc(), writeMp4, udpSend);
-//            vdEncoder.start();
-//            voiceRecord.start();
-//        }
-//    }
 
+    //  计算出 APP 符合的大小, 自动补齐
     private Size initSize(Size publishSize, Size[] outputSizes) {
-//        int numw = 10000;
-//        int numh = 10000;
         int numw = 1920;
         int numh = 1080;
         int num = 0;
@@ -262,38 +245,56 @@ public class Publish implements TextureView.SurfaceTextureListener {
         if (isCameraBegin) {
             return;
         }
-//        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (context.checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                return;
-            }
-        }
         try {
+
+            if (!mCameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
+                throw new RuntimeException("Time out waiting to lock camera opening.");
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (context.checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                    return;
+                }
+            }
             //  打开相机
             LogUtils.e("cameraId -------------:" + cameraId);
-            manager.openCamera(cameraId, new CameraDevice.StateCallback() {
-                @Override
-                public void onOpened( CameraDevice device) {
-                    cameraDevice = device;
-                    //开启预览
-                    startPreview();
-                    //  初始化画面大小调节
-                    initCharacteristics() ;
-                }
-
-                @Override
-                public void onDisconnected( CameraDevice cameraDevice) {
-                }
-
-                @Override
-                public void onError( CameraDevice cameraDevice, int i) {
-                }
-            }, camearHandler);
-        } catch (CameraAccessException e) {
+            manager.openCamera(cameraId, mDeviceStateCallback, camearHandler);
+        } catch (CameraAccessException |InterruptedException e) {
             e.printStackTrace();
         }
     }
 
+    private CameraDevice.StateCallback mDeviceStateCallback = new CameraDevice.StateCallback() {
+
+        @Override
+        public void onOpened( CameraDevice device) {
+            LogUtils.i("onOpened");
+            mCameraOpenCloseLock.release();
+            cameraDevice = device;
+            //开启预览
+            startPreview();
+            //  初始化画面大小调节
+            initCharacteristics() ;
+        }
+
+        @Override
+        public void onDisconnected( CameraDevice device) {
+            LogUtils.i("onDisconnected");
+            mCameraOpenCloseLock.release();
+            device.close();
+            cameraDevice = null ;
+
+
+        }
+
+        @Override
+        public void onError( CameraDevice device, int i) {
+            LogUtils.i("onError");
+            mCameraOpenCloseLock.release();
+            device.close();
+            cameraDevice = null ;
+        }
+
+    };
 
     private void startPreview() {
         try {
@@ -323,21 +324,21 @@ public class Publish implements TextureView.SurfaceTextureListener {
                 surfaces.add(textureSurface);
             }
 
-//            //    拍照数据输出
-//            if (map.getScreenshotsMode() == TAKEPHOTO) {
-//                final CaptureRequest.Builder captureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
-////                final CaptureRequest.Builder captureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-////                captureRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, captureRequestBuilder.get(CaptureRequest.CONTROL_AF_MODE));
-////                captureRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, captureRequestBuilder.get(CaptureRequest.CONTROL_AE_MODE));
-////                captureRequestBuilder.set(CaptureRequest.FLASH_MODE, captureRequestBuilder.get(CaptureRequest.FLASH_MODE));
-//                captureRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
-//                captureRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
-//                captureRequestBuilder.set(CaptureRequest.JPEG_ORIENTATION, rotateAngle);
-//                Surface pictureSurface = getPictureImageReaderSurface();
-//                captureRequestBuilder.addTarget(pictureSurface);
-//                surfaces.add(pictureSurface);
-//                captureRequest = captureRequestBuilder.build();
-//            }
+            //    拍照数据输出
+            if (map.getScreenshotsMode() == TAKEPHOTO) {
+                final CaptureRequest.Builder captureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
+//                final CaptureRequest.Builder captureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+//                captureRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, captureRequestBuilder.get(CaptureRequest.CONTROL_AF_MODE));
+//                captureRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, captureRequestBuilder.get(CaptureRequest.CONTROL_AE_MODE));
+//                captureRequestBuilder.set(CaptureRequest.FLASH_MODE, captureRequestBuilder.get(CaptureRequest.FLASH_MODE));
+                captureRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
+                captureRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
+                captureRequestBuilder.set(CaptureRequest.JPEG_ORIENTATION, rotateAngle);
+                Surface pictureSurface = getPictureImageReaderSurface();
+                captureRequestBuilder.addTarget(pictureSurface);
+                surfaces.add(pictureSurface);
+                captureRequest = captureRequestBuilder.build();
+            }
 
 
             //创建相机捕获会话，第一个参数是捕获数据的输出Surface列表(同时输出屏幕，输出预览，拍照)，
@@ -378,11 +379,6 @@ public class Publish implements TextureView.SurfaceTextureListener {
         }
         return surface ;
     }
-//    private Surface getTextureSurface() {
-//        SurfaceTexture mSurfaceTexture = map.getPublishView().getSurfaceTexture();
-//        mSurfaceTexture.setDefaultBufferSize(previewSize.getWidth(), previewSize.getHeight());//设置TextureView的缓冲区大小
-//        return new Surface(mSurfaceTexture);
-//    }
 
     /**
      * 创建预览ImageReader回调监听（在这里获取每一帧数据）并返回Surface
@@ -394,6 +390,7 @@ public class Publish implements TextureView.SurfaceTextureListener {
         previewImageReader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener() {
             @Override
             public void onImageAvailable(ImageReader reader) {
+                Log.d("cjh", "onImageAvailable-----") ;
                 if (isCameraBegin) {
                     if (frameRateControlQueue.size() >= (frameMax - 1)) {
                         //超出限制丢弃
@@ -526,23 +523,31 @@ public class Publish implements TextureView.SurfaceTextureListener {
     }
 
     private void releaseCamera() {
-        isCameraBegin = false;
-        while (!frameRateControlQueue.isEmpty()) {
-            frameRateControlQueue.poll().close();
-        }
-        //释放相机各种资源
-        if (session != null) {
-            session.close();
-            cameraDevice.close();
-            previewImageReader.close();
-            session = null;
-            cameraDevice = null;
-            previewImageReader = null;
+        try {
+            mCameraOpenCloseLock.acquire();
 
-        }
-        if (pictureImageReader != null) {
-            pictureImageReader.close();
-            pictureImageReader = null;
+            isCameraBegin = false;
+            while (!frameRateControlQueue.isEmpty()) {
+                frameRateControlQueue.poll().close();
+            }
+            //释放相机各种资源
+            if (session != null) {
+                session.close();
+                cameraDevice.close();
+                previewImageReader.close();
+                session = null;
+                cameraDevice = null;
+                previewImageReader = null;
+
+            }
+            if (pictureImageReader != null) {
+                pictureImageReader.close();
+                pictureImageReader = null;
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }finally {
+            mCameraOpenCloseLock.release();
         }
     }
 
@@ -582,22 +587,22 @@ public class Publish implements TextureView.SurfaceTextureListener {
         }
     }
 
-    //  不能随意释放
-    public void release(){
-        if (session != null) {
-            session.close();
-            session = null;
-        }
-        if (cameraDevice != null) {
-            cameraDevice.close();
-            cameraDevice = null;
-        }
-        if (previewImageReader != null) {
-            previewImageReader.close();
-            previewImageReader = null;
-        }
-
-    }
+//    //  不能随意释放
+//    public void release(){
+//        if (session != null) {
+//            session.close();
+//            session = null;
+//        }
+//        if (cameraDevice != null) {
+//            cameraDevice.close();
+//            cameraDevice = null;
+//        }
+//        if (previewImageReader != null) {
+//            previewImageReader.close();
+//            previewImageReader = null;
+//        }
+//
+//    }
 
     public void open(){
         openCamera();
@@ -674,12 +679,24 @@ public class Publish implements TextureView.SurfaceTextureListener {
         if (controlFrameRateThread != null) {
             controlFrameRateThread.getLooper().quitSafely();
             controlFrameRateThread.quitSafely();
+            try {
+                controlFrameRateThread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            controlFrameRateThread = null;
         }
         if (camearHandler != null)
             camearHandler.removeCallbacksAndMessages(null);
         if (handlerCamearThread != null) {
             handlerCamearThread.getLooper().quitSafely();
             handlerCamearThread.quitSafely();
+            try {
+                handlerCamearThread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            handlerCamearThread = null ;
         }
         if (writeMp4 != null)
             writeMp4.destroy();
@@ -793,24 +810,15 @@ public class Publish implements TextureView.SurfaceTextureListener {
         }
     }
 
-    private CaptureRequest.Builder previewBuilder ;
-//    private CaptureRequest.Builder getPreviewBuilder() throws CameraAccessException {
-//        if (previewBuilder == null && map.isPreview()){
-////            previewBuilder = createBuilder(CameraDevice.TEMPLATE_PREVIEW, getTextureSurface()) ;
-//            previewBuilder = createBuilder(CameraDevice.TEMPLATE_RECORD, getTextureSurface()) ;
-//        }else {
-//            previewBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-//        }
-//        return previewBuilder;
-//    }
 
     private CaptureRequest.Builder getPreviewBuilder() {
         if (previewBuilder ==null && map.isPreview()){
-            previewBuilder = createBuilder(CameraDevice.TEMPLATE_RECORD, getTextureSurface()) ;
-//            previewBuilder = createBuilder(CameraDevice.TEMPLATE_STILL_CAPTURE, getTextureSurface()) ;
+//            previewBuilder = createBuilder(CameraDevice.TEMPLATE_RECORD, getTextureSurface()) ;
+            previewBuilder = createBuilder(CameraDevice.TEMPLATE_STILL_CAPTURE, getTextureSurface()) ;
         }else {
             try {
-                previewBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD) ;
+//                previewBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD) ;
+                previewBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE) ;
             } catch (CameraAccessException e) {
                 e.printStackTrace();
             }
@@ -831,14 +839,8 @@ public class Publish implements TextureView.SurfaceTextureListener {
     }
 
 
+    //  通过帧率进行曝光补偿
     private Range<Integer> getRange() {
-////        CameraManager mCameraManager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
-//        CameraCharacteristics chars = null;
-//        try {
-//            chars = manager.getCameraCharacteristics(cameraId);
-//        } catch (CameraAccessException e) {
-//            e.printStackTrace();
-//        }
         Range<Integer>[] ranges = characteristics.get(CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES);
 
         Range<Integer> result = null;
@@ -857,12 +859,6 @@ public class Publish implements TextureView.SurfaceTextureListener {
     }
 
 
-
-
-
-
-
-
     public int getPublishStatus() {
         return tcpSend.getPublishStatus();
     }
@@ -879,284 +875,4 @@ public class Publish implements TextureView.SurfaceTextureListener {
         writeMp4.setWriteFileCallback(writeFileCallback);
     }
 
-    public static class Buider {
-        private Context context;
-        private ParameterMap map;
-
-//        @IntDef({CONVERSION, TAKEPHOTO})
-//        private @interface ScreenshotsMode {
-//        }
-
-        public Buider(Context context, PublishView publishView) {
-            map = new ParameterMap();
-            this.context = context;
-            map.setPublishView(publishView);
-        }
-
-        public Buider(Context context) {
-            map = new ParameterMap();
-            this.context = context;
-        }
-
-        //编码分辨率
-        public Buider setPublishSize(int publishWidth, int publishHeight) {
-            map.setPublishSize(new Size(publishWidth, publishHeight));
-            return this;
-        }
-
-        public Buider setPreviewSize(int previewWidth, int previewHeight) {
-            map.setPreviewSize(new Size(previewWidth, previewHeight));
-            return this;
-        }
-
-        public Buider setFrameRate(int frameRate) {
-            //限制最小8帧
-            map.setFrameRate(Math.max(8, frameRate));
-            return this;
-        }
-
-        public Buider setIsPreview(boolean isPreview) {
-            map.setPreview(isPreview);
-            return this;
-        }
-
-        public Buider setPublishBitrate(int publishBitrate) {
-            map.setPublishBitrate(publishBitrate);
-            return this;
-        }
-
-        public Buider setCollectionBitrate(int collectionBitrate) {
-            map.setCollectionBitrate(collectionBitrate);
-            return this;
-        }
-
-        public Buider setPublishBitrateVC(int publishbitrate_vc) {
-            //  限制最大48，因为发送会合并5个包，过大会导致溢出
-            map.setPublishbitrate_vc(Math.min(48 * 1024, publishbitrate_vc));
-            return this;
-        }
-
-        public Buider setCollectionBitrateVC(int collectionbitrate_vc) {
-            map.setCollectionbitrate_vc(collectionbitrate_vc);
-            return this;
-        }
-
-        public Buider setVideoCode(String codetype) {
-            map.setCodetype(codetype);
-            return this;
-        }
-
-        //        public Buider setScreenshotsMode(@ScreenshotsMode int screenshotsMode) {
-//            map.setScreenshotsMode(screenshotsMode);
-//            return this;
-//        }
-        public Buider setScreenshotsMode(int screenshotsMode) {
-            map.setScreenshotsMode(screenshotsMode);
-            return this;
-        }
-
-
-        public Buider setVideoDirPath(String videodirpath) {
-            map.setVideodirpath(videodirpath);
-            return this;
-        }
-
-        public Buider setPictureDirPath(String picturedirpath) {
-            map.setPicturedirpath(picturedirpath);
-            return this;
-        }
-
-        public Buider setRotate(boolean rotate) {
-            map.setRotate(rotate);
-            return this;
-        }
-
-        //        public Buider setPushMode(UdpSend pushMode) {
-//            map.setPushMode(pushMode);
-//            return this;
-//        }
-
-        public Buider setPushMode(TcpSend pushMode) {
-            map.setPushMode(pushMode);
-            return this;
-        }
-        public Buider setPushMode(UdpSend pushMode) {
-            map.setPushMode(pushMode);
-            return this;
-        }
-
-        public Buider setCenterScaleType(boolean isCenterScaleType) {
-            if (!map.isPreview()) {
-                return this;
-            }
-            map.getPublishView().setCenterScaleType(isCenterScaleType);
-            return this;
-        }
-
-//        public Buider setUdpControl(UdpControlInterface udpControl) {
-//            map.getPushMode().setUdpControl(udpControl);
-//            return this;
-//        }
-        public Publish build() {
-            return new Publish(context, map);
-        }
-    }
-
-    private static class ParameterMap {
-        private PublishView publishView;
-        private int screenshotsMode = TAKEPHOTO;
-        //编码参数
-        private int frameRate = 15;
-        private int publishBitrate = 600 * 1024;
-        private int collectionBitrate = 600 * 1024;
-        private int collectionbitrate_vc = 64 * 1024;
-        private int publishbitrate_vc = 24 * 1024;
-        //推流分辨率,仅控制推流编码
-        private Size publishSize = new Size(480, 320);
-        //预览分辨率，控制预览,录制编码分辨率，图片处理分辨率
-        private Size previewSize = new Size(480, 320);
-        //是否翻转，默认后置
-        private boolean rotate = false;
-        //设置是否需要显示预览,默认显示
-        private boolean isPreview = true;
-        private String codetype = VDEncoder.H264;
-        //录制地址
-        private String videodirpath = null;
-        //拍照地址
-        private String picturedirpath = Environment.getExternalStorageDirectory().getPath() + File.separator + "VideoPicture";
-        private TcpSend tPush;
-        private UdpSend uPush;
-
-        private PublishView getPublishView() {
-            return publishView;
-        }
-
-        private void setPublishView(PublishView publishView) {
-            this.publishView = publishView;
-        }
-
-        private int getScreenshotsMode() {
-            return screenshotsMode;
-        }
-
-        private void setScreenshotsMode(int screenshotsMode) {
-            this.screenshotsMode = screenshotsMode;
-        }
-
-        private int getFrameRate() {
-            return frameRate;
-        }
-
-        private void setFrameRate(int frameRate) {
-            this.frameRate = frameRate;
-        }
-
-        private int getPublishBitrate() {
-            return publishBitrate;
-        }
-
-        private void setPublishBitrate(int publishBitrate) {
-            this.publishBitrate = publishBitrate;
-        }
-
-        private int getCollectionBitrate() {
-            return collectionBitrate;
-        }
-
-        private void setCollectionBitrate(int collectionBitrate) {
-            this.collectionBitrate = collectionBitrate;
-        }
-
-        private int getCollectionbitrate_vc() {
-            return collectionbitrate_vc;
-        }
-
-        private void setCollectionbitrate_vc(int collectionbitrate_vc) {
-            this.collectionbitrate_vc = collectionbitrate_vc;
-        }
-
-        private int getPublishbitrate_vc() {
-            return publishbitrate_vc;
-        }
-
-        private void setPublishbitrate_vc(int publishbitrate_vc) {
-            this.publishbitrate_vc = publishbitrate_vc;
-        }
-
-        private Size getPublishSize() {
-            return publishSize;
-        }
-
-        private void setPublishSize(Size publishSize) {
-            this.publishSize = publishSize;
-        }
-
-        private Size getPreviewSize() {
-            return previewSize;
-        }
-
-        private void setPreviewSize(Size previewSize) {
-            this.previewSize = previewSize;
-        }
-
-        private boolean isRotate() {
-            return rotate;
-        }
-
-        private void setRotate(boolean rotate) {
-            this.rotate = rotate;
-        }
-
-        private boolean isPreview() {
-            return isPreview;
-        }
-
-        private void setPreview(boolean preview) {
-            isPreview = preview;
-        }
-
-        private String getCodetype() {
-            return codetype;
-        }
-
-        private void setCodetype(String codetype) {
-            this.codetype = codetype;
-        }
-
-        private String getPicturedirpath() {
-            return picturedirpath;
-        }
-
-        private void setPicturedirpath(String picturedirpath) {
-            this.picturedirpath = picturedirpath;
-        }
-
-        //        private UdpSend getPushMode() {
-//            return pushMode;
-//        }
-        private TcpSend getPushMode() {
-            return tPush;
-        }
-        private UdpSend getUPushMode() {
-            return uPush;
-        }
-
-        //        private void setPushMode(UdpSend pushMode) {
-//            this.pushMode = pushMode;
-//        }
-        private void setPushMode(TcpSend tPush) {
-            this.tPush = tPush;
-        }
-        private void setPushMode(UdpSend uPush) {
-            this.uPush = uPush;
-        }
-
-        private String getVideodirpath() {
-            return videodirpath;
-        }
-
-        private void setVideodirpath(String videodirpath) {
-            this.videodirpath = videodirpath;
-        }
-    }
 }

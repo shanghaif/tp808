@@ -66,9 +66,13 @@ public class SocketClientSender {
         header.setReservedBit(0);
         //  设置终端号
         if (phone == null) {
-            LogUtils.e("phone is null.") ;
+            LogUtils.e("phone is null.");
         }
-        header.setTerminalPhone("0"+phone);
+//        else if (phone.length() == 1) {
+//            header.setTerminalPhone("0" + phone);
+//        }
+        //  TODO 自动识别号码位数自动补 0
+            header.setTerminalPhone("0" + phone);
 //        header.setTerminalPhone(String.format("%012s", phone));
         return header ;
     }
@@ -264,7 +268,7 @@ public class SocketClientSender {
         terminalGeneralInfo.setSeNum(seNum);
         terminalGeneralInfo.setRespId(Constants.SERVER_AVTRANSMISSION_REQUEST);
         terminalGeneralInfo.setResult(code);
-        return sendGeneralReponse(terminalGeneralInfo, true, false) ;
+        return sendGeneralReponse(terminalGeneralInfo, false, false) ;
 
     }
 
@@ -281,7 +285,7 @@ public class SocketClientSender {
         terminalGeneralInfo.setSeNum(seNum);
         terminalGeneralInfo.setRespId(Constants.SERVER_FILEUPLOAD_REQUEST);
         terminalGeneralInfo.setResult(code);
-        return sendGeneralReponse(terminalGeneralInfo, true, false) ;
+        return sendGeneralReponse(terminalGeneralInfo, false, false) ;
     }
 
     /** 文件上传完成通知

@@ -236,7 +236,7 @@ public class USManager {
         terminalGeneralInfo.setSeNum(seNum);
         terminalGeneralInfo.setRespId(respId);
         terminalGeneralInfo.setResult(code);
-        SocketClientSender.sendGeneralReponse(terminalGeneralInfo, true, false) ;
+        SocketClientSender.sendGeneralReponse(terminalGeneralInfo, false, false) ;
 //        TerminalGeneralMsg.TerminalGeneralInfo terminalGeneralInfo = new TerminalGeneralMsg.TerminalGeneralInfo() ;
 //        terminalGeneralInfo.setSeNum(seNum);
 //        terminalGeneralInfo.setRespId(respId);

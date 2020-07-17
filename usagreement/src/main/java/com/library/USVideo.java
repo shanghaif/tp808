@@ -51,11 +51,13 @@ public class USVideo {
     private USVideo(Context context) {
         this.context = context ;
         bindServiceAidl();
+        LogUtils.i("USVideo init---------------------");
     }
 
     Intent intent ;
     //  初始化视频服务
     private void bindServiceAidl(){
+        LogUtils.i("bindServiceAidl---------------------");
          intent = new Intent(context, VideoPushService.class) ;
         context.bindService(intent, serviceConnection ,Context.BIND_AUTO_CREATE) ;
 //        context.bindService(intent, new ServiceConnection() {

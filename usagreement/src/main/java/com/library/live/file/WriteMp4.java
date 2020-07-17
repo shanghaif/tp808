@@ -9,19 +9,20 @@ import android.util.Log;
 
 import com.library.common.WriteFileCallback;
 import com.library.util.BitmapUtils;
-import cn.com.erayton.usagreement.utils.FileUtils;
 import com.library.util.MediaFunc;
-import cn.com.erayton.usagreement.utils.RegularUtils;
-import cn.com.erayton.usagreement.utils.StorageUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import cn.com.erayton.usagreement.ApplicationProvider;
+import cn.com.erayton.usagreement.data.Constants;
 import cn.com.erayton.usagreement.data.db.DbTools;
 import cn.com.erayton.usagreement.utils.BitOperator;
+import cn.com.erayton.usagreement.utils.FileUtils;
 import cn.com.erayton.usagreement.utils.LogUtils;
+import cn.com.erayton.usagreement.utils.RegularUtils;
+import cn.com.erayton.usagreement.utils.StorageUtils;
 
 /**
  * 视频录制与保存
@@ -70,12 +71,12 @@ public class WriteMp4 {
             File file = new File(name) ;
 
             BitmapUtils.getVideoThumbnail(name) ;
-
             DbTools.insertVideoRecord(name, Long.parseLong(names[0]),  Long.parseLong(names[1]),
                     Integer.parseInt(names[2]), file.length());
             StorageUtils.addVideoToDB(ApplicationProvider.context.getContentResolver(), file.getName(),
                     System.currentTimeMillis(), null, file.length(), name,
-                    200, 200, FileUtils.getMimeType(MediaFunc.MEDIA_TYPE_VIDEO));
+                    Constants.PREVIEW_RESOLUTION_W, Constants.PREVIEW_RESOLUTION_H,
+                    FileUtils.getMimeType(MediaFunc.MEDIA_TYPE_VIDEO));
         }
 
         @Override
