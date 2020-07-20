@@ -154,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onLongClick(View v) {
                 ipButton.setVisibility(View.GONE);
-                publish.flashMode(com.library.data.Constants.CameraSettings.FLASH_VALUE_TORCH);
+//                publish.flashMode(com.library.data.Constants.CameraSettings.FLASH_VALUE_TORCH);
                 return false;
             }
         });
@@ -183,7 +183,9 @@ public class MainActivity extends AppCompatActivity {
             public boolean onLongClick(View v) {
                 if (ipButton.getVisibility() == View.GONE){
                     ipButton.setVisibility(View.VISIBLE);
-                    publish.flashMode(com.library.data.Constants.CameraSettings.FLASH_VALUE_AUTO);
+//                    publish.flashMode(com.library.data.Constants.CameraSettings.FLASH_VALUE_AUTO);
+                    publish.rotate();
+
                 }
                 return false;
             }

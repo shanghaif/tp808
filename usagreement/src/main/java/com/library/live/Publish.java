@@ -51,9 +51,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
-
 import cn.com.erayton.usagreement.utils.FileUtils;
 import cn.com.erayton.usagreement.utils.LogUtils;
 
@@ -107,10 +104,10 @@ public class Publish implements TextureView.SurfaceTextureListener {
     private String cameraId;
     private CameraCharacteristics characteristics ;
     private CaptureRequest.Builder previewBuilder ;
-    /** 相机锁
-     * A {@link Semaphore} to prevent the app from exiting before closing the camera.
-     */
-    private Semaphore mCameraOpenCloseLock = new Semaphore(1);
+//    /** 相机锁
+//     * A {@link Semaphore} to prevent the app from exiting before closing the camera.
+//     */
+//    private Semaphore mCameraOpenCloseLock = new Semaphore(1);
 
 
     //  此摄像头最大放大倍数
@@ -161,6 +158,9 @@ public class Publish implements TextureView.SurfaceTextureListener {
     @Override
     public void onSurfaceTextureUpdated(SurfaceTexture surfaceTexture) {
         LogUtils.i( "onSurfaceTextureUpdated: ");
+        if (disconnect){
+            rotate(false);
+        }
     }
 
     /**
@@ -179,11 +179,17 @@ public class Publish implements TextureView.SurfaceTextureListener {
                     StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
                     //选取最佳分辨率初始化编码器（未必和设置的匹配，由于摄像头不支持设置的分辨率）
                     this.cameraId = cameraId;
-                    LogUtils.e("this.cameraId:" + this.cameraId+",SDK_INT:"+Build.VERSION.SDK_INT);
-                    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
-//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    LogUtils.e("this.cameraId:" + this.cameraId+",SDK_INT:"+Build.VERSION.SDK_INT+", has flash:"+context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH));
+//                    //  判断是否有闪光灯 且 版本大于一定程度 且 摄像头列表中的第一个摄像头
+                    if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH) && Build.VERSION.SDK_INT > Build.VERSION_CODES.M && cameraId.equals("0")){
+                        //  设置闪光灯,如果没有闪光灯，会出错
                         manager.setTorchMode(cameraId, false);
                     }
+//                    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
+////                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//                        //  设置闪光灯,如果没有闪光灯或者闪光灯跟摄像头对应不上，会出错
+//                        manager.setTorchMode(cameraId, false);
+//                    }
                     rotateAngle = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
 
                     initCode(map.getOutputSizes(SurfaceTexture.class));
@@ -246,10 +252,10 @@ public class Publish implements TextureView.SurfaceTextureListener {
             return;
         }
         try {
-
-            if (!mCameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
-                throw new RuntimeException("Time out waiting to lock camera opening.");
-            }
+//
+//            if (!mCameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
+//                throw new RuntimeException("Time out waiting to lock camera opening.");
+//            }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (context.checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                     return;
@@ -258,7 +264,8 @@ public class Publish implements TextureView.SurfaceTextureListener {
             //  打开相机
             LogUtils.e("cameraId -------------:" + cameraId);
             manager.openCamera(cameraId, mDeviceStateCallback, camearHandler);
-        } catch (CameraAccessException |InterruptedException e) {
+        } catch (CameraAccessException e) {
+//        } catch (CameraAccessException |InterruptedException e) {
             e.printStackTrace();
         }
     }
@@ -268,9 +275,9 @@ public class Publish implements TextureView.SurfaceTextureListener {
         @Override
         public void onOpened( CameraDevice device) {
             LogUtils.i("onOpened");
-            mCameraOpenCloseLock.release();
+//            mCameraOpenCloseLock.release();
             cameraDevice = device;
-            //开启预览
+            //  开启预览
             startPreview();
             //  初始化画面大小调节
             initCharacteristics() ;
@@ -279,24 +286,27 @@ public class Publish implements TextureView.SurfaceTextureListener {
         @Override
         public void onDisconnected( CameraDevice device) {
             LogUtils.i("onDisconnected");
-            mCameraOpenCloseLock.release();
+            disconnect = true ;
+//            mCameraOpenCloseLock.release();
             device.close();
-            cameraDevice = null ;
-
 
         }
 
         @Override
         public void onError( CameraDevice device, int i) {
             LogUtils.i("onError");
-            mCameraOpenCloseLock.release();
+            disconnect = true ;
+//            mCameraOpenCloseLock.release();
             device.close();
             cameraDevice = null ;
         }
 
     };
 
+    public boolean disconnect = false ;
+
     private void startPreview() {
+        disconnect = false ;
         try {
             List<Surface> surfaces = new ArrayList<>();
             //预览数据输出
@@ -349,6 +359,7 @@ public class Publish implements TextureView.SurfaceTextureListener {
                 public void onConfigured( CameraCaptureSession session) {
                     Publish.this.session = session;
                     //  设置反复捕获数据的请求，这样预览界面就会一直有数据显示
+                    LogUtils.w("onConfigured--------------------------------");
                     try {
                         session.setRepeatingRequest(previewRequestBuilder.build(), null, camearHandler);
                     } catch (CameraAccessException e) {
@@ -413,8 +424,10 @@ public class Publish implements TextureView.SurfaceTextureListener {
             @Override
             public void run() {
                 //  帧率控制时间
+
                 frameHandler.postDelayed(this, 1000 / map.getFrameRate());
                 if (!frameRateControlQueue.isEmpty()) {
+                    LogUtils.d("!frameRateControlQueue.isEmpty()");
                     //耗时检测
                     long time = System.currentTimeMillis();
                     Image image = frameRateControlQueue.poll();
@@ -524,7 +537,7 @@ public class Publish implements TextureView.SurfaceTextureListener {
 
     private void releaseCamera() {
         try {
-            mCameraOpenCloseLock.acquire();
+//            mCameraOpenCloseLock.acquire();
 
             isCameraBegin = false;
             while (!frameRateControlQueue.isEmpty()) {
@@ -544,10 +557,10 @@ public class Publish implements TextureView.SurfaceTextureListener {
                 pictureImageReader.close();
                 pictureImageReader = null;
             }
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }finally {
-            mCameraOpenCloseLock.release();
+//            mCameraOpenCloseLock.release();
         }
     }
 
@@ -578,12 +591,16 @@ public class Publish implements TextureView.SurfaceTextureListener {
 
     //  旋转
     public void rotate() {
+        map.setRotate(!map.isRotate());
+        rotate(true);
+        Rotate3dAnimation.rotate3dDegrees180(map.getPublishView(), 700, 500, Rotate3dAnimation.ROTATE_Y_AXIS);
+    }
+    public void rotate(boolean isRotate) {
         if (isCameraBegin) {
             releaseCamera();
-            map.setRotate(!map.isRotate());
             initCamera();
             openCamera();
-            Rotate3dAnimation.rotate3dDegrees180(map.getPublishView(), 700, 500, Rotate3dAnimation.ROTATE_Y_AXIS);
+
         }
     }
 
