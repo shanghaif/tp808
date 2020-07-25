@@ -401,7 +401,6 @@ public class Publish implements TextureView.SurfaceTextureListener {
         previewImageReader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener() {
             @Override
             public void onImageAvailable(ImageReader reader) {
-                Log.d("cjh", "onImageAvailable-----") ;
                 if (isCameraBegin) {
                     if (frameRateControlQueue.size() >= (frameMax - 1)) {
                         //超出限制丢弃

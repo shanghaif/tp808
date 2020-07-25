@@ -12,7 +12,7 @@ import cn.com.erayton.usagreement.BuildConfig;
 public class LogUtils {
     //  0. logFormat, 1. className, 2. lineNumber, 3. methodName, 4. log
     private static String logFormat = "%2$s %3$d ====== %1$s:%4$s" ;
-//    private static String logFormat = "%s%d================%s:%s" ;
+//    private static String log Format = "%s%d================%s:%s" ;
     private static String className;    //  类名
     private static String methodName;   //  方法名
     private static int lineNumber;      //  行数

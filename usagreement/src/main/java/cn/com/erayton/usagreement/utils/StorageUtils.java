@@ -241,12 +241,34 @@ public class StorageUtils {
     }
 
     public static void reflashMedia(Context context){
-        MediaScannerConnection.scanFile(context,
+        reflashMedia(context,StorageUtils.getTFCardList());
+    }
+
+    public static void reflashMedia(Context context, String[] TFCardList){
+        reflashMedia(context, TFCardList, new String[]{"video/*", "audio/*"});
+    }
+
+    public static void reflashMedia(Context context, String[] TFCardList, String[] typeList){
+        reflashMedia(context,
 //                        new String[]{"/storage/emulated", "/storage/74A2-A457"},
-                StorageUtils.getTFCardList(),
-                new String[]{"video/*", "audio/*"},
+                TFCardList,
+                typeList,
                 null
         );
+    }
+
+    public static void reflashMedia(Context context, String[] TFCardList, String[] typeList, MediaScannerConnection.OnScanCompletedListener callback){
+        MediaScannerConnection.scanFile(context,
+                TFCardList,
+                typeList,
+                callback
+        );
+        //        MediaScannerConnection.scanFile(context,
+//////                        new String[]{"/storage/emulated", "/storage/74A2-A457"},
+////                StorageUtils.getTFCardList(),
+////                new String[]{"video/*", "audio/*"},
+////                null
+////        );
     }
 
 
