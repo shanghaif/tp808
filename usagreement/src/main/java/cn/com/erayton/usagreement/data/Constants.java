@@ -413,7 +413,7 @@ public class Constants {
 //    public static boolean CAMERA = true ;
     public static boolean CAMERA = false ;
     //  音频推流码率
-    public static int VOICE_PUSH_RATE = 24 * SCALE ;
+    public static int VOICE_PUSH_RATE = 8 * SCALE ;
     //  音频采集码率
     public static int VOICE_SAMPLING_RATE = 64 * SCALE ;
 

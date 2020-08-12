@@ -6,7 +6,6 @@ import java.io.IOException;
 import cn.com.erayton.usagreement.model.decode.PacketData;
 import cn.com.erayton.usagreement.model.model.TerminalAVDataInfo;
 import cn.com.erayton.usagreement.utils.BitOperator;
-import cn.com.erayton.usagreement.utils.TimeUtils;
 
 public class TerminalAVDataMsg extends PacketData {
 

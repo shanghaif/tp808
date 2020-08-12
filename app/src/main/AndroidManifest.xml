@@ -13,7 +13,10 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
+    <uses-permission
+        android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"
         tools:ignore="ProtectedPermissions" />
     <uses-permission
         android:name="android.permission.UPDATE_DEVICE_STATS"
@@ -39,8 +42,7 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <!-- <activity android:name=".MainActivity"> -->
+        </activity> <!-- <activity android:name=".MainActivity"> -->
         <!-- <intent-filter> -->
         <!-- <action android:name="android.intent.action.MAIN" /> -->
         <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
@@ -53,23 +55,28 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="cn.com.erayton.testMp3.MainActivity">
-
-        </activity>
+        <activity android:name="cn.com.erayton.testMp3.MainActivity"></activity>
         <activity
             android:name=".video.video.Send"
             android:hardwareAccelerated="true"
             android:screenOrientation="portrait" />
-
         <activity android:name=".video.voice.VoiceReady" />
         <activity android:name=".video.voice.Voice" />
-        <activity android:name="cn.com.erayton.camera.LiveActivity" >
+        <activity android:name="cn.com.erayton.camera.LiveActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name="cn.com.erayton.floatwindow.FloatWindowMainActivity">
+            <intent-filter android:label="FloatWindow">
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <service android:name="cn.com.erayton.floatwindow.FloatWindowService" />
+
     </application>
 
 </manifest>

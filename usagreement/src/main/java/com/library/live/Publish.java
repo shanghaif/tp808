@@ -565,7 +565,8 @@ public class Publish implements TextureView.SurfaceTextureListener {
 
     public void startRecode() {
         if (voiceRecord == null){
-            voiceRecord = new VoiceRecord(map.getCollectionbitrate_vc(), map.getPublishbitrate_vc(), writeMp4, udpSend);
+//            voiceRecord = new VoiceRecord(map.getCollectionbitrate_vc(), map.getPublishbitrate_vc(), writeMp4, udpSend);
+            voiceRecord = new VoiceRecord(map.getCollectionbitrate_vc(), map.getPublishbitrate_vc(), writeMp4, tcpSend);
 
         }
         voiceRecord.start();
@@ -661,7 +662,8 @@ public class Publish implements TextureView.SurfaceTextureListener {
         vdEncoder.start();
         if (isVoice){
             if (voiceRecord == null){
-                voiceRecord = new VoiceRecord(map.getCollectionbitrate_vc(), map.getPublishbitrate_vc(), writeMp4, udpSend);
+//                voiceRecord = new VoiceRecord(map.getCollectionbitrate_vc(), map.getPublishbitrate_vc(), writeMp4, udpSend);
+                voiceRecord = new VoiceRecord(map.getCollectionbitrate_vc(), map.getPublishbitrate_vc(), writeMp4, tcpSend);
             }
             voiceRecord.start();
         }

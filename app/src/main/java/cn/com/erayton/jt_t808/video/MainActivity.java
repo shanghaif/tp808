@@ -328,7 +328,8 @@ public class MainActivity extends AppCompatActivity {
 //                .setCenterScaleType(true)
 //                .setScreenshotsMode(Publish.TAKEPHOTO)
 //                .build();
-        publish.initTcp(phone, ip, port, channelNum, false);
+//        publish.initTcp(phone, ip, port, channelNum, false);
+        publish.initTcp(phone, ip, port, channelNum, true);
         publish.start();
     }
 

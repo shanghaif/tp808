@@ -5,7 +5,7 @@ import android.media.AudioRecord;
 import android.media.MediaRecorder;
 
 import com.library.live.file.WriteMp4;
-import com.library.live.stream.UdpSend;
+import com.library.live.stream.TcpSend;
 import com.library.util.OtherUtil;
 import com.library.util.SingleThreadExecutor;
 
@@ -26,8 +26,8 @@ public class VoiceRecord {
     private SingleThreadExecutor singleThreadExecutor;
 
 //    public VoiceRecord(int collectionbitrate_vc, int publishbitrate_vc, WriteMp4 writeMp4) {
-    public VoiceRecord(int collectionbitrate_vc, int publishbitrate_vc, WriteMp4 writeMp4, UdpSend udpSend) {
-//    public VoiceRecord(TcpSend udpSend, int collectionbitrate_vc, int publishbitrate_vc, WriteMp4 writeMp4) {
+//    public VoiceRecord(int collectionbitrate_vc, int publishbitrate_vc, WriteMp4 writeMp4, UdpSend udpSend) {
+    public VoiceRecord( int collectionbitrate_vc, int publishbitrate_vc, WriteMp4 writeMp4, TcpSend udpSend) {
         recBufSize = AudioRecord.getMinBufferSize(
                 OtherUtil.samplerate,
                 AudioFormat.CHANNEL_IN_STEREO,
@@ -38,7 +38,7 @@ public class VoiceRecord {
                 AudioFormat.CHANNEL_IN_STEREO,
                 AudioFormat.ENCODING_PCM_16BIT,
                 recBufSize);
-        vencoder = new VCEncoder(publishbitrate_vc, recBufSize, udpSend);
+        vencoder = new VCEncoder(publishbitrate_vc, recBufSize);
 //        vencoder = new VCEncoder(publishbitrate_vc, recBufSize, udpSend);
         vencoder.setUdpSend(udpSend);
         recordEncoderVC = new RecordEncoderVC(collectionbitrate_vc, recBufSize, writeMp4);

@@ -42,15 +42,16 @@ public class TerminalAVDataInfo {
      * */
     public TerminalAVDataInfo(String devId, int packageNum, boolean ismPTV, int channelSignal,
                               int avType, int packageType, byte[] avData) {
-        this.ismPTV = ismPTV;
-        this.packageNum = packageNum;
-        this.devId = devId;
-        this.channelSignal = channelSignal;
-        this.time = TimeUtils.getTime() ;
-        this.avType = avType;
-        this.packageType = packageType;
-        this.length = avData.length;
-        this.avData = avData;
+        this(devId, packageNum, ismPTV, channelSignal, TimeUtils.getTime(), avType, packageType, avData) ;
+//        this.ismPTV = ismPTV;
+//        this.packageNum = packageNum;
+//        this.devId = devId;
+//        this.channelSignal = channelSignal;
+//        this.time = TimeUtils.getTime() ;
+//        this.avType = avType;
+//        this.packageType = packageType;
+//        this.length = avData.length;
+//        this.avData = avData;
     }
     public TerminalAVDataInfo(String devId, int packageNum, boolean ismPTV, int channelSignal,
                               long time, int avType, int packageType, byte[] avData) {

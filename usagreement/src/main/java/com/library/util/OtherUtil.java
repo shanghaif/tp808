@@ -29,6 +29,7 @@ public class OtherUtil {
     public static final int QueueNum = 300;
 
     public static final int waitTime = 0;
+//    public static final int samplerate = 8000;
     public static final int samplerate = 44100;
 
     public static byte setWeitht(double weitht) {

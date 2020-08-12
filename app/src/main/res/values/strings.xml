@@ -21,7 +21,6 @@
     <string name="appbar_scrolling_view_behavior" translatable="false">android.support.design.widget.AppBarLayout$ScrollingViewBehavior</string>
 
 
-
     <string name="swap">切换</string>
     <string name="start">开始</string>
     <string name="stop">停止</string>

@@ -22,12 +22,24 @@ public class SpeakRecord {
     private double decibel = 0;//平均振幅,用于计算分贝
 
     public SpeakRecord(int publishBitrate, SpeakSend speakSend, String dirpath) {
+//        recBufSize = AudioRecord.getMinBufferSize(
+//                OtherUtil.samplerate,
+//                AudioFormat.CHANNEL_IN_MONO,
+//                AudioFormat.ENCODING_PCM_16BIT);
+//
+//        audioRecord = new AudioRecord(
+//                MediaRecorder.AudioSource.VOICE_COMMUNICATION,  //  降噪配置
+//                OtherUtil.samplerate,
+//                AudioFormat.CHANNEL_IN_MONO,
+//                AudioFormat.ENCODING_PCM_16BIT,
+//                recBufSize);
+
         recBufSize = AudioRecord.getMinBufferSize(
                 OtherUtil.samplerate,
                 AudioFormat.CHANNEL_IN_STEREO,
                 AudioFormat.ENCODING_PCM_16BIT);
         audioRecord = new AudioRecord(
-                MediaRecorder.AudioSource.VOICE_COMMUNICATION,//降噪配置
+                MediaRecorder.AudioSource.VOICE_COMMUNICATION,  //  降噪配置
                 OtherUtil.samplerate,
                 AudioFormat.CHANNEL_IN_STEREO,
                 AudioFormat.ENCODING_PCM_16BIT,

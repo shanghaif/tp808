@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".video.video.SendReady">
+    >
+    <!--tools:context=".video.video.SendReady">-->
 
     <LinearLayout
         android:layout_width="match_parent"

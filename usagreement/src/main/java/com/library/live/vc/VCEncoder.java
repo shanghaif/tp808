@@ -4,7 +4,7 @@ import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
 
-import com.library.live.stream.UdpSend;
+import com.library.live.stream.TcpSend;
 import com.library.util.OtherUtil;
 import com.library.util.VoiceUtil;
 
@@ -18,13 +18,13 @@ import java.nio.ByteBuffer;
 public class VCEncoder {
     private final String AAC_MIME = MediaFormat.MIMETYPE_AUDIO_AAC;
     private MediaCodec mediaCodec;
-//    private TcpSend udpSend;
-    private UdpSend udpSend;
+    private TcpSend udpSend;
+//    private UdpSend udpSend;
 
-//    public VCEncoder(int bitrate, int recBufSize) {
-    public VCEncoder(int bitrate, int recBufSize, UdpSend udpSend) {
+    public VCEncoder(int bitrate, int recBufSize) {
+//    public VCEncoder(int bitrate, int recBufSize, UdpSend udpSend) {
 //    public VCEncoder(int bitrate, int recBufSize, TcpSend udpSend) {
-        this.udpSend = udpSend;
+//        this.udpSend = udpSend;
         try {
             mediaCodec = MediaCodec.createEncoderByType(AAC_MIME);
         } catch (IOException e) {
@@ -42,11 +42,20 @@ public class VCEncoder {
         mediaCodec.start();
     }
 
-    public UdpSend getUdpSend() {
+//    public UdpSend getUdpSend() {
+//        return udpSend;
+//    }
+//
+//    public void setUdpSend(UdpSend udpSend) {
+//        this.udpSend = udpSend;
+//    }
+
+
+    public TcpSend getUdpSend() {
         return udpSend;
     }
 
-    public void setUdpSend(UdpSend udpSend) {
+    public void setUdpSend(TcpSend udpSend) {
         this.udpSend = udpSend;
     }
 
@@ -77,8 +86,8 @@ public class VCEncoder {
                 byte[] outData = new byte[bufferInfo.size + 7];
                 VoiceUtil.addADTStoPacket(outData, bufferInfo.size + 7);
                 outputBuffer.get(outData, 7, bufferInfo.size);
-                //添加将要发送的音频数据
-//                udpSend.addVoice(outData);
+                //  添加将要发送的音频数据
+                udpSend.addVoice(outData);
 
                 mediaCodec.releaseOutputBuffer(outputBufferIndex, false);
                 outputBufferIndex = mediaCodec.dequeueOutputBuffer(bufferInfo, OtherUtil.waitTime);
