@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
 //    private String host2 = "60.13.227.76" ;
     private int port2 = 7000 ;
 //        private String phone ="23803560303" ;
-//    private String phone ="23803560297" ;
+//    private String phone ="23703930979" ;
     private String phone ="23803560285" ;
 //    private String phone ="23803560317" ;
 //        private String phone ="23803641388" ;

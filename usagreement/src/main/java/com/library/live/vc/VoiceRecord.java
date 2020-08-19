@@ -30,14 +30,27 @@ public class VoiceRecord {
     public VoiceRecord( int collectionbitrate_vc, int publishbitrate_vc, WriteMp4 writeMp4, TcpSend udpSend) {
         recBufSize = AudioRecord.getMinBufferSize(
                 OtherUtil.samplerate,
-                AudioFormat.CHANNEL_IN_STEREO,
+                //  单声道
+                AudioFormat.CHANNEL_IN_MONO,
                 AudioFormat.ENCODING_PCM_16BIT);
         audioRecord = new AudioRecord(
-                MediaRecorder.AudioSource.MIC,
+                MediaRecorder.AudioSource.VOICE_COMMUNICATION,
                 OtherUtil.samplerate,
-                AudioFormat.CHANNEL_IN_STEREO,
+                //  单声道
+                AudioFormat.CHANNEL_IN_MONO,
                 AudioFormat.ENCODING_PCM_16BIT,
                 recBufSize);
+
+//        recBufSize = AudioRecord.getMinBufferSize(
+//                OtherUtil.samplerate,
+//                AudioFormat.CHANNEL_IN_STEREO,
+//                AudioFormat.ENCODING_PCM_16BIT);
+//        audioRecord = new AudioRecord(
+//                MediaRecorder.AudioSource.MIC,
+//                OtherUtil.samplerate,
+//                AudioFormat.CHANNEL_IN_STEREO,
+//                AudioFormat.ENCODING_PCM_16BIT,
+//                recBufSize);
         vencoder = new VCEncoder(publishbitrate_vc, recBufSize);
 //        vencoder = new VCEncoder(publishbitrate_vc, recBufSize, udpSend);
         vencoder.setUdpSend(udpSend);

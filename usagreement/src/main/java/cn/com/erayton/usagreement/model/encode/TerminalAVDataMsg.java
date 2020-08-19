@@ -29,20 +29,31 @@ public class TerminalAVDataMsg extends PacketData {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         try {
+            //  帧头标识
             baos.write(terminalAVDataInfo.getLOGO());
+            //  4 V / P / X / CC    bit "10000001" radix:2
             baos.write(terminalAVDataInfo.getvPXCc());
+            //  音频 "00001000" radix:2
             baos.write(terminalAVDataInfo.isIsmPTV()?
                     terminalAVDataInfo.getmPtVideo(): terminalAVDataInfo.getmPtAudio());
-
+            //  6 包序号
             baos.write(BitOperator.getInstance().integerTo2Bytes(terminalAVDataInfo.getPackageNum()));
+            //  8 SIM 卡号
             baos.write(BitOperator.getInstance().string2Bcd(terminalAVDataInfo.getDevId()));
+            //  14 逻辑通道信号
             baos.write((byte)terminalAVDataInfo.getChannelSignal());
+            //  数据类型+分包处理
             baos.write(Byte.parseByte(terminalAVDataInfo.getAvHeader(), 2));
+            //  时间戳
             baos.write(BitOperator.getInstance().toDDbyte(terminalAVDataInfo.getTime(), 8));
+
             if (terminalAVDataInfo.isIsmPTV()){
+                //  视频， 无24，26
                 baos.write(terminalAVDataInfo.getFRAMETIMES());
             }
+            //  数据体长度
             baos.write(BitOperator.getInstance().toDDbyte(terminalAVDataInfo.getLength(), 2));
+            //  数据体
             baos.write(terminalAVDataInfo.getAvData());
 
 

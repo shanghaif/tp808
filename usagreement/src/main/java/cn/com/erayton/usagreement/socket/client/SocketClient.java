@@ -101,7 +101,18 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
 
         /** 平台下发远程录像回放请求
          *
-         * @param msg
+//         * @param msg
+         * @param host
+         * @param tPort
+         * @param uPort
+         * @param channel
+         * @param sourceType
+         * @param streamType
+         * @param memoryType
+         * @param playbackMode
+         * @param multiple
+         * @param startTime
+         * @param endTime
          */
 //        void onAVReplayReq(ServerVideoReplayMsg msg) ;
         void onAVReplayReq(String host, int tPort, int uPort, int channel, int sourceType,
@@ -522,10 +533,11 @@ public class SocketClient implements TCPClient.TCPClientListener, UDPClient.UDPC
                 }
                 continue;
             } else{
-                if ((tcpLastHbDt + getHBInterval() * 1000) <= curDt) {
-                    //  有信息发送的情况下不再发送心跳
+//                if ((tcpLastHbDt + getHBInterval() * 1000) <= curDt) {
+//                    //  有信息发送的情况下不再发送心跳
+//                    SocketClientSender.sendHB(false, false);
+//                }
                     SocketClientSender.sendHB(false, false);
-                }
             }
 
             try {

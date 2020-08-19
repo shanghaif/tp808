@@ -134,7 +134,7 @@ public class TcpSend implements Runnable {
      * @param isIFrame 是否为关键帧
      */
     public void writeVideo(byte[] video, int isIFrame) {
-        LogUtils.d("phone:" + phone);
+//        LogUtils.d("phone:" + phone);
         //当前截取位置
         int nowPosition = 0;
         //  是否首次进入
@@ -189,23 +189,30 @@ public class TcpSend implements Runnable {
      */
     public void writeVoice(byte[] voice) {
 
-        LogUtils.d("cjhvc","writeVoice:"+voice.length);
-        buffvoice.put(voice) ;
-        voiceSendNum ++ ;
+//        LogUtils.d("cjhvc","writeVoice:"+voice.length);
+//        buffvoice.put(voice) ;
+//        voiceSendNum ++ ;
+//
+//        if (voiceSendNum == 6) {
+//            voiceSendNum = 0 ;
+//            terminalACDataInfo = new TerminalAVDataInfo(phone, voiceNum++,
+//                    false, channelNum, 11, 0, Arrays.copyOfRange(buffvoice.array(), 0, buffvoice.position()));
+//
+////            LogUtils.d("cjhvc","writeVoice, position1:"+buffvoice.position());
+//            buffvoice.clear();
+//            terminalACDataMsg.setTerminalAVDataInfo(terminalACDataInfo) ;
+//            //  UPD发送
+//            addbytes(terminalACDataMsg.packageDataBody2Byte());
+//        }
 
-        if (voiceSendNum == 5) {
-            voiceSendNum = 0 ;
-            terminalACDataInfo = new TerminalAVDataInfo(phone, voiceNum++,
-                    false, channelNum, 11, 0, Arrays.copyOfRange(buffvoice.array(), 0, buffvoice.position()));
+        //  来一个数据发送一包
 
+        terminalACDataInfo = new TerminalAVDataInfo(phone, voiceNum++,
+                false, channelNum, 11, 0, voice);
+        terminalACDataMsg.setTerminalAVDataInfo(terminalACDataInfo) ;
+        //  UPD发送
+        addbytes(terminalACDataMsg.packageDataBody2Byte());
 
-            LogUtils.d("cjhvc","writeVoice, position1:"+buffvoice.position());
-            buffvoice.clear();
-//            buffvoice.put(terminalACDataMsg.packageDataBody2Byte());    // 数据
-            terminalACDataMsg.setTerminalAVDataInfo(terminalACDataInfo) ;
-            //  UPD发送
-            addbytes(terminalACDataMsg.packageDataBody2Byte());
-        }
 
 //        LogUtils.d("cjhvc","writeVoice:"+voice.length);
 //        TerminalAVDataInfo terminalAVDataInfo;

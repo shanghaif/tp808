@@ -30,7 +30,8 @@ public class VCDecoder implements VoiceCallback {
             mDecoder = MediaCodec.createDecoderByType(AAC_MIME);
             MediaFormat mediaFormat = new MediaFormat();
             mediaFormat.setString(MediaFormat.KEY_MIME, AAC_MIME);
-            mediaFormat.setInteger(MediaFormat.KEY_CHANNEL_COUNT, 2);
+            mediaFormat.setInteger(MediaFormat.KEY_CHANNEL_COUNT, 1);
+//            mediaFormat.setInteger(MediaFormat.KEY_CHANNEL_COUNT, 2);
             mediaFormat.setInteger(MediaFormat.KEY_SAMPLE_RATE, OtherUtil.samplerate);
             mediaFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC);
             //用来标记AAC是否有adts头，1->有
