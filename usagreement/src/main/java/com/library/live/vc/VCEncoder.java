@@ -6,8 +6,10 @@ import android.media.MediaFormat;
 
 import com.library.live.stream.TcpSend;
 import com.library.util.OtherUtil;
+import com.library.util.VoiceUtil;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 /**
  * Created by android1 on 2017/9/22.
@@ -74,34 +76,41 @@ public class VCEncoder {
      */
     public void encode(byte[] result, int length) {
 
-//        try {
-//            inputBufferIndex = mediaCodec.dequeueInputBuffer(OtherUtil.waitTime);
-//            if (inputBufferIndex >= 0) {
-//                ByteBuffer inputBuffer = mediaCodec.getInputBuffer(inputBufferIndex);
-//                inputBuffer.clear();
-//                inputBuffer.put(result, 0, length);
-//                mediaCodec.queueInputBuffer(inputBufferIndex, 0, length, OtherUtil.getFPS(), 0);
-//            }
+//        byte[] bytes = AudioUtils.pcmToG726(result) ;
+//        if (bytes != null){
+//            LogUtils.d("cjhencode", "length:"+bytes.length);
+//        }else {
 //
-//            outputBufferIndex = mediaCodec.dequeueOutputBuffer(bufferInfo, OtherUtil.waitTime);
-//
-//            while (outputBufferIndex >= 0) {
-//                ByteBuffer outputBuffer = mediaCodec.getOutputBuffer(outputBufferIndex);
-//                outputBuffer.position(bufferInfo.offset);
-//                outputBuffer.limit(bufferInfo.offset + bufferInfo.size);
-//
-//                byte[] outData = new byte[bufferInfo.size + 7];
-//                VoiceUtil.addADTStoPacket(outData, bufferInfo.size + 7);
-//                outputBuffer.get(outData, 7, bufferInfo.size);
-////                //  添加将要发送的音频数据
-////                udpSend.addVoice(outData);
-//
-//                mediaCodec.releaseOutputBuffer(outputBufferIndex, false);
-//                outputBufferIndex = mediaCodec.dequeueOutputBuffer(bufferInfo, OtherUtil.waitTime);
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
+//            LogUtils.d("cjhencode", "bytes is null:");
 //        }
+        try {
+            inputBufferIndex = mediaCodec.dequeueInputBuffer(OtherUtil.waitTime);
+            if (inputBufferIndex >= 0) {
+                ByteBuffer inputBuffer = mediaCodec.getInputBuffer(inputBufferIndex);
+                inputBuffer.clear();
+                inputBuffer.put(result, 0, length);
+                mediaCodec.queueInputBuffer(inputBufferIndex, 0, length, OtherUtil.getFPS(), 0);
+            }
+
+            outputBufferIndex = mediaCodec.dequeueOutputBuffer(bufferInfo, OtherUtil.waitTime);
+
+            while (outputBufferIndex >= 0) {
+                ByteBuffer outputBuffer = mediaCodec.getOutputBuffer(outputBufferIndex);
+                outputBuffer.position(bufferInfo.offset);
+                outputBuffer.limit(bufferInfo.offset + bufferInfo.size);
+
+                byte[] outData = new byte[bufferInfo.size + 7];
+                VoiceUtil.addADTStoPacket(outData, bufferInfo.size + 7);
+                outputBuffer.get(outData, 7, bufferInfo.size);
+//                //  添加将要发送的音频数据
+//                udpSend.addVoice(outData);
+
+                mediaCodec.releaseOutputBuffer(outputBufferIndex, false);
+                outputBufferIndex = mediaCodec.dequeueOutputBuffer(bufferInfo, OtherUtil.waitTime);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
 
     }

@@ -56,12 +56,18 @@ android {
 
     makeJar.dependsOn(build)
 
-    sourceSets {
-        main {
-            jniLibs.srcDirs 'libs'
-//            jniLibs.srcDirs = ['libs']
-        }
-    }
+//    sourceSets {
+//        main {
+//            jniLibs.srcDirs 'libs'
+////            jniLibs.srcDirs = ['libs']
+//        }
+//    }
+
+//    externalNativeBuild {
+//        cmake {
+//            path file('CMakeLists.txt')
+//        }
+//    }
 
 }
 //configurations.all{

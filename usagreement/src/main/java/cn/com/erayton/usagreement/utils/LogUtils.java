@@ -2,8 +2,6 @@ package cn.com.erayton.usagreement.utils;
 
 import android.util.Log;
 
-import cn.com.erayton.usagreement.BuildConfig;
-
 /**
  *
  * 日志封装
@@ -21,13 +19,13 @@ public class LogUtils {
      * 判断是否可以调试
      * @return
      */
-    public static boolean isDebuggable() {
-        return BuildConfig.DEBUG;
-    }
-
 //    public static boolean isDebuggable() {
-//        return false;
+//        return BuildConfig.DEBUG;
 //    }
+
+    public static boolean isDebuggable() {
+        return false;
+    }
 
 
     private static String createLog(String log) {
